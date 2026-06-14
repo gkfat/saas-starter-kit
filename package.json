@@ -1,0 +1,38 @@
+{
+  "name": "saas-starter-kit",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=9"
+  },
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@mdi/font": "^7.4.47",
+    "firebase": "^11.0.0",
+    "firebase-admin": "^13.0.0",
+    "nuxt": "~3.16.0",
+    "uuid": "^11.0.3",
+    "vuetify": "^3.8.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@nuxt/eslint": "^0.7.0",
+    "@types/uuid": "^10.0.0",
+    "eslint": "^9.0.0",
+    "eslint-config-prettier": "^9.0.0",
+    "prettier": "^3.0.0",
+    "sass": "^1.83.4",
+    "typescript": "^5.7.2"
+  },
+  "packageManager": "pnpm@9.15.2+sha512.93e57b0126f0df74ce6bff29680394c0ba54ec47246b9cf321f0121d8d9bb03f750a705f24edc3c1180853afd7c2c3b94196d0a3d53d3e069d9e2793ef11f321"
+}
