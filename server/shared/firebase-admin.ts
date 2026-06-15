@@ -2,29 +2,28 @@ import { type App, cert, getApps, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 
-let _app: App | null = null;
+function createAdminApp(): App {
+  const config = useRuntimeConfig();
+  const projectId = config.firebaseProjectId as string;
+  const clientEmail = config.firebaseClientEmail as string;
+  const privateKey = config.firebasePrivateKey as string;
 
-function getAdminApp(): App {
-  if (_app) return _app;
-
-  const existing = getApps();
-  if (existing.length > 0) {
-    _app = existing[0];
-    return _app;
+  if (!projectId || !clientEmail || !privateKey) {
+    throw new Error(
+      'Missing Firebase Admin SDK env vars: FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY are all required.',
+    );
   }
 
-  const config = useRuntimeConfig();
-
-  _app = initializeApp({
+  return initializeApp({
     credential: cert({
-      projectId: config.firebaseProjectId as string,
-      clientEmail: config.firebaseClientEmail as string,
-      privateKey: (config.firebasePrivateKey as string)?.replace(/\\n/g, '\n'),
+      projectId,
+      clientEmail,
+      privateKey: privateKey.replace(/\\n/g, '\n'),
     }),
   });
-
-  return _app;
 }
+
+const getAdminApp = createFirebaseSingleton(getApps, createAdminApp);
 
 export const adminAuth = () => getAuth(getAdminApp());
 export const adminDb = () => getFirestore(getAdminApp());

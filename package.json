@@ -17,21 +17,28 @@
     "format": "prettier --write .",
     "prepare": "husky"
   },
+  "lint-staged": {
+    "*.{ts,vue,mjs}": [
+      "eslint --fix"
+    ],
+    "*.{ts,vue,mjs,json,md,css,scss}": [
+      "prettier --write"
+    ]
+  },
   "dependencies": {
     "@mdi/font": "^7.4.47",
     "firebase": "^11.0.0",
     "firebase-admin": "^13.0.0",
     "nuxt": "~3.16.0",
-    "uuid": "^11.0.3",
     "vuetify": "^3.8.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
     "@nuxt/eslint": "^0.7.0",
-    "@types/uuid": "^10.0.0",
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.0.0",
     "husky": "^9.1.7",
+    "lint-staged": "^17.0.7",
     "prettier": "^3.0.0",
     "sass": "^1.83.4",
     "typescript": "^5.7.2"
