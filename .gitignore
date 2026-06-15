@@ -8,6 +8,10 @@ dist/
 .env.*
 !.env.example
 
+# Firebase
+*service_account*.json
+*serviceAccount*.json
+
 # Dependencies
 node_modules/
 
