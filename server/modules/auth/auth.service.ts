@@ -1,6 +1,7 @@
 import { createError } from 'h3';
 import { adminAuth } from '../../shared/firebase-admin';
 import { recordLoginLog } from '../logs';
+import { saveUser } from '../users';
 import type { AuthUser, LoginProvider } from './auth.types';
 
 type ProcessLoginParams = {
@@ -31,17 +32,24 @@ export async function processLogin(params: ProcessLoginParams): Promise<AuthUser
     throw createError({ statusCode: 401, message: 'Invalid ID token' });
   }
 
-  await recordLoginLog(user.tenantId, {
-    severity: 'INFO',
-    timestamp: new Date().toISOString(),
-    requestId,
-    actor: { userId: user.uid, tenantId: user.tenantId, role: user.role },
-    metadata,
-    provider,
-    ip,
-    result: 'success',
-    email: user.email ?? undefined,
-  });
+  await Promise.all([
+    recordLoginLog(user.tenantId, {
+      severity: 'INFO',
+      timestamp: new Date().toISOString(),
+      requestId,
+      actor: { userId: user.uid, tenantId: user.tenantId, role: user.role },
+      metadata,
+      provider,
+      ip,
+      result: 'success',
+      email: user.email ?? undefined,
+    }),
+    saveUser(user.tenantId, {
+      uid: user.uid,
+      email: user.email,
+      displayName: user.displayName,
+    }),
+  ]);
 
   return user;
 }
@@ -56,6 +64,7 @@ export async function verifyIdToken(idToken: string): Promise<AuthUser> {
   return {
     uid: decoded.uid,
     email: decoded.email ?? null,
+    displayName: (decoded['name'] as string | undefined) ?? null,
     tenantId,
     role,
     permissions,

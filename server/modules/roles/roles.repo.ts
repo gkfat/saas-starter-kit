@@ -1,5 +1,14 @@
 import { adminDb } from '../../shared/firebase-admin';
-import { RolePermissionSchema, UserRoleSchema } from './roles.schema';
+import { PermissionSchema, RolePermissionSchema, RoleSchema, UserRoleSchema } from './roles.schema';
+import type { Permission, Role } from './roles.types';
+
+function rolesCollection(tenantId: string) {
+  return adminDb().collection(`tenants/${tenantId}/roles`);
+}
+
+function permissionsCollection(tenantId: string) {
+  return adminDb().collection(`tenants/${tenantId}/permissions`);
+}
 
 function rolePermissionsRef(tenantId: string, roleName: string) {
   return adminDb().doc(`tenants/${tenantId}/role_permissions/${roleName}`);
@@ -54,4 +63,24 @@ export async function upsertUserRole(
   role: string,
 ): Promise<void> {
   await userRolesRef(tenantId, userId).set({ role });
+}
+
+export async function listRoles(tenantId: string): Promise<Role[]> {
+  const snapshot = await rolesCollection(tenantId).get();
+  return snapshot.docs.map((doc) => RoleSchema.parse(doc.data()));
+}
+
+export async function listPermissions(tenantId: string): Promise<Permission[]> {
+  const snapshot = await permissionsCollection(tenantId).get();
+  return snapshot.docs.map((doc) => PermissionSchema.parse(doc.data()));
+}
+
+export async function listAllRolePermissions(tenantId: string): Promise<Record<string, string[]>> {
+  const snapshot = await adminDb().collection(`tenants/${tenantId}/role_permissions`).get();
+  const result: Record<string, string[]> = {};
+  for (const doc of snapshot.docs) {
+    const parsed = RolePermissionSchema.parse(doc.data());
+    result[doc.id] = parsed.permissions;
+  }
+  return result;
 }

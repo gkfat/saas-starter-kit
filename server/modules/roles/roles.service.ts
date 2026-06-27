@@ -3,9 +3,13 @@ import {
   getRolePermissions,
   getUserRole,
   getUsersByRole,
+  listAllRolePermissions,
+  listPermissions,
+  listRoles,
   upsertRolePermissions,
   upsertUserRole,
 } from './roles.repo';
+import type { Permission, Role } from './roles.types';
 import { UserRoleSchema } from './roles.schema';
 
 export async function getPermissionsForRole(tenantId: string, roleName: string): Promise<string[]> {
@@ -72,4 +76,16 @@ export async function assignUserRole(
 
 export async function getRoleForUser(tenantId: string, userId: string): Promise<string | null> {
   return getUserRole(tenantId, userId);
+}
+
+export async function getAllRoles(tenantId: string): Promise<Role[]> {
+  return listRoles(tenantId);
+}
+
+export async function getAllPermissions(tenantId: string): Promise<Permission[]> {
+  return listPermissions(tenantId);
+}
+
+export async function getAllRolePermissions(tenantId: string): Promise<Record<string, string[]>> {
+  return listAllRolePermissions(tenantId);
 }
