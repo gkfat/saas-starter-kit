@@ -26,6 +26,7 @@ export default defineEventHandler(async (event) => {
     event.context.tenantId = user.tenantId;
     event.context.role = user.role;
     event.context.permissions = user.permissions;
+    if (user.phone) event.context.phone = user.phone;
   } catch {
     throw createError({ statusCode: 401, message: 'Invalid or expired token' });
   }

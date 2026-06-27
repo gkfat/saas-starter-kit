@@ -35,11 +35,6 @@
             <v-icon start>mdi-google</v-icon>
             透過 Google 登入
           </v-btn>
-
-          <v-btn block variant="outlined" :disabled="loading" @click="navigateTo('/otp')">
-            <v-icon start>mdi-phone</v-icon>
-            手機 OTP 登入
-          </v-btn>
         </v-card>
       </v-col>
     </v-row>

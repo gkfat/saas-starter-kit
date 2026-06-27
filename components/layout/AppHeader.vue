@@ -18,7 +18,7 @@ async function handleLogout() {
   loading.value = true;
   try {
     await logout();
-    router.push('/login');
+    router.push('/auth/login');
   } finally {
     loading.value = false;
   }

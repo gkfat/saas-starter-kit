@@ -3,6 +3,8 @@ import { defineStore } from 'pinia';
 type AuthUser = {
   uid: string;
   email: string | null;
+  displayName: string | null;
+  phone: string | null;
   tenantId: string;
   role: string;
   permissions: string[];
@@ -37,6 +39,10 @@ export const useAuthStore = defineStore('auth', {
 
     setReady() {
       this.isReady = true;
+    },
+
+    updateIdToken(idToken: string) {
+      this.idToken = idToken;
     },
 
     clearSession() {

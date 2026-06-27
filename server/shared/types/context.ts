@@ -4,7 +4,8 @@ export type RequestContext = {
   tenantId?: string;
   role?: string;
   permissions?: string[];
+  phone?: string;
 };
 
 // Narrowed type available after auth middleware has run
-export type AuthenticatedContext = Required<RequestContext>;
+export type AuthenticatedContext = Required<Omit<RequestContext, 'phone'>> & { phone?: string };

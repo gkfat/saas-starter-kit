@@ -17,6 +17,8 @@ export default defineNuxtPlugin(() => {
             {
               uid: firebaseUser.uid,
               email: firebaseUser.email ?? null,
+              displayName: firebaseUser.displayName ?? null,
+              phone: firebaseUser.phoneNumber ?? null,
               tenantId: (claims['tenantId'] as string) ?? 'default',
               role: (claims['role'] as string) ?? 'member',
               permissions: (claims['permissions'] as string[]) ?? [],

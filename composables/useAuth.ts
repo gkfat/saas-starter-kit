@@ -2,8 +2,8 @@ import {
   GoogleAuthProvider,
   RecaptchaVerifier,
   getAuth,
+  linkWithPhoneNumber,
   signInWithEmailAndPassword,
-  signInWithPhoneNumber,
   signInWithPopup,
   signOut,
   type ConfirmationResult,
@@ -35,27 +35,41 @@ export function useAuth() {
     await store.setSession(idToken, 'google');
   }
 
-  async function sendPhoneOtp(
+  async function sendPhoneLinkOtp(
     phone: string,
     recaptchaContainerId: string,
   ): Promise<ConfirmationResult> {
     const auth = getFirebaseAuth();
+    const currentUser = auth.currentUser;
+    if (!currentUser) throw new Error('Must be logged in to link phone');
+
     if (recaptchaVerifier) {
       recaptchaVerifier.clear();
       recaptchaVerifier = null;
     }
     recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainerId, { size: 'invisible' });
-    return signInWithPhoneNumber(auth, phone, recaptchaVerifier);
+    return linkWithPhoneNumber(currentUser, phone, recaptchaVerifier);
   }
 
-  async function verifyPhoneOtp(
+  async function confirmPhoneLinkOtp(
     confirmationResult: ConfirmationResult,
     otp: string,
-    phone: string,
-  ) {
-    const credential = await confirmationResult.confirm(otp);
-    const idToken = await credential.user.getIdToken();
-    await store.setSession(idToken, 'phone', phone);
+  ): Promise<void> {
+    const auth = getFirebaseAuth();
+    await confirmationResult.confirm(otp);
+
+    const currentUser = auth.currentUser;
+    if (!currentUser) return;
+
+    // Force refresh so idToken includes phone_number claim
+    const freshToken = await currentUser.getIdToken(true);
+    store.updateIdToken(freshToken);
+
+    // Persist phone to Firestore user doc
+    await $fetch('/api/profile/phone', {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${freshToken}` },
+    });
   }
 
   async function logout() {
@@ -75,5 +89,5 @@ export function useAuth() {
     }
   }
 
-  return { loginWithEmail, loginWithGoogle, sendPhoneOtp, verifyPhoneOtp, logout };
+  return { loginWithEmail, loginWithGoogle, sendPhoneLinkOtp, confirmPhoneLinkOtp, logout };
 }

@@ -1,6 +1,6 @@
 import { useAuthStore } from '~/stores/auth';
 
-const PUBLIC_ROUTES = new Set(['/login', '/otp']);
+const PUBLIC_ROUTES = new Set(['/auth/login']);
 
 export default defineNuxtRouteMiddleware((to) => {
   const auth = useAuthStore();
@@ -13,6 +13,6 @@ export default defineNuxtRouteMiddleware((to) => {
   }
 
   if (!auth.isLoggedIn) {
-    return navigateTo('/login');
+    return navigateTo('/auth/login');
   }
 });

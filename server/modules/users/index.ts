@@ -1,2 +1,2 @@
-export { saveUser, getAllUsers } from './users.service';
+export { saveUser, syncUserPhone, getAllUsers } from './users.service';
 export type { User } from './users.types';

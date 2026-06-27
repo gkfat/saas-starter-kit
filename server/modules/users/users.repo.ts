@@ -11,25 +11,33 @@ function usersCollection(tenantId: string) {
 
 export async function upsertUser(
   tenantId: string,
-  data: { uid: string; email: string | null; displayName: string | null },
+  data: { uid: string; email: string | null; displayName: string | null; phone: string | null },
 ): Promise<void> {
   const ref = userRef(tenantId, data.uid);
   const doc = await ref.get();
 
+  const mutableFields: Record<string, string> = {
+    email: data.email ?? '',
+    displayName: data.displayName ?? '',
+  };
+  if (data.phone) {
+    mutableFields.phone = data.phone;
+  }
+
   if (!doc.exists) {
     await ref.set({
       uid: data.uid,
-      email: data.email ?? '',
-      displayName: data.displayName ?? '',
       tenantId,
       createdAt: new Date().toISOString(),
+      ...mutableFields,
     });
   } else {
-    await ref.update({
-      email: data.email ?? '',
-      displayName: data.displayName ?? '',
-    });
+    await ref.update(mutableFields);
   }
+}
+
+export async function updateUserPhone(tenantId: string, uid: string, phone: string): Promise<void> {
+  await userRef(tenantId, uid).update({ phone });
 }
 
 export async function listUsers(tenantId: string): Promise<User[]> {

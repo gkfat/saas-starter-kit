@@ -48,6 +48,7 @@ export async function processLogin(params: ProcessLoginParams): Promise<AuthUser
       uid: user.uid,
       email: user.email,
       displayName: user.displayName,
+      phone: user.phone,
     }),
   ]);
 
@@ -65,6 +66,7 @@ export async function verifyIdToken(idToken: string): Promise<AuthUser> {
     uid: decoded.uid,
     email: decoded.email ?? null,
     displayName: (decoded['name'] as string | undefined) ?? null,
+    phone: (decoded['phone_number'] as string | undefined) ?? null,
     tenantId,
     role,
     permissions,
