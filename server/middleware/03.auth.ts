@@ -5,6 +5,10 @@ const PUBLIC_PATHS = new Set(['/api/auth/login', '/api/auth/otp/verify']);
 export default defineEventHandler(async (event) => {
   const url = (event.node.req.url ?? '').split('?')[0];
 
+  if (!url.startsWith('/api/')) {
+    return;
+  }
+
   if (PUBLIC_PATHS.has(url)) {
     return;
   }

@@ -8,7 +8,7 @@ export default defineNuxtRouteMiddleware((to) => {
   if (!auth.isReady) return;
 
   if (PUBLIC_ROUTES.has(to.path)) {
-    if (auth.isLoggedIn) return navigateTo('/');
+    if (auth.isLoggedIn) return navigateTo('/dashboard');
     return;
   }
 
