@@ -1,6 +1,7 @@
 import { type App, cert, getApps, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
+import { createFirebaseSingleton } from '../utils/firebase-singleton';
 
 function createAdminApp(): App {
   const config = useRuntimeConfig();
