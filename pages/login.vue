@@ -47,6 +47,8 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({ layout: 'blank' });
+
 const { loginWithEmail, loginWithGoogle } = useAuth();
 const router = useRouter();
 
@@ -60,7 +62,7 @@ async function handleEmailLogin() {
   loading.value = true;
   try {
     await loginWithEmail(email.value, password.value);
-    router.push('/');
+    router.push('/dashboard');
   } catch (e: unknown) {
     error.value = e instanceof Error ? e.message : '登入失敗';
   } finally {
@@ -73,7 +75,7 @@ async function handleGoogleLogin() {
   loading.value = true;
   try {
     await loginWithGoogle();
-    router.push('/');
+    router.push('/dashboard');
   } catch (e: unknown) {
     error.value = e instanceof Error ? e.message : '登入失敗';
   } finally {

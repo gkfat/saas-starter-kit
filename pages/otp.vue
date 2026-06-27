@@ -51,6 +51,8 @@
 <script setup lang="ts">
 import type { ConfirmationResult } from 'firebase/auth';
 
+definePageMeta({ layout: 'blank' });
+
 const { sendPhoneOtp, verifyPhoneOtp } = useAuth();
 const router = useRouter();
 
@@ -78,7 +80,7 @@ async function handleVerifyOtp() {
   loading.value = true;
   try {
     await verifyPhoneOtp(confirmationResult.value, otp.value, phone.value);
-    router.push('/');
+    router.push('/dashboard');
   } catch (e: unknown) {
     error.value = e instanceof Error ? e.message : '驗證失敗';
   } finally {
