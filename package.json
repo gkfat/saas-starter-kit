@@ -27,9 +27,11 @@
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
+    "@pinia/nuxt": "^0.11.3",
     "firebase": "^11.0.0",
     "firebase-admin": "^13.0.0",
     "nuxt": "~3.16.0",
+    "pinia": "^3.0.4",
     "vuetify": "^3.8.0",
     "zod": "^3.24.1"
   },
