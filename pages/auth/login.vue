@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ layout: 'blank' });
+definePageMeta({ layout: 'blank', path: '/login' });
 
 const { loginWithEmail, loginWithGoogle } = useAuth();
 const router = useRouter();
