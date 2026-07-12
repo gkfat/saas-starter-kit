@@ -1,0 +1,53 @@
+schema: spec-driven
+
+context: |
+  Project: SaaS Starter Kit — 展示用全端應用，涵蓋 Auth、RBAC、Logging、Admin Dashboard。
+
+  Tech stack:
+    - Framework: Nuxt 3, SPA mode (ssr: false), no SSR hydration concerns
+    - UI: Vuetify
+    - Backend: Nuxt Server API
+    - Auth: Firebase Auth (Email/Password, Google, Phone OTP)
+    - Database: Firestore (multi-tenant, all paths prefixed tenants/{tenantId}/)
+    - Firebase Server SDK: Firebase Admin SDK (Node.js, service account)
+    - Firebase Client SDK: Firebase Client SDK (browser only)
+    - Runtime: Node.js 22, pnpm 9
+
+  Request flow:
+    pages/ → middleware/auth.global.ts (client route guard)
+    api/   → server/middleware/ (tracing → logging → auth → rbac) → modules/*/service → modules/*/repo → Firestore
+
+  Server layer rules:
+    - api/ handlers are thin: parse body → call service → return response
+    - modules/*/service.ts owns business logic, never calls Firestore directly
+    - modules/*/repo.ts owns all Firestore operations, no business logic
+    - shared/ has zero dependency on any module (pure infra)
+    - Modules expose public API only through index.ts; cross-module imports must go through index.ts
+
+  Auth flow:
+    1. Browser: Firebase Client SDK handles sign-in (composables/useAuth.ts)
+    2. Browser gets idToken → POSTs to /api/auth/login
+    3. Server: auth.service.verifyIdToken() validates token via Admin SDK
+    4. Server injects userId, tenantId, role, permissions into event.context (RequestContext)
+
+  RBAC:
+    - Superadmin: Firebase Auth custom claims { role: 'superadmin' }, bypasses Firestore lookup
+    - Admin / Member: role stored in Firestore user_roles, permissions in role_permissions
+    - Permission format: resource:action (e.g. users:read, users:write, admin:access)
+
+  RequestContext type:
+    { requestId: string; userId?: string; tenantId?: string; role?: string; permissions?: string[] }
+
+  Logging strategy:
+    - audit_logs: Firestore (data change records, base_log + diff)
+    - login_logs: Firestore (login events, base_log + ip/provider/result)
+    - API logs: console.log GCP Structured Logging format (not stored in Firestore)
+    - All Firestore log writes go through modules/logs/ only
+
+  Implementation status:
+    - Phase 1 (infra): done
+    - Phase 2 (auth): done
+    - Phase 3 (RBAC): done
+    - Phase 4 (users module): done, audit_logs write pending
+    - Phase 5 (logging module): not started
+    - Phase 6 (admin dashboard): not started
