@@ -24,8 +24,6 @@ export default defineNuxtConfig({
     firebaseProjectId: process.env.FIREBASE_PROJECT_ID,
     firebaseClientEmail: process.env.FIREBASE_CLIENT_EMAIL,
     firebasePrivateKey: process.env.FIREBASE_PRIVATE_KEY,
-    superadminEmail: process.env.SUPERADMIN_EMAIL,
-    superadminUid: process.env.SUPERADMIN_UID,
     public: {
       firebaseApiKey: process.env.VITE_FIREBASE_API_KEY,
       firebaseAuthDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,

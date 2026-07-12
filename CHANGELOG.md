@@ -4,6 +4,8 @@
 
 ### Added
 
+- 新增 `scripts/seed-superadmin.ts`：透過 Firebase Admin SDK 建立 superadmin 帳號（email + password + custom claims `{ role: 'superadmin' }`），具備冪等保護，不寫入 Firestore
+- 新增 `pnpm seed:rbac` 與 `pnpm seed:superadmin` npm scripts，安裝 `tsx` devDependency
 - 實作 RBAC 權限系統：定義 Role、Permission、role_permissions、user_roles Firestore collections，並完成 server-side 授權驗證
 - 實作 Users、Roles、Permissions 管理 API，支援列表查詢
 - 新增 Users、Roles、Permissions 管理頁面
@@ -18,3 +20,8 @@
 - 修正 API handler 與頁面 redirect 邏輯
 - 導入 openspec
 - 實作 Audit Logs 查詢
+
+### Changed
+
+- `nuxt.config.ts` runtimeConfig 移除未使用的 `superadminEmail` / `superadminUid` 欄位
+- `.env.example` 移除 `SUPERADMIN_UID`，`SUPERADMIN_EMAIL` 改為僅供 seed script 使用，新增 `SUPERADMIN_PASSWORD`
