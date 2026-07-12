@@ -11,7 +11,7 @@ const app = initializeApp({
 });
 
 const db = getFirestore(app);
-const TENANT_ID = 'default';
+const TENANT_ID = process.env.TENANT_ID ?? 'default';
 
 const PERMISSIONS = [
   { name: 'users:read', description: '讀取會員資料' },
