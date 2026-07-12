@@ -44,6 +44,20 @@ context: |
     - API logs: console.log GCP Structured Logging format (not stored in Firestore)
     - All Firestore log writes go through modules/logs/ only
 
+  Deployment:
+    - Current target: Firebase App Hosting
+    - Future: Cloud Run (under evaluation)
+    - Dockerfile: not written (Cloud Run migration is future planning)
+
+  Key design decisions:
+    - SPA mode (ssr:false): avoids SSR hydration issues; Firebase Client SDK runs browser-only
+    - Superadmin via custom claims: avoids building custom session management
+    - Hybrid RBAC + Permission: role determines identity, permission controls fine-grained ops
+    - Repo layer abstraction: decouples service from Firestore; easier to test and swap
+    - Firebase Admin SDK lazy init guard: prevents hot reload re-initialization in dev server
+    - Multi-tenant with tenantId prefix: supports future multi-tenant expansion
+    - Log cost: not a concern (demo project, not production)
+
   Implementation status:
     - Phase 1 (infra): done
     - Phase 2 (auth): done
