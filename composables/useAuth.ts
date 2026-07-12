@@ -1,11 +1,13 @@
 import {
   GoogleAuthProvider,
   RecaptchaVerifier,
+  createUserWithEmailAndPassword,
   getAuth,
   linkWithPhoneNumber,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
+  updateProfile,
   type ConfirmationResult,
 } from 'firebase/auth';
 import { getClientApp } from '~/utils/firebase-client';
@@ -18,6 +20,13 @@ export function useAuth() {
   function getFirebaseAuth() {
     if (!import.meta.client) throw new Error('Firebase Auth is browser-only');
     return getAuth(getClientApp());
+  }
+
+  async function register(displayName: string, email: string, password: string) {
+    const auth = getFirebaseAuth();
+    const credential = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(credential.user, { displayName });
+    await signOut(auth);
   }
 
   async function loginWithEmail(email: string, password: string) {
@@ -89,5 +98,12 @@ export function useAuth() {
     }
   }
 
-  return { loginWithEmail, loginWithGoogle, sendPhoneLinkOtp, confirmPhoneLinkOtp, logout };
+  return {
+    register,
+    loginWithEmail,
+    loginWithGoogle,
+    sendPhoneLinkOtp,
+    confirmPhoneLinkOtp,
+    logout,
+  };
 }

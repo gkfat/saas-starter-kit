@@ -1,7 +1,7 @@
 import { useAuthStore } from '~/stores/auth';
 import { usePermission } from '~/composables/usePermission';
 
-const PUBLIC_ROUTES = new Set(['/login']);
+const PUBLIC_ROUTES = new Set(['/login', '/auth/register']);
 
 const PERMISSION_ROUTES: { prefix: string; permission: string }[] = [
   { prefix: '/admin', permission: 'admin:access' },

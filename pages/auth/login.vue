@@ -35,6 +35,11 @@
             <v-icon start>mdi-google</v-icon>
             透過 Google 登入
           </v-btn>
+
+          <div class="text-center text-body-2 mt-2">
+            還沒有帳號？
+            <NuxtLink to="/auth/register">前往註冊</NuxtLink>
+          </div>
         </v-card>
       </v-col>
     </v-row>
