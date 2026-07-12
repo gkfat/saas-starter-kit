@@ -22,3 +22,10 @@ export type LoginLog = BaseLog & {
   result: 'success' | 'failure';
   email?: string;
 };
+
+export type AuditLog = BaseLog & {
+  type: 'audit';
+  action: string;
+  resourceId?: string;
+  diff?: Record<string, { before: unknown; after: unknown }>;
+};

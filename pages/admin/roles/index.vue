@@ -1,27 +1,22 @@
 <template>
   <div>
-    <v-row>
-      <v-col cols="12">
-        <v-card elevation="2">
-          <v-card-title class="pa-6 pb-0 text-h5">Roles</v-card-title>
+    <div class="text-h5 mb-6">Roles</div>
+    <v-card elevation="2">
+      <v-data-table
+        :headers="headers"
+        :items="rolesWithPermissions"
+        :loading="pending"
+        item-value="name"
+      >
+        <template #no-data>
+          <span class="text-medium-emphasis">No roles found</span>
+        </template>
 
-          <v-data-table
-            :headers="headers"
-            :items="rolesWithPermissions"
-            :loading="pending"
-            item-value="name"
-          >
-            <template #no-data>
-              <span class="text-medium-emphasis">No roles found</span>
-            </template>
-
-            <template v-if="isSuperadmin" #[`item.actions`]="{ item }">
-              <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEdit(item)" />
-            </template>
-          </v-data-table>
-        </v-card>
-      </v-col>
-    </v-row>
+        <template v-if="isSuperadmin" #[`item.actions`]="{ item }">
+          <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEdit(item)" />
+        </template>
+      </v-data-table>
+    </v-card>
 
     <v-dialog v-model="dialog" max-width="480">
       <v-card>
@@ -56,7 +51,6 @@ const { isSuperadmin, idToken } = storeToRefs(auth);
 
 const headers = computed(() => [
   { title: 'Name', key: 'name' },
-  { title: 'Description', key: 'description' },
   { title: 'Permissions', key: 'permissions', sortable: false },
   ...(isSuperadmin.value
     ? [{ title: '', key: 'actions', sortable: false, align: 'end' as const }]

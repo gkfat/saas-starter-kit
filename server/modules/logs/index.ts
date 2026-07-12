@@ -1,2 +1,3 @@
 export { recordLoginLog } from './logs.service';
-export type { BaseLog, LoginLog, LogSeverity } from './logs.types';
+export { listLoginLogs, listAuditLogs } from './logs.repo';
+export type { AuditLog, BaseLog, LoginLog, LogSeverity } from './logs.types';

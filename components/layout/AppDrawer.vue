@@ -15,32 +15,44 @@
         :to="'/profile'"
       />
 
-      <v-list-subheader>Admin</v-list-subheader>
-
-      <v-list-item prepend-icon="mdi-account-group" title="Users" value="users" :to="'/users'" />
-
-      <v-list-group value="iam">
-        <template #activator="{ props }">
-          <v-list-item v-bind="props" prepend-icon="mdi-shield-account" title="IAM" />
-        </template>
+      <template v-if="hasPermission('admin:access')">
+        <v-divider class="my-2" />
+        <v-list-subheader>Management</v-list-subheader>
 
         <v-list-item
-          prepend-icon="mdi-badge-account"
+          prepend-icon="mdi-account-group"
+          title="Users"
+          value="admin-users"
+          :to="'/admin/users'"
+        />
+        <v-list-item
+          prepend-icon="mdi-shield-account"
           title="Roles"
-          value="iam-roles"
-          :to="'/iam/roles'"
+          value="admin-roles"
+          :to="'/admin/roles'"
+        />
+
+        <v-divider class="my-2" />
+        <v-list-subheader>Logs</v-list-subheader>
+
+        <v-list-item
+          prepend-icon="mdi-login"
+          title="Login Logs"
+          value="admin-logs-login"
+          :to="'/admin/logs/login'"
         />
         <v-list-item
-          prepend-icon="mdi-key"
-          title="Permissions"
-          value="iam-permissions"
-          :to="'/iam/permissions'"
+          prepend-icon="mdi-history"
+          title="Audit Logs"
+          value="admin-logs-audit"
+          :to="'/admin/logs/audit'"
         />
-      </v-list-group>
+      </template>
     </v-list>
   </v-navigation-drawer>
 </template>
 
 <script setup lang="ts">
 const open = defineModel<boolean>({ required: true });
+const { hasPermission } = usePermission();
 </script>

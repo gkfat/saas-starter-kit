@@ -17,3 +17,4 @@
 - 設定 Husky + lint-staged pre-commit hook
 - 修正 API handler 與頁面 redirect 邏輯
 - 導入 openspec
+- 實作 Audit Logs 查詢
