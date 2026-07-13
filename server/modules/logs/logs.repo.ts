@@ -1,13 +1,21 @@
 import { adminDb } from '../../shared/firebase-admin';
+import { prefixCollection } from '../../shared/firestore-prefix';
 import type { AuditLog, LoginLog } from './logs.types';
 
+function loginLogsCollection(tenantId: string) {
+  return adminDb().collection(`tenants/${tenantId}/${prefixCollection('login_logs')}`);
+}
+
+function auditLogsCollection(tenantId: string) {
+  return adminDb().collection(`tenants/${tenantId}/${prefixCollection('audit_logs')}`);
+}
+
 export async function insertLoginLog(tenantId: string, log: LoginLog): Promise<void> {
-  await adminDb().collection(`tenants/${tenantId}/login_logs`).add(log);
+  await loginLogsCollection(tenantId).add(log);
 }
 
 export async function listLoginLogs(tenantId: string): Promise<LoginLog[]> {
-  const snapshot = await adminDb()
-    .collection(`tenants/${tenantId}/login_logs`)
+  const snapshot = await loginLogsCollection(tenantId)
     .orderBy('timestamp', 'desc')
     .limit(100)
     .get();
@@ -15,8 +23,7 @@ export async function listLoginLogs(tenantId: string): Promise<LoginLog[]> {
 }
 
 export async function listAuditLogs(tenantId: string): Promise<AuditLog[]> {
-  const snapshot = await adminDb()
-    .collection(`tenants/${tenantId}/audit_logs`)
+  const snapshot = await auditLogsCollection(tenantId)
     .orderBy('timestamp', 'desc')
     .limit(100)
     .get();

@@ -1,25 +1,30 @@
 import { adminDb } from '../../shared/firebase-admin';
+import { prefixCollection } from '../../shared/firestore-prefix';
 import { PermissionSchema, RolePermissionSchema, RoleSchema, UserRoleSchema } from './roles.schema';
 import type { Permission, Role } from './roles.types';
 
 function rolesCollection(tenantId: string) {
-  return adminDb().collection(`tenants/${tenantId}/roles`);
+  return adminDb().collection(`tenants/${tenantId}/${prefixCollection('roles')}`);
 }
 
 function permissionsCollection(tenantId: string) {
-  return adminDb().collection(`tenants/${tenantId}/permissions`);
+  return adminDb().collection(`tenants/${tenantId}/${prefixCollection('permissions')}`);
 }
 
 function rolePermissionsRef(tenantId: string, roleName: string) {
-  return adminDb().doc(`tenants/${tenantId}/role_permissions/${roleName}`);
+  return adminDb().doc(`tenants/${tenantId}/${prefixCollection('role_permissions')}/${roleName}`);
+}
+
+function rolePermissionsCollection(tenantId: string) {
+  return adminDb().collection(`tenants/${tenantId}/${prefixCollection('role_permissions')}`);
 }
 
 function userRolesRef(tenantId: string, userId: string) {
-  return adminDb().doc(`tenants/${tenantId}/user_roles/${userId}`);
+  return adminDb().doc(`tenants/${tenantId}/${prefixCollection('user_roles')}/${userId}`);
 }
 
 function userRolesCollection(tenantId: string) {
-  return adminDb().collection(`tenants/${tenantId}/user_roles`);
+  return adminDb().collection(`tenants/${tenantId}/${prefixCollection('user_roles')}`);
 }
 
 export async function getRolePermissions(tenantId: string, roleName: string): Promise<string[]> {
@@ -76,7 +81,7 @@ export async function listPermissions(tenantId: string): Promise<Permission[]> {
 }
 
 export async function listAllRolePermissions(tenantId: string): Promise<Record<string, string[]>> {
-  const snapshot = await adminDb().collection(`tenants/${tenantId}/role_permissions`).get();
+  const snapshot = await rolePermissionsCollection(tenantId).get();
   const result: Record<string, string[]> = {};
   for (const doc of snapshot.docs) {
     const parsed = RolePermissionSchema.parse(doc.data());

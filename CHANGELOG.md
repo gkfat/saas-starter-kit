@@ -27,3 +27,4 @@
 
 - `nuxt.config.ts` runtimeConfig 移除未使用的 `superadminEmail` / `superadminUid` 欄位
 - `.env.example` 移除 `SUPERADMIN_UID`，`SUPERADMIN_EMAIL` 改為僅供 seed script 使用，新增 `SUPERADMIN_PASSWORD`
+- firestore 區分 dev, prod 前綴

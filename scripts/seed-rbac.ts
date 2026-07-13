@@ -1,6 +1,7 @@
 import { cert, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import 'dotenv/config';
+import { prefixCollection } from '../server/shared/firestore-prefix';
 
 const app = initializeApp({
   credential: cert({
@@ -34,12 +35,12 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
   const base = `tenants/${TENANT_ID}`;
 
   for (const perm of PERMISSIONS) {
-    batch.set(db.doc(`${base}/permissions/${perm.name}`), perm);
+    batch.set(db.doc(`${base}/${prefixCollection('permissions')}/${perm.name}`), perm);
   }
 
   for (const role of ROLES) {
-    batch.set(db.doc(`${base}/roles/${role.name}`), role);
-    batch.set(db.doc(`${base}/role_permissions/${role.name}`), {
+    batch.set(db.doc(`${base}/${prefixCollection('roles')}/${role.name}`), role);
+    batch.set(db.doc(`${base}/${prefixCollection('role_permissions')}/${role.name}`), {
       permissions: ROLE_PERMISSIONS[role.name] ?? [],
     });
   }

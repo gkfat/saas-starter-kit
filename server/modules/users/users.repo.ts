@@ -1,12 +1,13 @@
 import { adminDb } from '../../shared/firebase-admin';
+import { prefixCollection } from '../../shared/firestore-prefix';
 import type { User } from './users.types';
 
 function userRef(tenantId: string, uid: string) {
-  return adminDb().doc(`tenants/${tenantId}/users/${uid}`);
+  return adminDb().doc(`tenants/${tenantId}/${prefixCollection('users')}/${uid}`);
 }
 
 function usersCollection(tenantId: string) {
-  return adminDb().collection(`tenants/${tenantId}/users`);
+  return adminDb().collection(`tenants/${tenantId}/${prefixCollection('users')}`);
 }
 
 export async function upsertUser(
