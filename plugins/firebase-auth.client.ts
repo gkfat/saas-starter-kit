@@ -11,20 +11,11 @@ export default defineNuxtPlugin(() => {
       unsubscribe();
       if (firebaseUser) {
         try {
-          const result = await firebaseUser.getIdTokenResult();
-          const claims = result.claims;
-          store.rehydrate(
-            {
-              uid: firebaseUser.uid,
-              email: firebaseUser.email ?? null,
-              displayName: firebaseUser.displayName ?? null,
-              phone: firebaseUser.phoneNumber ?? null,
-              tenantId: (claims['tenantId'] as string) ?? 'default',
-              role: (claims['role'] as string) ?? 'member',
-              permissions: (claims['permissions'] as string[]) ?? [],
-            },
-            result.token,
-          );
+          const idToken = await firebaseUser.getIdToken();
+          const user = await $fetch('/api/auth/me', {
+            headers: { Authorization: `Bearer ${idToken}` },
+          });
+          store.rehydrate(user as Parameters<typeof store.rehydrate>[0], idToken);
         } catch {
           // token invalid; treat as logged out
         }
