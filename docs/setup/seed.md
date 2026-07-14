@@ -78,11 +78,38 @@ Superadmin 身份**僅透過 Firebase Auth custom claims 辨識**，不寫入 Fi
 
 ---
 
+## 3. Seed Demo Users
+
+建立兩組示範帳號，分別對應 `admin` 與 `member` role，適用於開發與展示環境。
+
+```bash
+pnpm seed:demo-users
+```
+
+**建立的帳號：**
+
+| Email           | Password | Role   |
+| --------------- | -------- | ------ |
+| admin@demo.com  | demo1234 | admin  |
+| member@demo.com | demo1234 | member |
+
+**行為說明：**
+
+| 情境            | 結果                                                       |
+| --------------- | ---------------------------------------------------------- |
+| 帳號不存在      | 建立 Firebase Auth 帳號並寫入 Firestore users / user_roles |
+| Auth 帳號已存在 | 跳過建立，輸出 `[SKIP]`；Firestore 資料仍會 upsert         |
+
+> 勿在正式環境執行此 script。
+
+---
+
 ## 執行順序
 
 ```
 pnpm seed:rbac
 pnpm seed:superadmin
+pnpm seed:demo-users   # 開發 / 展示環境選用
 ```
 
-完成後即可以 `SUPERADMIN_EMAIL` / `SUPERADMIN_PASSWORD` 登入後台。
+完成後即可以 `SUPERADMIN_EMAIL` / `SUPERADMIN_PASSWORD` 登入後台，或使用 demo 帳號測試一般功能。

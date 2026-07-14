@@ -17,7 +17,8 @@
     "format": "prettier --write .",
     "prepare": "husky",
     "seed:rbac": "tsx scripts/seed-rbac.ts",
-    "seed:superadmin": "tsx scripts/seed-superadmin.ts"
+    "seed:superadmin": "tsx scripts/seed-superadmin.ts",
+    "seed:demo-users": "tsx scripts/seed-demo-users.ts"
   },
   "lint-staged": {
     "*.{ts,vue,mjs}": [
