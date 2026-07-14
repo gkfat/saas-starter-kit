@@ -2,7 +2,23 @@ export default defineNuxtConfig({
   ssr: false,
   compatibilityDate: '2024-04-03',
 
-  modules: ['@nuxt/eslint', '@pinia/nuxt'],
+  modules: ['@nuxt/eslint', '@pinia/nuxt', '@nuxtjs/i18n'],
+
+  i18n: {
+    locales: [
+      { code: 'zh-TW', name: '繁體中文', file: 'zh-TW.json' },
+      { code: 'en', name: 'English', file: 'en.json' },
+    ],
+    lazy: false,
+    langDir: 'locales',
+    restructureDir: 'i18n',
+    defaultLocale: 'zh-TW',
+    strategy: 'no_prefix',
+    detectBrowserLanguage: {
+      useCookie: false,
+      storageKey: 'i18n_locale',
+    },
+  },
 
   build: {
     transpile: ['vuetify'],

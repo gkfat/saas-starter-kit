@@ -1,0 +1,145 @@
+{
+  "common": {
+    "logout": "Logout",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "loading": "Loading...",
+    "noData": "No data",
+    "actions": "Actions"
+  },
+  "lang": {
+    "zh-TW": "繁體中文",
+    "en": "English"
+  },
+  "nav": {
+    "groupGeneral": "General",
+    "groupManagement": "Management",
+    "groupLogs": "Logs",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "users": "User Management",
+    "permissions": "Permissions",
+    "adminRoles": "Roles",
+    "adminUsers": "Users",
+    "loginLogs": "Login Logs",
+    "auditLogs": "Audit Logs"
+  },
+  "auth": {
+    "login": "Sign In",
+    "createAccount": "Create Account",
+    "register": "Register",
+    "logout": "Logout",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "displayName": "Display Name",
+    "loginWithGoogle": "Sign in with Google",
+    "loginWithPhone": "Sign in with Phone",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "registerLink": "Register now",
+    "loginLink": "Sign in",
+    "otp": "Verification Code",
+    "sendOtp": "Send Code",
+    "verifyOtp": "Verify",
+    "passwordMismatch": "Passwords do not match",
+    "error": {
+      "invalidCredential": "Incorrect email or password",
+      "invalidEmail": "Invalid email format",
+      "userDisabled": "Account is disabled, please contact admin",
+      "tooManyRequests": "Too many login attempts, please try again later",
+      "emailAlreadyInUse": "Email is already in use, please use a different email or sign in",
+      "weakPassword": "Password is too weak, please use a stronger password",
+      "default": "Login failed, please try again",
+      "registerDefault": "Registration failed, please try again"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back"
+  },
+  "profile": {
+    "title": "Profile",
+    "displayName": "Display Name",
+    "email": "Email",
+    "role": "Role",
+    "phone": "Phone Number",
+    "phoneNotVerified": "Not verified",
+    "verifyPhone": "Verify Phone Number",
+    "phonePlaceholder": "Phone number (with country code, e.g. +886912345678)",
+    "enterOtp": "Enter verification code",
+    "confirmOtp": "Verify",
+    "resendOtp": "Resend",
+    "otpSuccess": "Phone number verified successfully",
+    "otpSendFailed": "Failed to send verification code",
+    "otpFailed": "Verification failed"
+  },
+  "users": {
+    "title": "User Management",
+    "uid": "UID",
+    "name": "Name",
+    "email": "Email",
+    "displayName": "Display Name",
+    "phone": "Phone",
+    "tenant": "Tenant",
+    "role": "Role",
+    "status": "Status",
+    "createdAt": "Created At",
+    "noData": "No users found",
+    "searchByEmail": "Search by email",
+    "editRole": "Edit Role",
+    "updateRoleSuccess": "User role updated"
+  },
+  "roles": {
+    "title": "Role Management",
+    "name": "Role Name",
+    "description": "Description",
+    "permissions": "Permissions",
+    "noData": "No roles found",
+    "editPermissions": "Edit Permissions",
+    "updateSuccess": "Role permissions updated"
+  },
+  "permissions": {
+    "title": "Permissions",
+    "name": "Permission Name",
+    "description": "Description",
+    "resource": "Resource",
+    "action": "Action",
+    "noData": "No permissions found"
+  },
+  "logs": {
+    "loginTitle": "Login Logs",
+    "auditTitle": "Audit Logs",
+    "time": "Time",
+    "user": "User",
+    "actor": "Actor",
+    "action": "Action",
+    "resource": "Resource",
+    "changedFields": "Changed Fields",
+    "ip": "IP Address",
+    "provider": "Provider",
+    "result": "Result",
+    "success": "Success",
+    "failed": "Failed",
+    "noData": "No login logs found",
+    "auditNoData": "No audit logs yet"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language"
+  },
+  "admin": {
+    "title": "Administration",
+    "management": "Management",
+    "logs": "Logs",
+    "users": "Users",
+    "roles": "Roles",
+    "loginLogs": "Login Logs",
+    "auditLogs": "Audit Logs"
+  }
+}

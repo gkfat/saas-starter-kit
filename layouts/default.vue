@@ -1,11 +1,11 @@
 <template>
   <v-app>
-    <v-app-bar v-if="mobile" elevation="1" density="compact">
-      <v-app-bar-nav-icon @click="drawerOpen = !drawerOpen" />
-      <v-app-bar-title class="text-body-1 font-weight-medium">saas-starter-kit</v-app-bar-title>
-    </v-app-bar>
-
+    <LayoutAppHeader
+      @toggle-drawer="drawerOpen = !drawerOpen"
+      @toggle-settings="settingsOpen = !settingsOpen"
+    />
     <LayoutAppDrawer v-model="drawerOpen" />
+    <LayoutAppSettingsDrawer v-model="settingsOpen" />
 
     <v-main>
       <LayoutPageContent>
@@ -16,8 +16,6 @@
 </template>
 
 <script setup lang="ts">
-import { useDisplay } from 'vuetify';
-
-const { mobile } = useDisplay();
 const drawerOpen = ref(false);
+const settingsOpen = ref(false);
 </script>

@@ -4,6 +4,7 @@
     :rail="!mobile && rail"
     :permanent="!mobile"
     :temporary="mobile"
+    :width="mobile ? viewportWidth : 256"
   >
     <!-- Project header -->
     <div class="d-flex align-center px-3 py-3" style="min-height: 64px">
@@ -21,20 +22,20 @@
     <v-list nav density="compact" class="py-2" style="--v-list-item-icon-size: 18px">
       <template v-for="group in visibleGroups" :key="group.label">
         <v-divider v-if="group.label !== visibleGroups[0]?.label" class="my-2" />
-        <v-list-subheader v-if="!rail || mobile">{{ group.label }}</v-list-subheader>
+        <v-list-subheader v-if="!rail || mobile">{{ $t(group.label) }}</v-list-subheader>
 
         <template v-for="item in group.items" :key="item.title">
           <!-- Parent item with children (accordion) -->
           <v-list-group v-if="item.children?.length" :value="item.title">
             <template #activator="{ props }">
-              <v-list-item v-bind="props" :prepend-icon="item.icon" :title="item.title" />
+              <v-list-item v-bind="props" :prepend-icon="item.icon" :title="$t(item.title)" />
             </template>
 
             <v-list-item
               v-for="child in item.children"
               :key="child.title"
               :prepend-icon="child.icon"
-              :title="child.title"
+              :title="$t(child.title)"
               :to="child.path"
               :active="isActive(child)"
               @click="closeOnMobile"
@@ -45,7 +46,7 @@
           <v-list-item
             v-else
             :prepend-icon="item.icon"
-            :title="item.title"
+            :title="$t(item.title)"
             :to="item.path"
             :active="isActive(item)"
             @click="closeOnMobile"
@@ -77,7 +78,7 @@
           @click="handleLogout"
         >
           <v-icon>mdi-logout</v-icon>
-          <span v-if="!rail || mobile" class="ml-3">Log out</span>
+          <span v-if="!rail || mobile" class="ml-3">{{ $t('common.logout') }}</span>
         </v-btn>
       </div>
       <template v-if="!mobile">
@@ -108,7 +109,7 @@ import type { RouteItem } from '~/config/app-routes';
 
 const open = defineModel<boolean>({ default: false });
 
-const { mobile } = useDisplay();
+const { mobile, width: viewportWidth } = useDisplay();
 const { rail, toggle } = useSidebarState();
 const { hasPermission } = usePermission();
 const { logout } = useAuth();

@@ -23,6 +23,7 @@
 - 導入 openspec
 - 實作 Audit Logs 查詢
 - 實作 Toast 元件與 API error handler
+- 實作 i18n 多語系
 
 ### Changed
 

@@ -1,14 +1,14 @@
 <template>
   <div>
-    <div class="text-h5 mb-6">Admin Dashboard</div>
+    <div class="text-h5 mb-6">{{ $t('admin.title') }}</div>
     <v-row>
       <v-col cols="12" sm="6" md="3">
         <v-card :to="'/admin/users'" elevation="2" hover>
           <v-card-text class="d-flex align-center ga-4">
             <v-icon icon="mdi-account-group" size="36" color="primary" />
             <div>
-              <div class="text-overline text-medium-emphasis">Management</div>
-              <div class="text-h6">Users</div>
+              <div class="text-overline text-medium-emphasis">{{ $t('admin.management') }}</div>
+              <div class="text-h6">{{ $t('admin.users') }}</div>
             </div>
           </v-card-text>
         </v-card>
@@ -18,8 +18,8 @@
           <v-card-text class="d-flex align-center ga-4">
             <v-icon icon="mdi-shield-account" size="36" color="secondary" />
             <div>
-              <div class="text-overline text-medium-emphasis">Management</div>
-              <div class="text-h6">Roles</div>
+              <div class="text-overline text-medium-emphasis">{{ $t('admin.management') }}</div>
+              <div class="text-h6">{{ $t('admin.roles') }}</div>
             </div>
           </v-card-text>
         </v-card>
@@ -29,8 +29,8 @@
           <v-card-text class="d-flex align-center ga-4">
             <v-icon icon="mdi-login" size="36" color="success" />
             <div>
-              <div class="text-overline text-medium-emphasis">Logs</div>
-              <div class="text-h6">Login Logs</div>
+              <div class="text-overline text-medium-emphasis">{{ $t('admin.logs') }}</div>
+              <div class="text-h6">{{ $t('admin.loginLogs') }}</div>
             </div>
           </v-card-text>
         </v-card>
@@ -40,8 +40,8 @@
           <v-card-text class="d-flex align-center ga-4">
             <v-icon icon="mdi-history" size="36" color="warning" />
             <div>
-              <div class="text-overline text-medium-emphasis">Logs</div>
-              <div class="text-h6">Audit Logs</div>
+              <div class="text-overline text-medium-emphasis">{{ $t('admin.logs') }}</div>
+              <div class="text-h6">{{ $t('admin.auditLogs') }}</div>
             </div>
           </v-card-text>
         </v-card>

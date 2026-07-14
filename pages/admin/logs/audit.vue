@@ -1,7 +1,7 @@
 <template>
   <div>
     <LayoutBreadcrumb />
-    <LayoutPageHeader title="Audit Logs" />
+    <LayoutPageHeader :title="$t('logs.auditTitle')" />
     <v-card elevation="2">
       <v-data-table
         :headers="headers"
@@ -22,7 +22,7 @@
           <span v-else class="text-disabled">—</span>
         </template>
         <template #no-data>
-          <span class="text-medium-emphasis">No audit logs yet</span>
+          <span class="text-medium-emphasis">{{ $t('logs.auditNoData') }}</span>
         </template>
       </v-data-table>
     </v-card>
@@ -32,13 +32,15 @@
 <script setup lang="ts">
 import type { AuditLog } from '~/server/modules/logs';
 
-const headers = [
-  { title: 'Time', key: 'timestamp' },
-  { title: 'Actor', key: 'actor', sortable: false },
-  { title: 'Action', key: 'action' },
-  { title: 'Resource', key: 'resourceId' },
-  { title: 'Changed Fields', key: 'diff', sortable: false },
-];
+const { t } = useI18n();
+
+const headers = computed(() => [
+  { title: t('logs.time'), key: 'timestamp' },
+  { title: t('logs.actor'), key: 'actor', sortable: false },
+  { title: t('logs.action'), key: 'action' },
+  { title: t('logs.resource'), key: 'resourceId' },
+  { title: t('logs.changedFields'), key: 'diff', sortable: false },
+]);
 
 const { data: logs, pending } = await useAuthFetch<AuditLog[]>('/api/admin/logs/audit', {
   default: (): AuditLog[] => [],

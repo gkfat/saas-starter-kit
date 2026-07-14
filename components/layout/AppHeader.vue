@@ -1,27 +1,22 @@
-<!-- DEPRECATED: Replaced by AppDrawer which handles toggle and logout. Do not use. -->
 <template>
-  <v-app-bar elevation="1">
+  <v-app-bar v-if="mobile" elevation="1" density="compact">
     <v-app-bar-nav-icon @click="$emit('toggle-drawer')" />
-    <v-app-bar-title>SaaS Starter Kit</v-app-bar-title>
-    <v-spacer />
-    <v-btn variant="text" :loading="loading" @click="handleLogout">登出</v-btn>
+    <v-app-bar-title class="text-body-1 font-weight-medium">saas-starter-kit</v-app-bar-title>
+    <template #append>
+      <v-btn icon size="small" variant="text" @click="$emit('toggle-settings')">
+        <v-icon>mdi-cog-outline</v-icon>
+      </v-btn>
+    </template>
   </v-app-bar>
 </template>
 
 <script setup lang="ts">
-defineEmits<{ 'toggle-drawer': [] }>();
+import { useDisplay } from 'vuetify';
 
-const { logout } = useAuth();
-const router = useRouter();
-const loading = ref(false);
+defineEmits<{
+  'toggle-drawer': [];
+  'toggle-settings': [];
+}>();
 
-async function handleLogout() {
-  loading.value = true;
-  try {
-    await logout();
-    router.push('/login');
-  } finally {
-    loading.value = false;
-  }
-}
+const { mobile } = useDisplay();
 </script>

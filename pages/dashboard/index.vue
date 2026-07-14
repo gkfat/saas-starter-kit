@@ -1,7 +1,7 @@
 <template>
   <div>
     <LayoutBreadcrumb />
-    <LayoutPageHeader title="Dashboard" />
+    <LayoutPageHeader :title="$t('dashboard.title')" />
     <v-card elevation="2">
       <v-card-text>
         <div class="text-body-2 text-medium-emphasis mb-3">

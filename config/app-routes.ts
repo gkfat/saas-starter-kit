@@ -16,16 +16,16 @@ export type RouteGroup = {
 
 export const APP_ROUTES: RouteGroup[] = [
   {
-    label: 'General',
+    label: 'nav.groupGeneral',
     items: [
       {
-        title: 'Dashboard',
+        title: 'nav.dashboard',
         icon: 'mdi-view-dashboard',
         path: '/dashboard',
         exact: true,
       },
       {
-        title: 'Profile',
+        title: 'nav.profile',
         icon: 'mdi-account-circle',
         path: '/profile',
         exact: true,
@@ -33,22 +33,22 @@ export const APP_ROUTES: RouteGroup[] = [
     ],
   },
   {
-    label: 'Management',
+    label: 'nav.groupManagement',
     items: [
       {
-        title: 'Users',
+        title: 'nav.adminUsers',
         icon: 'mdi-account-group',
         path: '/admin/users',
         permission: Permission.Users.Read,
       },
       {
-        title: 'Roles',
+        title: 'nav.adminRoles',
         icon: 'mdi-shield-account',
         path: '/admin/roles',
         permission: Permission.Roles.Read,
       },
       {
-        title: 'Permissions',
+        title: 'nav.permissions',
         icon: 'mdi-key-variant',
         path: '/iam/permissions',
         permission: Permission.Permissions.Read,
@@ -56,17 +56,17 @@ export const APP_ROUTES: RouteGroup[] = [
     ],
   },
   {
-    label: 'Logs',
+    label: 'nav.groupLogs',
     items: [
       {
-        title: 'Login Logs',
+        title: 'nav.loginLogs',
         icon: 'mdi-login',
         path: '/admin/logs/login',
         exact: true,
         permission: Permission.LoginLogs.Read,
       },
       {
-        title: 'Audit Logs',
+        title: 'nav.auditLogs',
         icon: 'mdi-history',
         path: '/admin/logs/audit',
         exact: true,

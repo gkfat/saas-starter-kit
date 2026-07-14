@@ -1,7 +1,7 @@
 <template>
   <div>
     <LayoutBreadcrumb />
-    <LayoutPageHeader title="Roles" />
+    <LayoutPageHeader :title="$t('roles.title')" />
     <v-card elevation="2">
       <v-data-table
         :headers="headers"
@@ -10,7 +10,7 @@
         item-value="name"
       >
         <template #no-data>
-          <span class="text-medium-emphasis">No roles found</span>
+          <span class="text-medium-emphasis">{{ $t('roles.noData') }}</span>
         </template>
 
         <template v-if="isSuperadmin" #[`item.actions`]="{ item }">
@@ -21,7 +21,9 @@
 
     <v-dialog v-model="dialog" max-width="480">
       <v-card>
-        <v-card-title class="pa-4">Edit Permissions — {{ editing?.name }}</v-card-title>
+        <v-card-title class="pa-4"
+          >{{ $t('roles.editPermissions') }} — {{ editing?.name }}</v-card-title
+        >
         <v-card-text>
           <v-checkbox
             v-for="perm in allPermissions"
@@ -35,8 +37,8 @@
         </v-card-text>
         <v-card-actions class="pa-4">
           <v-spacer />
-          <v-btn variant="text" @click="dialog = false">Cancel</v-btn>
-          <v-btn color="primary" :loading="saving" @click="save">Save</v-btn>
+          <v-btn variant="text" @click="dialog = false">{{ $t('common.cancel') }}</v-btn>
+          <v-btn color="primary" :loading="saving" @click="save">{{ $t('common.save') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -49,13 +51,14 @@ import { useAuthStore } from '~/stores/auth';
 
 const auth = useAuthStore();
 const { isSuperadmin, idToken } = storeToRefs(auth);
+const { t } = useI18n();
 
 const { showSuccess } = useToast();
 const { withErrorToast } = useApiError();
 
 const headers = computed(() => [
-  { title: 'Name', key: 'name' },
-  { title: 'Permissions', key: 'permissions', sortable: false },
+  { title: t('roles.name'), key: 'name' },
+  { title: t('roles.permissions'), key: 'permissions', sortable: false },
   ...(isSuperadmin.value
     ? [{ title: '', key: 'actions', sortable: false, align: 'end' as const }]
     : []),
@@ -104,7 +107,7 @@ async function save() {
   if (result !== null) {
     dialog.value = false;
     await Promise.all([refreshRoles(), refreshRolePermissions()]);
-    showSuccess('角色權限已更新');
+    showSuccess(t('roles.updateSuccess'));
   }
   saving.value = false;
 }

@@ -1,0 +1,145 @@
+{
+  "common": {
+    "logout": "登出",
+    "confirm": "確認",
+    "cancel": "取消",
+    "save": "儲存",
+    "delete": "刪除",
+    "edit": "編輯",
+    "create": "新增",
+    "search": "搜尋",
+    "loading": "載入中...",
+    "noData": "無資料",
+    "actions": "操作"
+  },
+  "lang": {
+    "zh-TW": "繁體中文",
+    "en": "English"
+  },
+  "nav": {
+    "groupGeneral": "一般",
+    "groupManagement": "管理",
+    "groupLogs": "紀錄",
+    "dashboard": "儀表板",
+    "profile": "個人資料",
+    "users": "使用者管理",
+    "permissions": "權限",
+    "adminRoles": "角色管理",
+    "adminUsers": "使用者",
+    "loginLogs": "登入紀錄",
+    "auditLogs": "稽核紀錄"
+  },
+  "auth": {
+    "login": "登入",
+    "createAccount": "建立帳號",
+    "register": "註冊",
+    "logout": "登出",
+    "email": "Email",
+    "password": "密碼",
+    "confirmPassword": "確認密碼",
+    "displayName": "顯示名稱",
+    "loginWithGoogle": "透過 Google 登入",
+    "loginWithPhone": "使用手機號碼登入",
+    "noAccount": "還沒有帳號？",
+    "hasAccount": "已有帳號？",
+    "registerLink": "前往註冊",
+    "loginLink": "前往登入",
+    "otp": "驗證碼",
+    "sendOtp": "發送驗證碼",
+    "verifyOtp": "確認驗證",
+    "passwordMismatch": "兩次密碼輸入不一致",
+    "error": {
+      "invalidCredential": "帳號或密碼錯誤",
+      "invalidEmail": "Email 格式不正確",
+      "userDisabled": "帳號已停用，請聯絡管理員",
+      "tooManyRequests": "登入嘗試次數過多，請稍後再試",
+      "emailAlreadyInUse": "Email 已被使用，請改用其他 Email 或前往登入",
+      "weakPassword": "密碼強度不足，請使用更複雜的密碼",
+      "default": "登入失敗，請再試一次",
+      "registerDefault": "註冊失敗，請再試一次"
+    }
+  },
+  "dashboard": {
+    "title": "儀表板",
+    "welcome": "歡迎回來"
+  },
+  "profile": {
+    "title": "個人資料",
+    "displayName": "Display Name",
+    "email": "Email",
+    "role": "Role",
+    "phone": "手機號碼",
+    "phoneNotVerified": "未驗證",
+    "verifyPhone": "驗證手機號碼",
+    "phonePlaceholder": "手機號碼（含國碼，例如 +886912345678）",
+    "enterOtp": "輸入驗證碼",
+    "confirmOtp": "確認驗證",
+    "resendOtp": "重新發送",
+    "otpSuccess": "手機號碼驗證成功",
+    "otpSendFailed": "驗證碼發送失敗",
+    "otpFailed": "驗證失敗"
+  },
+  "users": {
+    "title": "使用者管理",
+    "uid": "UID",
+    "name": "名稱",
+    "email": "Email",
+    "displayName": "顯示名稱",
+    "phone": "手機",
+    "tenant": "租戶",
+    "role": "角色",
+    "status": "狀態",
+    "createdAt": "建立時間",
+    "noData": "無使用者資料",
+    "searchByEmail": "以 Email 搜尋",
+    "editRole": "編輯角色",
+    "updateRoleSuccess": "使用者角色已更新"
+  },
+  "roles": {
+    "title": "角色管理",
+    "name": "角色名稱",
+    "description": "說明",
+    "permissions": "權限",
+    "noData": "無角色資料",
+    "editPermissions": "編輯權限",
+    "updateSuccess": "角色權限已更新"
+  },
+  "permissions": {
+    "title": "權限列表",
+    "name": "權限名稱",
+    "description": "說明",
+    "resource": "資源",
+    "action": "操作",
+    "noData": "無權限資料"
+  },
+  "logs": {
+    "loginTitle": "登入紀錄",
+    "auditTitle": "稽核紀錄",
+    "time": "時間",
+    "user": "使用者",
+    "actor": "操作者",
+    "action": "動作",
+    "resource": "資源",
+    "changedFields": "變更欄位",
+    "ip": "IP 位址",
+    "provider": "登入方式",
+    "result": "結果",
+    "success": "成功",
+    "failed": "失敗",
+    "noData": "無登入紀錄",
+    "auditNoData": "無稽核紀錄"
+  },
+  "settings": {
+    "title": "設定",
+    "language": "語言"
+  },
+  "admin": {
+    "title": "系統管理",
+    "management": "管理",
+    "logs": "紀錄",
+    "users": "使用者",
+    "roles": "角色",
+    "loginLogs": "登入紀錄",
+    "auditLogs": "稽核紀錄"
+  }
+}

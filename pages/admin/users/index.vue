@@ -1,13 +1,13 @@
 <template>
   <div>
     <LayoutBreadcrumb />
-    <LayoutPageHeader title="Users" />
+    <LayoutPageHeader :title="$t('users.title')" />
     <v-card elevation="2">
       <v-card-text class="pb-0">
         <v-text-field
           v-model="search"
           prepend-inner-icon="mdi-magnify"
-          label="Search by email"
+          :label="$t('users.searchByEmail')"
           clearable
           hide-details
           density="compact"
@@ -16,7 +16,7 @@
       </v-card-text>
       <v-data-table :headers="headers" :items="filteredUsers" :loading="pending" item-value="uid">
         <template #no-data>
-          <span class="text-medium-emphasis">No users found</span>
+          <span class="text-medium-emphasis">{{ $t('users.noData') }}</span>
         </template>
         <template #[`item.uid`]="{ item }">
           <span class="text-caption font-mono text-medium-emphasis">{{ item.uid }}</span>
@@ -29,20 +29,20 @@
 
     <v-dialog v-model="dialog" max-width="400">
       <v-card>
-        <v-card-title class="pa-4">Edit Role — {{ editing?.email }}</v-card-title>
+        <v-card-title class="pa-4">{{ $t('users.editRole') }} — {{ editing?.email }}</v-card-title>
         <v-card-text>
           <v-select
             v-model="selectedRole"
             :items="roleNames"
-            label="Role"
+            :label="$t('users.role')"
             density="compact"
             hide-details
           />
         </v-card-text>
         <v-card-actions class="pa-4">
           <v-spacer />
-          <v-btn variant="text" @click="dialog = false">Cancel</v-btn>
-          <v-btn color="primary" :loading="saving" @click="save">Save</v-btn>
+          <v-btn variant="text" @click="dialog = false">{{ $t('common.cancel') }}</v-btn>
+          <v-btn color="primary" :loading="saving" @click="save">{{ $t('common.save') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -63,18 +63,19 @@ type UserRow = {
 
 const auth = useAuthStore();
 const { idToken } = storeToRefs(auth);
+const { t } = useI18n();
 
 const { showSuccess } = useToast();
 const { withErrorToast } = useApiError();
 
-const headers = [
-  { title: 'UID', key: 'uid' },
-  { title: 'Email', key: 'email' },
-  { title: 'Display Name', key: 'displayName' },
-  { title: 'Role', key: 'role' },
-  { title: 'Created', key: 'createdAt' },
+const headers = computed(() => [
+  { title: t('users.uid'), key: 'uid' },
+  { title: t('users.email'), key: 'email' },
+  { title: t('users.displayName'), key: 'displayName' },
+  { title: t('users.role'), key: 'role' },
+  { title: t('users.createdAt'), key: 'createdAt' },
   { title: '', key: 'actions', sortable: false, align: 'end' as const },
-];
+]);
 
 const [{ data: users, pending, refresh }, { data: roles }] = await Promise.all([
   useAuthFetch<UserRow[]>('/api/admin/users', { default: () => [] }),
@@ -113,7 +114,7 @@ async function save() {
   if (result !== null) {
     dialog.value = false;
     await refresh();
-    showSuccess('使用者角色已更新');
+    showSuccess(t('users.updateRoleSuccess'));
   }
   saving.value = false;
 }
