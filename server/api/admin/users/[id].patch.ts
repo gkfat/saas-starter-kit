@@ -3,13 +3,14 @@ import { recordAuditLog } from '~/server/modules/logs';
 import { assignUserRole } from '~/server/modules/roles';
 import { requirePermission } from '~/server/shared/rbac';
 import type { AuthenticatedContext } from '~/server/shared/types/context';
+import { Permission } from '~/shared/permissions';
 
 const BodySchema = z.object({
   role: z.string().min(1),
 });
 
 export default defineEventHandler(async (event) => {
-  requirePermission(event, 'users:write');
+  requirePermission(event, Permission.Users.Write);
   const {
     tenantId,
     userId: actorId,

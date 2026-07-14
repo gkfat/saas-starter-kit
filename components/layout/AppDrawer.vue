@@ -126,7 +126,10 @@ const drawerOpen = computed({
 });
 
 const visibleGroups = computed(() =>
-  APP_ROUTES.filter((group) => !group.permission || hasPermission(group.permission)),
+  APP_ROUTES.map((group) => ({
+    ...group,
+    items: group.items.filter((item) => !item.permission || hasPermission(item.permission)),
+  })).filter((group) => group.items.length > 0),
 );
 
 const avatarLetter = computed(() => {

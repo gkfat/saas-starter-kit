@@ -3,6 +3,7 @@ import { recordAuditLog } from '../../modules/logs';
 import { updateRolePermissions } from '../../modules/roles';
 import { requirePermission } from '../../shared/rbac';
 import type { AuthenticatedContext } from '../../shared/types/context';
+import { Permission } from '~/shared/permissions';
 
 const BodySchema = z.object({
   roleName: z.string().min(1),
@@ -10,7 +11,7 @@ const BodySchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
-  requirePermission(event, 'admin:access');
+  requirePermission(event, Permission.Roles.Write);
 
   const { tenantId, userId, role, requestId } = event.context as AuthenticatedContext;
   const body = await readBody(event);

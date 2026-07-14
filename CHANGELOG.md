@@ -29,3 +29,4 @@
 - `.env.example` 移除 `SUPERADMIN_UID`，`SUPERADMIN_EMAIL` 改為僅供 seed script 使用，新增 `SUPERADMIN_PASSWORD`
 - firestore 區分 dev, prod 前綴
 - 調整 UI layout
+- 調整權限結構與共用 enum
