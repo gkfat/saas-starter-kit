@@ -19,68 +19,38 @@
     <v-divider />
 
     <v-list nav density="compact" class="py-2" style="--v-list-item-icon-size: 18px">
-      <!-- General -->
-      <v-list-subheader v-if="!rail || mobile">General</v-list-subheader>
+      <template v-for="group in visibleGroups" :key="group.label">
+        <v-divider v-if="group.label !== visibleGroups[0]?.label" class="my-2" />
+        <v-list-subheader v-if="!rail || mobile">{{ group.label }}</v-list-subheader>
 
-      <v-list-item
-        prepend-icon="mdi-view-dashboard"
-        title="Dashboard"
-        :to="'/dashboard'"
-        :active="route.path === '/dashboard'"
-        @click="closeOnMobile"
-      />
-      <v-list-item
-        prepend-icon="mdi-account-circle"
-        title="Profile"
-        :to="'/profile'"
-        :active="route.path === '/profile'"
-        @click="closeOnMobile"
-      />
+        <template v-for="item in group.items" :key="item.title">
+          <!-- Parent item with children (accordion) -->
+          <v-list-group v-if="item.children?.length" :value="item.title">
+            <template #activator="{ props }">
+              <v-list-item v-bind="props" :prepend-icon="item.icon" :title="item.title" />
+            </template>
 
-      <!-- Management -->
-      <template v-if="hasPermission('admin:access')">
-        <v-divider class="my-2" />
-        <v-list-subheader v-if="!rail || mobile">Management</v-list-subheader>
+            <v-list-item
+              v-for="child in item.children"
+              :key="child.title"
+              :prepend-icon="child.icon"
+              :title="child.title"
+              :to="child.path"
+              :active="isActive(child)"
+              @click="closeOnMobile"
+            />
+          </v-list-group>
 
-        <v-list-item
-          prepend-icon="mdi-account-group"
-          title="Users"
-          :to="'/admin/users'"
-          :active="route.path.startsWith('/admin/users')"
-          @click="closeOnMobile"
-        />
-        <v-list-item
-          prepend-icon="mdi-shield-account"
-          title="Roles"
-          :to="'/admin/roles'"
-          :active="route.path.startsWith('/admin/roles')"
-          @click="closeOnMobile"
-        />
-        <v-list-item
-          prepend-icon="mdi-key-variant"
-          title="Permissions"
-          :to="'/iam/permissions'"
-          :active="route.path.startsWith('/iam/permissions')"
-          @click="closeOnMobile"
-        />
-
-        <v-divider class="my-2" />
-        <v-list-subheader v-if="!rail || mobile">Logs</v-list-subheader>
-
-        <v-list-item
-          prepend-icon="mdi-login"
-          title="Login Logs"
-          :to="'/admin/logs/login'"
-          :active="route.path === '/admin/logs/login'"
-          @click="closeOnMobile"
-        />
-        <v-list-item
-          prepend-icon="mdi-history"
-          title="Audit Logs"
-          :to="'/admin/logs/audit'"
-          :active="route.path === '/admin/logs/audit'"
-          @click="closeOnMobile"
-        />
+          <!-- Leaf item -->
+          <v-list-item
+            v-else
+            :prepend-icon="item.icon"
+            :title="item.title"
+            :to="item.path"
+            :active="isActive(item)"
+            @click="closeOnMobile"
+          />
+        </template>
       </template>
     </v-list>
 
@@ -133,6 +103,8 @@
 import { useAuthStore } from '~/stores/auth';
 import { storeToRefs } from 'pinia';
 import { useDisplay } from 'vuetify';
+import { APP_ROUTES } from '~/config/app-routes';
+import type { RouteItem } from '~/config/app-routes';
 
 const open = defineModel<boolean>({ default: false });
 
@@ -153,12 +125,21 @@ const drawerOpen = computed({
   },
 });
 
+const visibleGroups = computed(() =>
+  APP_ROUTES.filter((group) => !group.permission || hasPermission(group.permission)),
+);
+
 const avatarLetter = computed(() => {
   const name = user.value?.displayName ?? user.value?.email ?? '?';
   return name.charAt(0).toUpperCase();
 });
 
 const loading = ref(false);
+
+function isActive(item: RouteItem): boolean {
+  if (!item.path) return false;
+  return item.exact ? route.path === item.path : route.path.startsWith(item.path);
+}
 
 function closeOnMobile() {
   if (mobile.value) open.value = false;
