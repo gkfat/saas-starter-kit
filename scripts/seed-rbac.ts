@@ -2,7 +2,8 @@ import { cert, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import 'dotenv/config';
 import { prefixCollection } from '../server/shared/firestore-prefix';
-import { Permission } from '../shared/permissions';
+import { type Permission, PermissionMeta } from '../shared/permissions';
+import { type Role, RoleMeta, RolePermissions } from '../shared/roles';
 
 const app = initializeApp({
   credential: cert({
@@ -15,33 +16,14 @@ const app = initializeApp({
 const db = getFirestore(app);
 const TENANT_ID = process.env.TENANT_ID ?? 'default';
 
-const PERMISSIONS = [
-  { name: Permission.Users.Read, description: '讀取會員資料' },
-  { name: Permission.Users.Write, description: '寫入會員資料' },
-  { name: Permission.Roles.Read, description: '讀取角色' },
-  { name: Permission.Roles.Write, description: '編輯角色權限' },
-  { name: Permission.Permissions.Read, description: '讀取權限清單' },
-  { name: Permission.LoginLogs.Read, description: '讀取登入紀錄' },
-  { name: Permission.AuditLogs.Read, description: '讀取稽核紀錄' },
-];
+const PERMISSIONS = (Object.entries(PermissionMeta) as [Permission, string][]).map(
+  ([name, description]) => ({ name, description }),
+);
 
-const ROLES = [
-  { name: 'admin', description: '管理員' },
-  { name: 'member', description: '一般會員' },
-];
-
-const ROLE_PERMISSIONS: Record<string, string[]> = {
-  admin: [
-    Permission.Users.Read,
-    Permission.Users.Write,
-    Permission.Roles.Read,
-    Permission.Roles.Write,
-    Permission.Permissions.Read,
-    Permission.LoginLogs.Read,
-    Permission.AuditLogs.Read,
-  ],
-  member: [Permission.Users.Read],
-};
+const ROLES = (Object.entries(RoleMeta) as [Role, string][]).map(([name, description]) => ({
+  name,
+  description,
+}));
 
 (async () => {
   const batch = db.batch();
@@ -54,7 +36,7 @@ const ROLE_PERMISSIONS: Record<string, string[]> = {
   for (const role of ROLES) {
     batch.set(db.doc(`${base}/${prefixCollection('roles')}/${role.name}`), role);
     batch.set(db.doc(`${base}/${prefixCollection('role_permissions')}/${role.name}`), {
-      permissions: ROLE_PERMISSIONS[role.name] ?? [],
+      permissions: RolePermissions[role.name as Role] ?? [],
     });
   }
 
