@@ -1,6 +1,7 @@
 import { createError } from 'h3';
 import { adminAuth } from '../../shared/firebase-admin';
 import { recordLoginLog } from '../logs';
+import { getPermissionsForRole, getRoleForUser } from '../roles';
 import { saveUser } from '../users';
 import type { AuthUser, LoginProvider } from './auth.types';
 
@@ -30,6 +31,12 @@ export async function processLogin(params: ProcessLoginParams): Promise<AuthUser
       result: 'failure',
     });
     throw createError({ statusCode: 401, message: 'Invalid ID token' });
+  }
+
+  if (user.role !== 'superadmin') {
+    const role = (await getRoleForUser(user.tenantId, user.uid)) ?? 'member';
+    const permissions = await getPermissionsForRole(user.tenantId, role);
+    user = { ...user, role, permissions };
   }
 
   await Promise.all([
