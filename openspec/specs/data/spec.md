@@ -2,19 +2,20 @@
 
 ## Multi-Tenant Design
 
-All data is isolated by `tenantId` at the top level:
+All data is isolated by `tenantId` at the top level, and all collection names include an environment prefix (`dev_` or `prod_`):
 
 ```
 tenants/{tenantId}/
-  ├── users/{userId}
-  ├── roles/{roleId}
-  ├── permissions/{permissionId}
-  ├── role_permissions/{rolePermissionId}
-  ├── user_roles/{userRoleId}
-  ├── audit_logs/{logId}
-  └── login_logs/{logId}
+  ├── {prefix}users/{userId}
+  ├── {prefix}roles/{roleId}
+  ├── {prefix}permissions/{permissionId}
+  ├── {prefix}role_permissions/{rolePermissionId}
+  ├── {prefix}user_roles/{userRoleId}
+  ├── {prefix}audit_logs/{logId}
+  └── {prefix}login_logs/{logId}
 ```
 
+- `{prefix}` is determined by `prefixCollection()` — `dev_` or `prod_` based on `APP_ENV`
 - `tenantId` comes from Firebase Auth custom claims
 - Defaults to `'default'` when absent
 - Every Firestore query must include `tenantId` filter
