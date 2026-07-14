@@ -5,10 +5,6 @@
         <v-card class="pa-6" elevation="4">
           <v-card-title class="text-h5 mb-4">建立帳號</v-card-title>
 
-          <v-alert v-if="error" type="error" class="mb-4" density="compact">
-            {{ error }}
-          </v-alert>
-
           <v-form @submit.prevent="handleRegister">
             <v-text-field
               v-model="displayName"
@@ -51,6 +47,7 @@
 definePageMeta({ layout: 'blank' });
 
 const { register } = useAuth();
+const { showError } = useToast();
 const router = useRouter();
 
 const displayName = ref('');
@@ -58,7 +55,6 @@ const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 const loading = ref(false);
-const error = ref('');
 
 const FIREBASE_ERROR_MESSAGES: Record<string, string> = {
   'auth/email-already-in-use': 'Email 已被使用，請改用其他 Email 或前往登入',
@@ -67,10 +63,8 @@ const FIREBASE_ERROR_MESSAGES: Record<string, string> = {
 };
 
 async function handleRegister() {
-  error.value = '';
-
   if (password.value !== confirmPassword.value) {
-    error.value = '兩次密碼輸入不一致';
+    showError('兩次密碼輸入不一致');
     return;
   }
 
@@ -80,7 +74,7 @@ async function handleRegister() {
     router.push('/login');
   } catch (e: unknown) {
     const code = (e as { code?: string }).code ?? '';
-    error.value = FIREBASE_ERROR_MESSAGES[code] ?? (e instanceof Error ? e.message : '註冊失敗');
+    showError(FIREBASE_ERROR_MESSAGES[code] ?? '註冊失敗，請再試一次');
   } finally {
     loading.value = false;
   }

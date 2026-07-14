@@ -5,10 +5,6 @@
         <v-card class="pa-6" elevation="4">
           <v-card-title class="text-h5 mb-4">登入</v-card-title>
 
-          <v-alert v-if="error" type="error" class="mb-4" density="compact">
-            {{ error }}
-          </v-alert>
-
           <v-form @submit.prevent="handleEmailLogin">
             <v-text-field v-model="email" label="Email" type="email" required :disabled="loading" />
             <v-text-field
@@ -50,34 +46,46 @@
 definePageMeta({ layout: 'blank', path: '/login' });
 
 const { loginWithEmail, loginWithGoogle } = useAuth();
+const { showError } = useToast();
 const router = useRouter();
 
 const email = ref('');
 const password = ref('');
 const loading = ref(false);
-const error = ref('');
+
+const FIREBASE_LOGIN_ERRORS: Record<string, string> = {
+  'auth/invalid-credential': '帳號或密碼錯誤',
+  'auth/wrong-password': '帳號或密碼錯誤',
+  'auth/user-not-found': '帳號或密碼錯誤',
+  'auth/invalid-email': 'Email 格式不正確',
+  'auth/user-disabled': '帳號已停用，請聯絡管理員',
+  'auth/too-many-requests': '登入嘗試次數過多，請稍後再試',
+};
+
+function getLoginErrorMessage(e: unknown): string {
+  const code = (e as { code?: string }).code ?? '';
+  return FIREBASE_LOGIN_ERRORS[code] ?? '登入失敗，請再試一次';
+}
 
 async function handleEmailLogin() {
-  error.value = '';
   loading.value = true;
   try {
     await loginWithEmail(email.value, password.value);
     router.push('/dashboard');
   } catch (e: unknown) {
-    error.value = e instanceof Error ? e.message : '登入失敗';
+    showError(getLoginErrorMessage(e));
   } finally {
     loading.value = false;
   }
 }
 
 async function handleGoogleLogin() {
-  error.value = '';
   loading.value = true;
   try {
     await loginWithGoogle();
     router.push('/dashboard');
   } catch (e: unknown) {
-    error.value = e instanceof Error ? e.message : '登入失敗';
+    showError(getLoginErrorMessage(e));
   } finally {
     loading.value = false;
   }

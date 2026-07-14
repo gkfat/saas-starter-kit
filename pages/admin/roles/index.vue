@@ -50,6 +50,9 @@ import { useAuthStore } from '~/stores/auth';
 const auth = useAuthStore();
 const { isSuperadmin, idToken } = storeToRefs(auth);
 
+const { showSuccess } = useToast();
+const { withErrorToast } = useApiError();
+
 const headers = computed(() => [
   { title: 'Name', key: 'name' },
   { title: 'Permissions', key: 'permissions', sortable: false },
@@ -91,16 +94,18 @@ function openEdit(item: RoleRow) {
 async function save() {
   if (!editing.value) return;
   saving.value = true;
-  try {
-    await $fetch('/api/admin/role-permissions', {
+  const result = await withErrorToast(() =>
+    $fetch<unknown>('/api/admin/role-permissions', {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${idToken.value}` },
-      body: { roleName: editing.value.name, permissions: selectedPermissions.value },
-    });
+      body: { roleName: editing.value!.name, permissions: selectedPermissions.value },
+    }),
+  );
+  if (result !== null) {
     dialog.value = false;
     await Promise.all([refreshRoles(), refreshRolePermissions()]);
-  } finally {
-    saving.value = false;
+    showSuccess('角色權限已更新');
   }
+  saving.value = false;
 }
 </script>

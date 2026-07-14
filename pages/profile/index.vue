@@ -32,13 +32,6 @@
             <div v-if="!store.user?.phone">
               <div class="text-subtitle-2 mb-3">驗證手機號碼</div>
 
-              <v-alert v-if="error" type="error" density="compact" class="mb-3">
-                {{ error }}
-              </v-alert>
-              <v-alert v-if="success" type="success" density="compact" class="mb-3">
-                手機號碼驗證成功
-              </v-alert>
-
               <template v-if="!confirmationResult">
                 <v-text-field
                   v-model="phone"
@@ -80,21 +73,19 @@ import { useAuthStore } from '~/stores/auth';
 
 const store = useAuthStore();
 const { sendPhoneLinkOtp, confirmPhoneLinkOtp } = useAuth();
+const { showError, showSuccess } = useToast();
 
 const phone = ref('');
 const otp = ref('');
 const loading = ref(false);
-const error = ref('');
-const success = ref(false);
 const confirmationResult = ref<ConfirmationResult | null>(null);
 
 async function handleSendOtp() {
-  error.value = '';
   loading.value = true;
   try {
     confirmationResult.value = await sendPhoneLinkOtp(phone.value, 'recaptcha-container');
   } catch (e: unknown) {
-    error.value = e instanceof Error ? e.message : '發送失敗';
+    showError(e instanceof Error ? e.message : '驗證碼發送失敗');
   } finally {
     loading.value = false;
   }
@@ -102,14 +93,13 @@ async function handleSendOtp() {
 
 async function handleConfirmOtp() {
   if (!confirmationResult.value) return;
-  error.value = '';
   loading.value = true;
   try {
     await confirmPhoneLinkOtp(confirmationResult.value, otp.value);
-    success.value = true;
+    showSuccess('手機號碼驗證成功');
     confirmationResult.value = null;
   } catch (e: unknown) {
-    error.value = e instanceof Error ? e.message : '驗證失敗';
+    showError(e instanceof Error ? e.message : '驗證失敗');
   } finally {
     loading.value = false;
   }

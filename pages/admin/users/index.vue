@@ -64,6 +64,9 @@ type UserRow = {
 const auth = useAuthStore();
 const { idToken } = storeToRefs(auth);
 
+const { showSuccess } = useToast();
+const { withErrorToast } = useApiError();
+
 const headers = [
   { title: 'UID', key: 'uid' },
   { title: 'Email', key: 'email' },
@@ -100,16 +103,18 @@ function openEdit(item: UserRow) {
 async function save() {
   if (!editing.value) return;
   saving.value = true;
-  try {
-    await $fetch(`/api/admin/users/${editing.value.uid}`, {
+  const result = await withErrorToast(() =>
+    $fetch<unknown>(`/api/admin/users/${editing.value!.uid}`, {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${idToken.value}` },
       body: { role: selectedRole.value },
-    });
+    }),
+  );
+  if (result !== null) {
     dialog.value = false;
     await refresh();
-  } finally {
-    saving.value = false;
+    showSuccess('使用者角色已更新');
   }
+  saving.value = false;
 }
 </script>
