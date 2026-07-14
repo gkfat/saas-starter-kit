@@ -20,3 +20,10 @@ export const LoginLogSchema = BaseLogSchema.extend({
   result: z.enum(['success', 'failure']),
   email: z.string().optional(),
 });
+
+export const AuditLogSchema = BaseLogSchema.extend({
+  type: z.literal('audit'),
+  action: z.string(),
+  resourceId: z.string().optional(),
+  diff: z.record(z.object({ before: z.unknown(), after: z.unknown() })).optional(),
+});

@@ -14,6 +14,10 @@ export async function insertLoginLog(tenantId: string, log: LoginLog): Promise<v
   await loginLogsCollection(tenantId).add(log);
 }
 
+export async function insertAuditLog(tenantId: string, log: AuditLog): Promise<void> {
+  await auditLogsCollection(tenantId).add(log);
+}
+
 export async function listLoginLogs(tenantId: string): Promise<LoginLog[]> {
   const snapshot = await loginLogsCollection(tenantId)
     .orderBy('timestamp', 'desc')
