@@ -8,6 +8,15 @@ export default defineNuxtPlugin((app) => {
     directives,
     theme: {
       defaultTheme: 'light',
+      themes: {
+        light: {
+          colors: {
+            primary: '#1967D2',
+            surface: '#ffffff',
+            background: '#ffffff',
+          },
+        },
+      },
     },
     icons: {
       defaultSet: 'mdi',

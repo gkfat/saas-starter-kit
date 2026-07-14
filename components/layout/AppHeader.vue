@@ -1,3 +1,4 @@
+<!-- DEPRECATED: Replaced by AppDrawer which handles toggle and logout. Do not use. -->
 <template>
   <v-app-bar elevation="1">
     <v-app-bar-nav-icon @click="$emit('toggle-drawer')" />

@@ -1,21 +1,21 @@
 <template>
-  <v-row>
-    <v-col cols="12">
-      <v-card class="pa-6" elevation="2">
-        <v-card-title class="text-h5 mb-2">Dashboard</v-card-title>
-        <v-card-subtitle class="mb-4">
+  <div>
+    <LayoutBreadcrumb />
+    <LayoutPageHeader title="Dashboard" />
+    <v-card elevation="2">
+      <v-card-text>
+        <div class="text-body-2 text-medium-emphasis mb-3">
           {{ store.user?.email ?? store.user?.uid }}
-        </v-card-subtitle>
-
+        </div>
         <v-chip class="mr-2" color="primary" variant="tonal">
           {{ store.user?.role }}
         </v-chip>
         <v-chip color="secondary" variant="tonal">
           {{ store.user?.tenantId }}
         </v-chip>
-      </v-card>
-    </v-col>
-  </v-row>
+      </v-card-text>
+    </v-card>
+  </div>
 </template>
 
 <script setup lang="ts">

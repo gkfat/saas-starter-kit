@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div class="text-h5 mb-6">Audit Logs</div>
+    <LayoutBreadcrumb />
+    <LayoutPageHeader title="Audit Logs" />
     <v-card elevation="2">
       <v-data-table
         :headers="headers"
@@ -8,6 +9,9 @@
         :loading="pending"
         item-value="requestId"
       >
+        <template #[`item.timestamp`]="{ item }">
+          <span class="text-caption font-mono">{{ item.timestamp }}</span>
+        </template>
         <template #[`item.actor`]="{ item }">
           {{ item.actor?.userId ?? '—' }}
         </template>

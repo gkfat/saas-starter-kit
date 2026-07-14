@@ -1,17 +1,15 @@
 <template>
-  <v-row>
-    <v-col cols="12">
-      <v-card elevation="2">
-        <v-card-title class="pa-6 pb-0 text-h5">Permissions</v-card-title>
-
-        <v-data-table :headers="headers" :items="permissions" :loading="pending" item-value="name">
-          <template #no-data>
-            <span class="text-medium-emphasis">No permissions found</span>
-          </template>
-        </v-data-table>
-      </v-card>
-    </v-col>
-  </v-row>
+  <div>
+    <LayoutBreadcrumb />
+    <LayoutPageHeader title="Permissions" />
+    <v-card elevation="2">
+      <v-data-table :headers="headers" :items="permissions" :loading="pending" item-value="name">
+        <template #no-data>
+          <span class="text-medium-emphasis">No permissions found</span>
+        </template>
+      </v-data-table>
+    </v-card>
+  </div>
 </template>
 
 <script setup lang="ts">

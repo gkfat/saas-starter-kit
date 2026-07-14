@@ -26,6 +26,8 @@ export default defineEventHandler(async (event) => {
     event.context.userId = user.uid;
     event.context.tenantId = user.tenantId;
     if (user.phone) event.context.phone = user.phone;
+    if (user.email) event.context.email = user.email;
+    if (user.displayName) event.context.displayName = user.displayName;
 
     if (user.role === 'superadmin') {
       event.context.role = 'superadmin';

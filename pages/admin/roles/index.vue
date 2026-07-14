@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div class="text-h5 mb-6">Roles</div>
+    <LayoutBreadcrumb />
+    <LayoutPageHeader title="Roles" />
     <v-card elevation="2">
       <v-data-table
         :headers="headers"

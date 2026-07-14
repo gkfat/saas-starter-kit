@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div class="text-h5 mb-6">Users</div>
+    <LayoutBreadcrumb />
+    <LayoutPageHeader title="Users" />
     <v-card elevation="2">
       <v-card-text class="pb-0">
         <v-text-field
@@ -16,6 +17,9 @@
       <v-data-table :headers="headers" :items="filteredUsers" :loading="pending" item-value="uid">
         <template #no-data>
           <span class="text-medium-emphasis">No users found</span>
+        </template>
+        <template #[`item.uid`]="{ item }">
+          <span class="text-caption font-mono text-medium-emphasis">{{ item.uid }}</span>
         </template>
         <template #[`item.actions`]="{ item }">
           <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEdit(item)" />
@@ -61,6 +65,7 @@ const auth = useAuthStore();
 const { idToken } = storeToRefs(auth);
 
 const headers = [
+  { title: 'UID', key: 'uid' },
   { title: 'Email', key: 'email' },
   { title: 'Display Name', key: 'displayName' },
   { title: 'Role', key: 'role' },

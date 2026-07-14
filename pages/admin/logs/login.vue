@@ -1,6 +1,7 @@
 <template>
   <div>
-    <div class="text-h5 mb-6">Login Logs</div>
+    <LayoutBreadcrumb />
+    <LayoutPageHeader title="Login Logs" />
     <v-card elevation="2">
       <v-data-table
         :headers="headers"
@@ -16,6 +17,9 @@
           >
             {{ item.result }}
           </v-chip>
+        </template>
+        <template #[`item.timestamp`]="{ item }">
+          <span class="text-caption font-mono">{{ item.timestamp }}</span>
         </template>
         <template #no-data>
           <span class="text-medium-emphasis">No login logs found</span>
