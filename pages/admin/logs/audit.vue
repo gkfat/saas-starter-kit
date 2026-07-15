@@ -13,13 +13,16 @@
           <span class="text-caption font-mono">{{ formatDateTime(item.timestamp) }}</span>
         </template>
         <template #[`item.actor`]="{ item }">
-          {{ item.actor?.username ?? item.actor?.userId ?? '—' }}
+          {{ item.actor?.username ?? item.actor?.userId ?? '-' }}
+        </template>
+        <template #[`item.resourceId`]="{ item }">
+          {{ item.resourceId ?? '-' }}
         </template>
         <template #[`item.diff`]="{ item }">
           <span v-if="item.diff" class="text-medium-emphasis text-caption">
             {{ Object.keys(item.diff).join(', ') }}
           </span>
-          <span v-else class="text-disabled">—</span>
+          <span v-else class="text-disabled">-</span>
         </template>
         <template #no-data>
           <span class="text-medium-emphasis">{{ $t('logs.auditNoData') }}</span>

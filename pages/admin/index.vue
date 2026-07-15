@@ -14,7 +14,7 @@
         </v-card>
       </v-col>
       <v-col cols="12" sm="6" md="3">
-        <v-card :to="'/admin/roles'" elevation="2" hover>
+        <v-card :to="'/iam/roles'" elevation="2" hover>
           <v-card-text class="d-flex align-center ga-4">
             <v-icon icon="mdi-shield-account" size="36" color="secondary" />
             <div>

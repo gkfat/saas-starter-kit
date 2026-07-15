@@ -20,10 +20,9 @@
         <v-btn
           v-bind="props"
           variant="text"
-          size="x-small"
-          density="compact"
+          size="small"
           class="text-disabled px-1"
-          style="font-size: 11px; min-width: 0"
+          style="font-size: 11px"
         >
           <v-icon size="13" class="mr-1">mdi-translate</v-icon>
           {{ currentLocaleName }}

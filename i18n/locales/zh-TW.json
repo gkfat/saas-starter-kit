@@ -22,8 +22,8 @@
     "en": "English"
   },
   "nav": {
-    "groupGeneral": "一般",
     "groupManagement": "管理",
+    "groupIam": "身份與存取管理",
     "groupLogs": "紀錄",
     "dashboard": "儀表板",
     "profile": "個人資料",
@@ -121,7 +121,7 @@
     "profileCardTitle": "基本資料"
   },
   "users": {
-    "title": "使用者管理",
+    "title": "使用者",
     "uid": "UID",
     "name": "名稱",
     "email": "Email",
@@ -147,7 +147,7 @@
     "updateSuccess": "角色權限已更新"
   },
   "permissions": {
-    "title": "權限列表",
+    "title": "權限",
     "name": "權限名稱",
     "description": "說明",
     "resource": "資源",
@@ -189,5 +189,14 @@
     "admin": "管理員",
     "member": "會員",
     "superadmin": "超級管理員"
+  },
+  "permission": {
+    "users:read": "讀取會員資料",
+    "users:write": "寫入會員資料",
+    "roles:read": "讀取角色",
+    "roles:write": "編輯角色權限",
+    "permissions:read": "讀取權限清單",
+    "login_logs:read": "讀取登入紀錄",
+    "audit_logs:read": "讀取稽核紀錄"
   }
 }

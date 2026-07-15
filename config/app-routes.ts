@@ -10,13 +10,12 @@ export type RouteItem = {
 };
 
 export type RouteGroup = {
-  label: string;
+  label?: string;
   items: RouteItem[];
 };
 
 export const APP_ROUTES: RouteGroup[] = [
   {
-    label: 'nav.groupGeneral',
     items: [
       {
         title: 'nav.dashboard',
@@ -41,10 +40,15 @@ export const APP_ROUTES: RouteGroup[] = [
         path: '/admin/users',
         permission: Permission.Users.Read,
       },
+    ],
+  },
+  {
+    label: 'nav.groupIam',
+    items: [
       {
         title: 'nav.adminRoles',
         icon: 'mdi-shield-account',
-        path: '/admin/roles',
+        path: '/iam/roles',
         permission: Permission.Roles.Read,
       },
       {

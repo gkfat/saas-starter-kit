@@ -22,7 +22,9 @@
     <v-list nav density="compact" class="py-2" style="--v-list-item-icon-size: 18px">
       <template v-for="group in visibleGroups" :key="group.label">
         <v-divider v-if="group.label !== visibleGroups[0]?.label" class="my-2" />
-        <v-list-subheader v-if="!rail || mobile">{{ $t(group.label) }}</v-list-subheader>
+        <v-list-subheader v-if="group.label && (!rail || mobile)">{{
+          $t(group.label)
+        }}</v-list-subheader>
 
         <template v-for="item in group.items" :key="item.title">
           <!-- Parent item with children (accordion) -->
@@ -70,7 +72,6 @@
           </div>
         </div>
         <v-btn
-          size="small"
           variant="text"
           class="border text-none"
           :loading="loading"

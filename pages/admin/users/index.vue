@@ -36,19 +36,30 @@
       </v-data-table>
     </v-card>
 
-    <v-dialog v-model="dialog" max-width="400">
+    <v-dialog v-model="dialog" max-width="400" persistent>
       <v-card>
         <v-card-title class="pa-4"
           >{{ $t('users.editRole') }} — {{ editing?.username }}</v-card-title
         >
         <v-card-text>
+          <div class="text-caption text-medium-emphasis mb-1">{{ $t('users.role') }}</div>
           <v-select
             v-model="selectedRole"
-            :items="roleNames"
-            :label="$t('users.role')"
-            density="compact"
-            hide-details
+            :items="roleOptions"
+            item-title="title"
+            item-value="value"
+            hide-details="auto"
           />
+          <div class="mt-3">
+            <v-chip
+              v-for="perm in selectedRolePermissions"
+              :key="perm"
+              size="small"
+              class="mr-1 mb-1"
+            >
+              {{ $t(`permission.${perm}`) }}
+            </v-chip>
+          </div>
         </v-card-text>
         <v-card-actions class="pa-4">
           <v-spacer />
@@ -96,12 +107,20 @@ const headers = computed(() => [
     : []),
 ]);
 
-const [{ data: users, pending, refresh }, { data: roles }] = await Promise.all([
-  useAuthFetch<UserRow[]>('/api/admin/users', { default: () => [] }),
-  useAuthFetch<Array<{ name: string }>>('/api/admin/roles', { default: () => [] }),
-]);
+const [{ data: users, pending, refresh }, { data: roles }, { data: rolePermissions }] =
+  await Promise.all([
+    useAuthFetch<UserRow[]>('/api/admin/users', { default: () => [] }),
+    useAuthFetch<Array<{ name: string }>>('/api/admin/roles', { default: () => [] }),
+    useAuthFetch<Record<string, string[]>>('/api/admin/role-permissions', {
+      default: () => ({}),
+    }),
+  ]);
 
-const roleNames = computed(() => (roles.value ?? []).map((r) => r.name));
+const roleOptions = computed(() =>
+  (roles.value ?? []).map((r) => ({ title: t(`role.${r.name}`), value: r.name })),
+);
+
+const selectedRolePermissions = computed(() => rolePermissions.value?.[selectedRole.value] ?? []);
 
 const search = ref('');
 const filteredUsers = computed(() => {

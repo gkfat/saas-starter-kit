@@ -1,39 +1,40 @@
 <template>
   <div>
-    <v-row>
-      <v-col cols="12">
-        <v-card elevation="2">
-          <v-card-title class="pa-6 pb-0 text-h5">{{ $t('roles.title') }}</v-card-title>
+    <LayoutBreadcrumb />
+    <LayoutPageHeader :title="$t('roles.title')" />
+    <v-card elevation="2">
+      <v-data-table
+        :headers="headers"
+        :items="rolesWithPermissions"
+        :loading="pending"
+        item-value="name"
+      >
+        <template #no-data>
+          <span class="text-medium-emphasis">{{ $t('roles.noData') }}</span>
+        </template>
 
-          <v-data-table
-            :headers="headers"
-            :items="rolesWithPermissions"
-            :loading="pending"
-            item-value="name"
-          >
-            <template #no-data>
-              <span class="text-medium-emphasis">{{ $t('roles.noData') }}</span>
-            </template>
+        <template #[`item.name`]="{ item }">
+          {{ $t(`role.${item.name}`) }}
+        </template>
 
-            <template v-if="isSuperadmin" #[`item.actions`]="{ item }">
-              <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEdit(item)" />
-            </template>
-          </v-data-table>
-        </v-card>
-      </v-col>
-    </v-row>
+        <template v-if="isSuperadmin" #[`item.actions`]="{ item }">
+          <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEdit(item)" />
+        </template>
+      </v-data-table>
+    </v-card>
 
     <v-dialog v-model="dialog" max-width="480">
       <v-card>
         <v-card-title class="pa-4"
-          >{{ $t('roles.editPermissions') }} — {{ editing?.name }}</v-card-title
+          >{{ $t('roles.editPermissions') }} —
+          {{ editing ? $t(`role.${editing.name}`) : '' }}</v-card-title
         >
         <v-card-text>
           <v-checkbox
             v-for="perm in allPermissions"
             :key="perm.name"
             v-model="selectedPermissions"
-            :label="perm.name"
+            :label="$t(`permission.${perm.name}`)"
             :value="perm.name"
             density="compact"
             hide-details
@@ -57,9 +58,11 @@ const auth = useAuthStore();
 const { isSuperadmin, idToken } = storeToRefs(auth);
 const { t } = useI18n();
 
+const { showSuccess } = useToast();
+const { withErrorToast } = useApiError();
+
 const headers = computed(() => [
   { title: t('roles.name'), key: 'name' },
-  { title: t('roles.description'), key: 'description' },
   { title: t('roles.permissions'), key: 'permissions', sortable: false },
   ...(isSuperadmin.value
     ? [{ title: '', key: 'actions', sortable: false, align: 'end' as const }]
@@ -79,7 +82,8 @@ const [
 const rolesWithPermissions = computed(() =>
   (roles.value ?? []).map((role) => ({
     ...role,
-    permissions: (rolePermissions.value?.[role.name] ?? []).join(', ') || '—',
+    permissions:
+      (rolePermissions.value?.[role.name] ?? []).map((p) => t(`permission.${p}`)).join(', ') || '—',
   })),
 );
 
@@ -99,16 +103,18 @@ function openEdit(item: RoleRow) {
 async function save() {
   if (!editing.value) return;
   saving.value = true;
-  try {
-    await $fetch('/api/admin/role-permissions', {
+  const result = await withErrorToast(() =>
+    $fetch<unknown>('/api/admin/role-permissions', {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${idToken.value}` },
-      body: { roleName: editing.value.name, permissions: selectedPermissions.value },
-    });
+      body: { roleName: editing.value!.name, permissions: selectedPermissions.value },
+    }),
+  );
+  if (result !== null) {
     dialog.value = false;
     await Promise.all([refreshRoles(), refreshRolePermissions()]);
-  } finally {
-    saving.value = false;
+    showSuccess(t('roles.updateSuccess'));
   }
+  saving.value = false;
 }
 </script>

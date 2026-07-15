@@ -22,8 +22,8 @@
     "en": "English"
   },
   "nav": {
-    "groupGeneral": "General",
     "groupManagement": "Management",
+    "groupIam": "IAM",
     "groupLogs": "Logs",
     "dashboard": "Dashboard",
     "profile": "Profile",
@@ -121,7 +121,7 @@
     "profileCardTitle": "Basic Info"
   },
   "users": {
-    "title": "User Management",
+    "title": "Users",
     "uid": "UID",
     "name": "Name",
     "email": "Email",
@@ -138,7 +138,7 @@
     "updateRoleSuccess": "User role updated"
   },
   "roles": {
-    "title": "Role Management",
+    "title": "Roles",
     "name": "Role Name",
     "description": "Description",
     "permissions": "Permissions",
@@ -189,5 +189,14 @@
     "admin": "Admin",
     "member": "Member",
     "superadmin": "Super Admin"
+  },
+  "permission": {
+    "users:read": "Read users",
+    "users:write": "Write users",
+    "roles:read": "Read roles",
+    "roles:write": "Edit role permissions",
+    "permissions:read": "Read permissions",
+    "login_logs:read": "Read login logs",
+    "audit_logs:read": "Read audit logs"
   }
 }
