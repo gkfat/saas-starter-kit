@@ -1,7 +1,14 @@
+import { Role } from '~/shared/roles';
 import { verifyIdToken } from '../modules/auth';
 import { getPermissionsForRole, getRoleForUser } from '../modules/roles';
 
-const PUBLIC_PATHS = new Set(['/api/auth/login', '/api/auth/otp/verify']);
+const PUBLIC_PATHS = new Set([
+  '/api/auth/login',
+  '/api/auth/register',
+  '/api/auth/google-login',
+  '/api/auth/google-register',
+  '/api/auth/otp/verify',
+]);
 
 export default defineEventHandler(async (event) => {
   const url = (event.node.req.url ?? '').split('?')[0];
@@ -29,8 +36,8 @@ export default defineEventHandler(async (event) => {
     if (user.email) event.context.email = user.email;
     if (user.displayName) event.context.displayName = user.displayName;
 
-    if (user.role === 'superadmin') {
-      event.context.role = 'superadmin';
+    if (user.role === Role.SuperAdmin) {
+      event.context.role = Role.SuperAdmin;
       event.context.permissions = [];
     } else {
       const role = (await getRoleForUser(user.tenantId, user.uid)) ?? 'member';

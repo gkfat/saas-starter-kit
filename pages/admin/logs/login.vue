@@ -36,6 +36,7 @@ const { t } = useI18n();
 
 const headers = computed(() => [
   { title: t('logs.time'), key: 'timestamp' },
+  { title: t('logs.username'), key: 'username' },
   { title: t('users.email'), key: 'email' },
   { title: t('logs.provider'), key: 'provider' },
   { title: t('logs.ip'), key: 'ip' },

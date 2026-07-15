@@ -102,6 +102,22 @@ pnpm seed:demo-users
 
 > 勿在正式環境執行此 script。
 
+Demo 帳號建立時 `providers` 皆為 `['password']`，尚未綁定 Google。可用來測試 Profile 頁面的 Google 綁定流程（見下方說明）。
+
+---
+
+## 測試 Google Provider 綁定（Profile 頁面）
+
+以任一帳號（demo 帳號或自行註冊的帳號）登入後，至 `/profile` 頁面：
+
+1. 若帳號尚未綁定 Google，會顯示「綁定 Google 帳號」按鈕
+2. 點擊後跳出 Google 登入彈窗，完成登入即完成綁定
+3. 綁定成功後該帳號的 Firestore `users/{uid}` 文件 `providers` 陣列會加入 `'google'`
+4. 綁定不會檢查或覆蓋既有的 `email` 欄位，也不要求 Google 帳號的 email 與已綁定的 email 相同
+5. 若該 Google 帳號已綁定至其他 Firebase Auth 帳號，Firebase 會回傳 `auth/credential-already-in-use` 錯誤，畫面顯示綁定失敗
+
+> 此綁定流程與登入頁「以 Google 繼續」的自動綁定邏輯不同：登入頁流程要求 Google email 與帳號已綁定的 email 一致，Profile 頁面的主動綁定則不做此檢查。
+
 ---
 
 ## 執行順序

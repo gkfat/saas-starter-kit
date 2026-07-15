@@ -9,16 +9,18 @@ export const BaseLogSchema = z.object({
     userId: z.string(),
     tenantId: z.string(),
     role: z.string(),
+    username: z.string().optional(),
   }),
   metadata: z.record(z.unknown()),
 });
 
 export const LoginLogSchema = BaseLogSchema.extend({
   type: z.literal('login'),
-  provider: z.enum(['email', 'google', 'phone']),
+  provider: z.enum(['password', 'email', 'google', 'phone']),
   ip: z.string(),
   result: z.enum(['success', 'failure']),
   email: z.string().optional(),
+  username: z.string().optional(),
 });
 
 export const AuditLogSchema = BaseLogSchema.extend({

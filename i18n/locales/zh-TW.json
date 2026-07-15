@@ -33,11 +33,20 @@
     "login": "登入",
     "createAccount": "建立帳號",
     "register": "註冊",
+    "registerSuccess": "註冊成功，請前往登入",
     "logout": "登出",
     "email": "Email",
+    "emailOptional": "Email（選填）",
+    "phoneOptional": "手機號碼（選填）",
     "password": "密碼",
     "confirmPassword": "確認密碼",
     "displayName": "顯示名稱",
+    "username": "帳號",
+    "identifier": "帳號或 Email",
+    "usernameHint": "6–8 碼英數字，不含特殊符號",
+    "passwordHint": "6–8 碼英數字，不含特殊符號",
+    "chooseUsername": "選擇帳號名稱",
+    "confirmUsername": "確認並完成註冊",
     "loginWithGoogle": "透過 Google 登入",
     "loginWithPhone": "使用手機號碼登入",
     "noAccount": "還沒有帳號？",
@@ -51,12 +60,19 @@
     "error": {
       "invalidCredential": "帳號或密碼錯誤",
       "invalidEmail": "Email 格式不正確",
+      "invalidUsername": "帳號須為 6–8 碼英數字，不含特殊符號",
+      "invalidPassword": "密碼須為 6–8 碼英數字，不含特殊符號",
+      "usernameTaken": "此帳號名稱已被使用",
+      "googleEmailConflict": "此 Google 帳號的 Email 已綁定至其他帳號",
       "userDisabled": "帳號已停用，請聯絡管理員",
       "tooManyRequests": "登入嘗試次數過多，請稍後再試",
       "emailAlreadyInUse": "Email 已被使用，請改用其他 Email 或前往登入",
       "weakPassword": "密碼強度不足，請使用更複雜的密碼",
       "default": "登入失敗，請再試一次",
-      "registerDefault": "註冊失敗，請再試一次"
+      "registerDefault": "註冊失敗，請再試一次",
+      "googleAlreadyLinked": "綁定失敗",
+      "popupClosed": "已取消 Google 登入視窗",
+      "popupBlocked": "瀏覽器封鎖了彈出視窗，請允許彈出視窗後再試一次"
     }
   },
   "dashboard": {
@@ -77,7 +93,12 @@
     "resendOtp": "重新發送",
     "otpSuccess": "手機號碼驗證成功",
     "otpSendFailed": "驗證碼發送失敗",
-    "otpFailed": "驗證失敗"
+    "otpFailed": "驗證失敗",
+    "loginMethods": "登入方式",
+    "bindGoogle": "綁定 Google 帳號",
+    "googleBound": "已綁定 Google 帳號",
+    "bindGoogleSuccess": "Google 帳號綁定成功",
+    "bindGoogleFailed": "Google 帳號綁定失敗"
   },
   "users": {
     "title": "使用者管理",
@@ -92,6 +113,7 @@
     "createdAt": "建立時間",
     "noData": "無使用者資料",
     "searchByEmail": "以 Email 搜尋",
+    "searchByUsernameOrEmail": "以帳號或 Email 搜尋",
     "editRole": "編輯角色",
     "updateRoleSuccess": "使用者角色已更新"
   },
@@ -117,6 +139,7 @@
     "auditTitle": "稽核紀錄",
     "time": "時間",
     "user": "使用者",
+    "username": "帳號",
     "actor": "操作者",
     "action": "動作",
     "resource": "資源",

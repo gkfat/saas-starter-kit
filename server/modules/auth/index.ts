@@ -1,3 +1,16 @@
-export { verifyIdToken, revokeRefreshTokens, processLogin } from './auth.service';
+export {
+  verifyIdToken,
+  revokeRefreshTokens,
+  processLogin,
+  processPasswordLogin,
+  createCustomToken,
+} from './auth.service';
 export type { AuthUser, LoginProvider } from './auth.types';
-export { LoginDto } from './auth.schema';
+export {
+  LoginDto,
+  PasswordLoginDto,
+  OAuthLoginDto,
+  RegisterDto,
+  GoogleRegisterDto,
+  GoogleLoginDto,
+} from './auth.schema';

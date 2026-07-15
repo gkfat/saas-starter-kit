@@ -7,17 +7,25 @@
 
           <v-form @submit.prevent="handleRegister">
             <v-text-field
-              v-model="displayName"
-              :label="$t('auth.displayName')"
+              v-model="username"
+              :label="$t('auth.username')"
               type="text"
               required
               :disabled="loading"
+              :hint="$t('auth.usernameHint')"
+              persistent-hint
+              class="mb-1"
             />
             <v-text-field
               v-model="email"
-              :label="$t('auth.email')"
+              :label="$t('auth.emailOptional')"
               type="email"
-              required
+              :disabled="loading"
+            />
+            <v-text-field
+              v-model="phone"
+              :label="$t('auth.phoneOptional')"
+              type="tel"
               :disabled="loading"
             />
             <v-text-field
@@ -26,6 +34,9 @@
               type="password"
               required
               :disabled="loading"
+              :hint="$t('auth.passwordHint')"
+              persistent-hint
+              class="mb-1"
             />
             <v-text-field
               v-model="confirmPassword"
@@ -34,7 +45,7 @@
               required
               :disabled="loading"
             />
-            <v-btn type="submit" color="primary" block :loading="loading" class="mb-3">
+            <v-btn type="submit" color="primary" block :loading="loading" class="mb-3 mt-2">
               {{ $t('auth.register') }}
             </v-btn>
           </v-form>
@@ -50,26 +61,31 @@
 </template>
 
 <script setup lang="ts">
+import { isValidUsername, isValidPassword } from '~/shared/utils/validation';
+
 definePageMeta({ layout: 'blank' });
 
 const { register } = useAuth();
-const { showError } = useToast();
+const { showError, showSuccess } = useToast();
 const router = useRouter();
 const { t } = useI18n();
 
-const displayName = ref('');
+const username = ref('');
 const email = ref('');
+const phone = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 const loading = ref(false);
 
-const FIREBASE_ERROR_MESSAGES: Record<string, string> = {
-  'auth/email-already-in-use': 'auth.error.emailAlreadyInUse',
-  'auth/invalid-email': 'auth.error.invalidEmail',
-  'auth/weak-password': 'auth.error.weakPassword',
-};
-
 async function handleRegister() {
+  if (!isValidUsername(username.value)) {
+    showError(t('auth.error.invalidUsername'));
+    return;
+  }
+  if (!isValidPassword(password.value)) {
+    showError(t('auth.error.invalidPassword'));
+    return;
+  }
   if (password.value !== confirmPassword.value) {
     showError(t('auth.passwordMismatch'));
     return;
@@ -77,12 +93,21 @@ async function handleRegister() {
 
   loading.value = true;
   try {
-    await register(displayName.value, email.value, password.value);
+    await register(
+      username.value,
+      password.value,
+      email.value || undefined,
+      phone.value || undefined,
+    );
+    showSuccess(t('auth.registerSuccess'));
     router.push('/login');
   } catch (e: unknown) {
-    const code = (e as { code?: string }).code ?? '';
-    const key = FIREBASE_ERROR_MESSAGES[code] ?? 'auth.error.registerDefault';
-    showError(t(key));
+    const statusCode = (e as { data?: { statusCode?: number } }).data?.statusCode;
+    if (statusCode === 409) {
+      showError(t('auth.error.usernameTaken'));
+    } else {
+      showError(t('auth.error.registerDefault'));
+    }
   } finally {
     loading.value = false;
   }

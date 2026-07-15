@@ -1,4 +1,11 @@
-import { LoginDto, processLogin } from '../../modules/auth';
+import {
+  LoginDto,
+  processLogin,
+  processPasswordLogin,
+  createCustomToken,
+} from '../../modules/auth';
+import { getUserWithHashByIdentifier } from '../../modules/users';
+import { verifyPassword } from '../../shared/crypto';
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
@@ -8,17 +15,63 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Invalid request body' });
   }
 
-  const { idToken, provider } = parsed.data;
   const ip = getRequestIP(event, { xForwardedFor: true }) ?? '';
   const requestId = event.context.requestId ?? '';
 
+  if (parsed.data.provider === 'password') {
+    const { identifier, password } = parsed.data;
+    const tenantId = 'default';
+
+    const firestoreUser = await getUserWithHashByIdentifier(tenantId, identifier);
+
+    const valid =
+      firestoreUser?.passwordHash != null &&
+      (await verifyPassword(firestoreUser.passwordHash, password));
+
+    if (!valid) {
+      throw createError({ statusCode: 401, message: '帳號或密碼錯誤' });
+    }
+
+    const [user, customToken] = await Promise.all([
+      processPasswordLogin({
+        uid: firestoreUser!.uid,
+        tenantId,
+        username: firestoreUser!.username,
+        email: firestoreUser!.email,
+        displayName: firestoreUser!.displayName,
+        phone: firestoreUser!.phone,
+        providers: firestoreUser!.providers,
+        ip,
+        requestId,
+      }),
+      createCustomToken(firestoreUser!.uid),
+    ]);
+
+    return {
+      uid: user.uid,
+      username: user.username,
+      email: user.email,
+      displayName: user.displayName,
+      phone: user.phone,
+      providers: user.providers,
+      tenantId: user.tenantId,
+      role: user.role,
+      permissions: user.permissions,
+      customToken,
+    };
+  }
+
+  // OAuth flow (google / phone)
+  const { idToken, provider } = parsed.data;
   const user = await processLogin({ idToken, provider, ip, requestId });
 
   return {
     uid: user.uid,
+    username: user.username,
     email: user.email,
     displayName: user.displayName,
     phone: user.phone,
+    providers: user.providers,
     tenantId: user.tenantId,
     role: user.role,
     permissions: user.permissions,

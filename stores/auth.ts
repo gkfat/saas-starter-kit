@@ -1,10 +1,14 @@
 import { defineStore } from 'pinia';
+import type { LoginProvider } from '~/server/modules/auth/auth.types';
+import { Role } from '~/shared/roles';
 
 type AuthUser = {
   uid: string;
+  username: string | null;
   email: string | null;
   displayName: string | null;
   phone: string | null;
+  providers: string[];
   tenantId: string;
   role: string;
   permissions: string[];
@@ -19,11 +23,11 @@ export const useAuthStore = defineStore('auth', {
 
   getters: {
     isLoggedIn: (state) => state.user !== null,
-    isSuperadmin: (state) => state.user?.role === 'superadmin',
+    isSuperadmin: (state) => state.user?.role === Role.SuperAdmin,
   },
 
   actions: {
-    async setSession(idToken: string, provider: 'email' | 'google' | 'phone', phone?: string) {
+    async setSession(idToken: string, provider: LoginProvider, phone?: string) {
       const data = await $fetch<AuthUser>('/api/auth/login', {
         method: 'POST',
         body: { idToken, provider, phone },

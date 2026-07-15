@@ -3,6 +3,8 @@ import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import 'dotenv/config';
 import { prefixCollection } from '../server/shared/firestore-prefix';
+import { hashPassword } from '../server/shared/crypto';
+import { Role } from '~/shared/roles';
 
 const app = initializeApp({
   credential: cert({
@@ -18,45 +20,57 @@ const TENANT_ID = process.env.TENANT_ID ?? 'default';
 
 const DEMO_USERS = [
   {
-    email: 'admin@demo.com',
+    username: 'demoadmin',
     password: 'demo1234',
     displayName: 'Demo Admin',
-    role: 'admin',
+    email: 'admin@demo.com',
+    phone: null,
+    role: Role.Admin,
   },
   {
-    email: 'member@demo.com',
+    username: 'demomember',
     password: 'demo1234',
     displayName: 'Demo Member',
-    role: 'member',
+    email: null,
+    phone: null,
+    role: Role.Member,
   },
 ];
 
 async function upsertDemoUser(user: (typeof DEMO_USERS)[number]) {
+  const base = `tenants/${TENANT_ID}`;
+  const usersCol = `${base}/${prefixCollection('users')}`;
+
+  // Check if Firestore doc with this username already exists
+  const existing = await db
+    .collection(usersCol)
+    .where('username', '==', user.username)
+    .limit(1)
+    .get();
+
   let uid: string;
 
-  try {
-    const existing = await auth.getUserByEmail(user.email);
-    uid = existing.uid;
-    console.log(`[SKIP] Auth user already exists: ${user.email} (uid: ${uid})`);
-  } catch (err: unknown) {
-    if ((err as { code?: string }).code !== 'auth/user-not-found') throw err;
-    const created = await auth.createUser({
-      email: user.email,
-      password: user.password,
-      displayName: user.displayName,
-    });
+  if (!existing.empty) {
+    uid = existing.docs[0].data().uid as string;
+    console.log(`[SKIP] Firestore user already exists: ${user.username} (uid: ${uid})`);
+  } else {
+    const created = await auth.createUser({ displayName: user.displayName });
     uid = created.uid;
-    console.log(`[OK] Auth user created: ${user.email} (uid: ${uid})`);
+    console.log(`[OK] Auth user created: ${user.username} (uid: ${uid})`);
   }
 
-  const base = `tenants/${TENANT_ID}`;
+  const passwordHash = await hashPassword(user.password);
   const batch = db.batch();
 
-  batch.set(db.doc(`${base}/${prefixCollection('users')}/${uid}`), {
+  batch.set(db.doc(`${usersCol}/${uid}`), {
     uid,
-    tenantId: TENANT_ID,
-    email: user.email,
+    username: user.username,
     displayName: user.displayName,
+    email: user.email,
+    phone: user.phone,
+    providers: ['password'],
+    passwordHash,
+    tenantId: TENANT_ID,
     createdAt: new Date().toISOString(),
   });
 
@@ -65,7 +79,7 @@ async function upsertDemoUser(user: (typeof DEMO_USERS)[number]) {
   });
 
   await batch.commit();
-  console.log(`[OK] Firestore upserted: ${user.email} → role: ${user.role}`);
+  console.log(`[OK] Firestore upserted: ${user.username} → role: ${user.role}`);
 }
 
 (async () => {

@@ -11,6 +11,7 @@ export type BaseLog = {
     userId: string;
     tenantId: string;
     role: string;
+    username?: string;
   };
   metadata: Record<string, unknown>;
 };
@@ -21,6 +22,7 @@ export type LoginLog = BaseLog & {
   ip: string;
   result: 'success' | 'failure';
   email?: string;
+  username?: string;
 };
 
 export type AuditLog = BaseLog & {

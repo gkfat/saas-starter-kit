@@ -1,17 +1,20 @@
 import {
   GoogleAuthProvider,
   RecaptchaVerifier,
-  createUserWithEmailAndPassword,
   getAuth,
   linkWithPhoneNumber,
-  signInWithEmailAndPassword,
+  linkWithPopup,
+  signInWithCustomToken,
   signInWithPopup,
   signOut,
-  updateProfile,
   type ConfirmationResult,
 } from 'firebase/auth';
 import { getClientApp } from '~/utils/firebase-client';
 import { useAuthStore } from '~/stores/auth';
+
+type GoogleLoginResult =
+  | { status: 'ready' }
+  | { status: 'quick-register'; googleEmail: string; displayName: string | null; idToken: string };
 
 export function useAuth() {
   const store = useAuthStore();
@@ -22,25 +25,58 @@ export function useAuth() {
     return getAuth(getClientApp());
   }
 
-  async function register(displayName: string, email: string, password: string) {
-    const auth = getFirebaseAuth();
-    const credential = await createUserWithEmailAndPassword(auth, email, password);
-    await updateProfile(credential.user, { displayName });
-    await signOut(auth);
+  async function register(
+    username: string,
+    password: string,
+    email?: string,
+    phone?: string,
+  ): Promise<void> {
+    await $fetch('/api/auth/register', {
+      method: 'POST',
+      body: { username, password, email, phone },
+    });
   }
 
-  async function loginWithEmail(email: string, password: string) {
+  async function login(identifier: string, password: string): Promise<void> {
     const auth = getFirebaseAuth();
-    const credential = await signInWithEmailAndPassword(auth, email, password);
+    const { customToken, ...userData } = await $fetch<
+      { customToken: string } & Parameters<typeof store.rehydrate>[0]
+    >('/api/auth/login', { method: 'POST', body: { provider: 'password', identifier, password } });
+    const credential = await signInWithCustomToken(auth, customToken);
     const idToken = await credential.user.getIdToken();
-    await store.setSession(idToken, 'email');
+    store.rehydrate(userData, idToken);
   }
 
-  async function loginWithGoogle() {
+  async function loginWithGoogle(): Promise<GoogleLoginResult> {
     const auth = getFirebaseAuth();
     const provider = new GoogleAuthProvider();
-    const credential = await signInWithPopup(auth, provider);
-    const idToken = await credential.user.getIdToken();
+    const googleCredential = await signInWithPopup(auth, provider);
+    const googleIdToken = await googleCredential.user.getIdToken();
+
+    const result = await $fetch<{
+      status: string;
+      googleEmail?: string;
+      displayName?: string | null;
+    }>('/api/auth/google-login', { method: 'POST', body: { idToken: googleIdToken } });
+
+    if (result.status === 'ready') {
+      await store.setSession(googleIdToken, 'google');
+      return { status: 'ready' };
+    }
+
+    return {
+      status: 'quick-register',
+      googleEmail: result.googleEmail ?? '',
+      displayName: result.displayName ?? null,
+      idToken: googleIdToken,
+    };
+  }
+
+  async function googleRegister(username: string, idToken: string): Promise<void> {
+    await $fetch('/api/auth/google-register', {
+      method: 'POST',
+      body: { username, idToken },
+    });
     await store.setSession(idToken, 'google');
   }
 
@@ -70,15 +106,34 @@ export function useAuth() {
     const currentUser = auth.currentUser;
     if (!currentUser) return;
 
-    // Force refresh so idToken includes phone_number claim
     const freshToken = await currentUser.getIdToken(true);
     store.updateIdToken(freshToken);
 
-    // Persist phone to Firestore user doc
     await $fetch('/api/profile/phone', {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${freshToken}` },
     });
+  }
+
+  async function linkGoogleProvider(): Promise<void> {
+    const auth = getFirebaseAuth();
+    const currentUser = auth.currentUser;
+    if (!currentUser) throw new Error('Must be logged in to link Google');
+
+    await linkWithPopup(currentUser, new GoogleAuthProvider());
+
+    const freshToken = await currentUser.getIdToken(true);
+    store.updateIdToken(freshToken);
+
+    await $fetch('/api/profile/google-provider', {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${freshToken}` },
+    });
+
+    const user = await $fetch('/api/auth/me', {
+      headers: { Authorization: `Bearer ${freshToken}` },
+    });
+    store.rehydrate(user as Parameters<typeof store.rehydrate>[0], freshToken);
   }
 
   async function logout() {
@@ -100,10 +155,12 @@ export function useAuth() {
 
   return {
     register,
-    loginWithEmail,
+    login,
     loginWithGoogle,
+    googleRegister,
     sendPhoneLinkOtp,
     confirmPhoneLinkOtp,
+    linkGoogleProvider,
     logout,
   };
 }

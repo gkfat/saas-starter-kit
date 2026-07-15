@@ -13,7 +13,7 @@
           <span class="text-caption font-mono">{{ item.timestamp }}</span>
         </template>
         <template #[`item.actor`]="{ item }">
-          {{ item.actor?.userId ?? '—' }}
+          {{ item.actor?.username ?? item.actor?.userId ?? '—' }}
         </template>
         <template #[`item.diff`]="{ item }">
           <span v-if="item.diff" class="text-medium-emphasis text-caption">

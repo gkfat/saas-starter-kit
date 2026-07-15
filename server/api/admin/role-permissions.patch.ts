@@ -3,6 +3,7 @@ import { recordAuditLog } from '../../modules/logs';
 import { updateRolePermissions } from '../../modules/roles';
 import { requirePermission } from '../../shared/rbac';
 import type { AuthenticatedContext } from '../../shared/types/context';
+import { getUserByUid } from '~/server/modules/users';
 import { Permission } from '~/shared/permissions';
 
 const BodySchema = z.object({
@@ -19,11 +20,18 @@ export default defineEventHandler(async (event) => {
 
   await updateRolePermissions(tenantId, roleName, permissions);
 
+  const actorUser = await getUserByUid(tenantId, userId);
+
   recordAuditLog(tenantId, {
     severity: 'INFO',
     timestamp: new Date().toISOString(),
     requestId,
-    actor: { userId, tenantId, role: role ?? 'unknown' },
+    actor: {
+      userId,
+      tenantId,
+      role: role ?? 'unknown',
+      ...(actorUser?.username ? { username: actorUser.username } : {}),
+    },
     action: 'role.permissions.update',
     metadata: { roleName, permissions },
   }).catch((err) =>

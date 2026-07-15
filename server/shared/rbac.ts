@@ -1,8 +1,9 @@
 import { createError } from 'h3';
 import type { H3Event } from 'h3';
+import { Role } from '~/shared/roles';
 
 export function hasPermission(event: H3Event, permission: string): boolean {
-  if (event.context.role === 'superadmin') return true;
+  if (event.context.role === Role.SuperAdmin) return true;
   return event.context.permissions?.includes(permission) ?? false;
 }
 

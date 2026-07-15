@@ -1,6 +1,14 @@
+import { resolve } from 'path';
+
 export default defineNuxtConfig({
   ssr: false,
   compatibilityDate: '2024-04-03',
+
+  nitro: {
+    alias: {
+      '~/shared': resolve('./shared'),
+    },
+  },
 
   modules: ['@nuxt/eslint', '@pinia/nuxt', '@nuxtjs/i18n'],
 

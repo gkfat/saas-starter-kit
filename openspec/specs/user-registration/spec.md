@@ -2,38 +2,43 @@
 
 ## Purpose
 
-允許新使用者以 email/password 自行建立帳號。註冊成功後導向登入頁，由使用者手動登入。
+允許新使用者以 username/password 自行建立帳號，email 與 phone 為選填綁定欄位。註冊成功後導向登入頁，由使用者手動登入。
 
 ## Requirements
 
-### Requirement: User can register a new account with email and password
+### Requirement: User can register a new account with username and password
 
-The system SHALL provide a registration page at `/auth/register` where a new user can create a Firebase Auth account by providing a display name, email address, and password. On successful registration the user SHALL be redirected to the login page (`/login`).
+The system SHALL provide a registration page at `/auth/register` where a new user can create an account by providing a username (6–8 alphanumeric), an optional email address, an optional phone number, and a password (6–8 alphanumeric) with confirmation. On successful registration the user SHALL be redirected to `/login`.
 
-#### Scenario: Successful registration
+#### Scenario: Successful registration with username and password only
 
-- **WHEN** user submits a valid display name, email, password, and matching confirm password
-- **THEN** system creates a Firebase Auth account via `createUserWithEmailAndPassword`, sets the display name via `updateProfile`, signs out, and redirects to `/login`
+- **WHEN** user submits a valid username, matching password and confirm password (no email, no phone)
+- **THEN** system creates a Firebase Auth account via `createUserWithEmailAndPassword` using synthetic email `{username}@internal.local`, creates Firestore `users` document with `username`, `email: null`, `phone: null`, `providers: ['password']`, signs out, and redirects to `/login`
+
+#### Scenario: Successful registration with username, email, and password
+
+- **WHEN** user submits a valid username, a valid email address, and matching password
+- **THEN** system creates a Firebase Auth account and Firestore `users` document with `email` populated, signs out, and redirects to `/login`
 
 #### Scenario: Passwords do not match
 
 - **WHEN** user submits a form where password and confirm password fields differ
 - **THEN** system displays a validation error and does not call Firebase
 
-#### Scenario: Email already in use
+#### Scenario: Username already taken
 
-- **WHEN** user submits an email that is already registered with any provider
-- **THEN** system catches the `auth/email-already-in-use` Firebase error and displays an error message directing the user to the login page
+- **WHEN** user submits a username that already exists in Firestore
+- **THEN** system displays "此帳號名稱已被使用" and does not create a Firebase Auth account
 
-#### Scenario: Invalid email format
+#### Scenario: Username format invalid
 
-- **WHEN** user submits a malformed email address
-- **THEN** system catches the `auth/invalid-email` Firebase error and displays an appropriate error message
+- **WHEN** user submits a username that is not 6–8 alphanumeric characters
+- **THEN** system displays a validation error describing the format requirement
 
-#### Scenario: Weak password rejected by Firebase
+#### Scenario: Password format invalid
 
-- **WHEN** user submits a password that does not meet Firebase minimum strength requirements
-- **THEN** system catches the `auth/weak-password` Firebase error and displays an error message
+- **WHEN** user submits a password that is not 6–8 alphanumeric characters
+- **THEN** system displays a validation error describing the format requirement
 
 ### Requirement: Login page links to the registration page
 

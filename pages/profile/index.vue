@@ -7,6 +7,7 @@
         <v-card elevation="2">
           <v-card-text>
             <v-list lines="two" class="mb-4">
+              <v-list-item :title="$t('auth.username')" :subtitle="store.user?.username ?? '—'" />
               <v-list-item :title="$t('profile.email')" :subtitle="store.user?.email ?? '—'" />
               <v-list-item
                 :title="$t('profile.displayName')"
@@ -31,6 +32,29 @@
                 </template>
               </v-list-item>
             </v-list>
+
+            <v-divider class="mb-4" />
+
+            <div class="text-subtitle-2 mb-3">{{ $t('profile.loginMethods') }}</div>
+            <div class="d-flex align-center gap-2 mb-4">
+              <v-chip
+                v-if="store.user?.providers.includes('google')"
+                color="success"
+                variant="tonal"
+              >
+                <v-icon start size="small">mdi-check-circle</v-icon>
+                {{ $t('profile.googleBound') }}
+              </v-chip>
+              <v-btn
+                v-else
+                color="primary"
+                variant="tonal"
+                :loading="googleLoading"
+                @click="handleLinkGoogle"
+              >
+                {{ $t('profile.bindGoogle') }}
+              </v-btn>
+            </div>
 
             <v-divider class="mb-4" />
 
@@ -81,14 +105,38 @@ import type { ConfirmationResult } from 'firebase/auth';
 import { useAuthStore } from '~/stores/auth';
 
 const store = useAuthStore();
-const { sendPhoneLinkOtp, confirmPhoneLinkOtp } = useAuth();
+const { sendPhoneLinkOtp, confirmPhoneLinkOtp, linkGoogleProvider } = useAuth();
 const { showError, showSuccess } = useToast();
 const { t } = useI18n();
 
 const phone = ref('');
 const otp = ref('');
 const loading = ref(false);
+const googleLoading = ref(false);
 const confirmationResult = ref<ConfirmationResult | null>(null);
+
+function getGoogleLinkErrorMessage(e: unknown): string {
+  const code = (e as { code?: string }).code ?? '';
+  const map: Record<string, string> = {
+    'auth/credential-already-in-use': t('auth.error.googleAlreadyLinked'),
+    'auth/popup-closed-by-user': t('auth.error.popupClosed'),
+    'auth/cancelled-popup-request': t('auth.error.popupClosed'),
+    'auth/popup-blocked': t('auth.error.popupBlocked'),
+  };
+  return map[code] ?? t('profile.bindGoogleFailed');
+}
+
+async function handleLinkGoogle() {
+  googleLoading.value = true;
+  try {
+    await linkGoogleProvider();
+    showSuccess(t('profile.bindGoogleSuccess'));
+  } catch (e: unknown) {
+    showError(getGoogleLinkErrorMessage(e));
+  } finally {
+    googleLoading.value = false;
+  }
+}
 
 async function handleSendOtp() {
   loading.value = true;

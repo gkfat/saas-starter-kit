@@ -7,7 +7,7 @@
         <v-text-field
           v-model="search"
           prepend-inner-icon="mdi-magnify"
-          :label="$t('users.searchByEmail')"
+          :label="$t('users.searchByUsernameOrEmail')"
           clearable
           hide-details
           density="compact"
@@ -29,7 +29,9 @@
 
     <v-dialog v-model="dialog" max-width="400">
       <v-card>
-        <v-card-title class="pa-4">{{ $t('users.editRole') }} — {{ editing?.email }}</v-card-title>
+        <v-card-title class="pa-4"
+          >{{ $t('users.editRole') }} — {{ editing?.username }}</v-card-title
+        >
         <v-card-text>
           <v-select
             v-model="selectedRole"
@@ -55,7 +57,8 @@ import { useAuthStore } from '~/stores/auth';
 
 type UserRow = {
   uid: string;
-  email: string;
+  username: string;
+  email: string | null;
   displayName: string;
   role: string | null;
   createdAt: string;
@@ -70,6 +73,7 @@ const { withErrorToast } = useApiError();
 
 const headers = computed(() => [
   { title: t('users.uid'), key: 'uid' },
+  { title: t('auth.username'), key: 'username' },
   { title: t('users.email'), key: 'email' },
   { title: t('users.displayName'), key: 'displayName' },
   { title: t('users.role'), key: 'role' },
@@ -87,7 +91,9 @@ const roleNames = computed(() => (roles.value ?? []).map((r) => r.name));
 const search = ref('');
 const filteredUsers = computed(() => {
   const q = search.value?.toLowerCase() ?? '';
-  return (users.value ?? []).filter((u) => !q || u.email.toLowerCase().includes(q));
+  return (users.value ?? []).filter(
+    (u) => !q || u.username.toLowerCase().includes(q) || (u.email ?? '').toLowerCase().includes(q),
+  );
 });
 
 const dialog = ref(false);
