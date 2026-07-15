@@ -21,7 +21,16 @@
         <template #[`item.uid`]="{ item }">
           <span class="text-caption font-mono text-medium-emphasis">{{ item.uid }}</span>
         </template>
-        <template #[`item.actions`]="{ item }">
+        <template #[`item.email`]="{ item }">
+          <span>{{ item.email ?? '-' }}</span>
+        </template>
+        <template #[`item.role`]="{ item }">
+          <span>{{ item.role ? $t(`role.${item.role}`) : '-' }}</span>
+        </template>
+        <template #[`item.createdAt`]="{ item }">
+          <span>{{ formatDateTime(item.createdAt) }}</span>
+        </template>
+        <template v-if="canWriteUsers" #[`item.actions`]="{ item }">
           <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEdit(item)" />
         </template>
       </v-data-table>
@@ -53,6 +62,7 @@
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
+import { Permission } from '~/shared/permissions';
 import { useAuthStore } from '~/stores/auth';
 
 type UserRow = {
@@ -70,6 +80,9 @@ const { t } = useI18n();
 
 const { showSuccess } = useToast();
 const { withErrorToast } = useApiError();
+const { hasPermission } = usePermission();
+
+const canWriteUsers = computed(() => hasPermission(Permission.Users.Write));
 
 const headers = computed(() => [
   { title: t('users.uid'), key: 'uid' },
@@ -78,7 +91,9 @@ const headers = computed(() => [
   { title: t('users.displayName'), key: 'displayName' },
   { title: t('users.role'), key: 'role' },
   { title: t('users.createdAt'), key: 'createdAt' },
-  { title: '', key: 'actions', sortable: false, align: 'end' as const },
+  ...(canWriteUsers.value
+    ? [{ title: '', key: 'actions', sortable: false, align: 'end' as const }]
+    : []),
 ]);
 
 const [{ data: users, pending, refresh }, { data: roles }] = await Promise.all([

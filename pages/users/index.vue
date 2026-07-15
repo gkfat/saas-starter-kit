@@ -38,7 +38,7 @@ const { data: users, pending } = await useAuthFetch('/api/admin/users', {
 const formattedUsers = computed(() =>
   (users.value ?? []).map((u) => ({
     ...u,
-    createdAt: u.createdAt ? new Date(u.createdAt).toLocaleString() : '—',
+    createdAt: formatDateTime(u.createdAt),
   })),
 );
 </script>

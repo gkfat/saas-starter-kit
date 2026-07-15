@@ -19,7 +19,7 @@
           </v-chip>
         </template>
         <template #[`item.timestamp`]="{ item }">
-          <span class="text-caption font-mono">{{ item.timestamp }}</span>
+          <span class="text-caption font-mono">{{ formatDateTime(item.timestamp) }}</span>
         </template>
         <template #no-data>
           <span class="text-medium-emphasis">{{ $t('logs.noData') }}</span>

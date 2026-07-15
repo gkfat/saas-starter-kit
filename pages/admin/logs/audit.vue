@@ -10,7 +10,7 @@
         item-value="requestId"
       >
         <template #[`item.timestamp`]="{ item }">
-          <span class="text-caption font-mono">{{ item.timestamp }}</span>
+          <span class="text-caption font-mono">{{ formatDateTime(item.timestamp) }}</span>
         </template>
         <template #[`item.actor`]="{ item }">
           {{ item.actor?.username ?? item.actor?.userId ?? '—' }}
