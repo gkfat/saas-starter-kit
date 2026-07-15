@@ -24,7 +24,6 @@
   "nav": {
     "groupManagement": "管理",
     "groupIam": "身份與存取管理",
-    "groupLogs": "紀錄",
     "dashboard": "儀表板",
     "profile": "個人資料",
     "users": "使用者管理",
@@ -177,13 +176,8 @@
     "language": "語言"
   },
   "admin": {
-    "title": "系統管理",
-    "management": "管理",
-    "logs": "紀錄",
-    "users": "使用者",
-    "roles": "角色",
-    "loginLogs": "登入紀錄",
-    "auditLogs": "稽核紀錄"
+    "noPermission": "無此權限",
+    "noPermissionHint": "您沒有權限存取任何管理頁面。"
   },
   "role": {
     "admin": "管理員",

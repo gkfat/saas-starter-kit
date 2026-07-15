@@ -24,7 +24,6 @@
   "nav": {
     "groupManagement": "Management",
     "groupIam": "IAM",
-    "groupLogs": "Logs",
     "dashboard": "Dashboard",
     "profile": "Profile",
     "users": "User Management",
@@ -177,13 +176,8 @@
     "language": "Language"
   },
   "admin": {
-    "title": "Administration",
-    "management": "Management",
-    "logs": "Logs",
-    "users": "Users",
-    "roles": "Roles",
-    "loginLogs": "Login Logs",
-    "auditLogs": "Audit Logs"
+    "noPermission": "No Access",
+    "noPermissionHint": "You don't have permission to access any admin page."
   },
   "role": {
     "admin": "Admin",

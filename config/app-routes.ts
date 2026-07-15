@@ -40,6 +40,20 @@ export const APP_ROUTES: RouteGroup[] = [
         path: '/admin/users',
         permission: Permission.Users.Read,
       },
+      {
+        title: 'nav.loginLogs',
+        icon: 'mdi-login',
+        path: '/admin/logs/login',
+        exact: true,
+        permission: Permission.LoginLogs.Read,
+      },
+      {
+        title: 'nav.auditLogs',
+        icon: 'mdi-history',
+        path: '/admin/logs/audit',
+        exact: true,
+        permission: Permission.AuditLogs.Read,
+      },
     ],
   },
   {
@@ -59,26 +73,10 @@ export const APP_ROUTES: RouteGroup[] = [
       },
     ],
   },
-  {
-    label: 'nav.groupLogs',
-    items: [
-      {
-        title: 'nav.loginLogs',
-        icon: 'mdi-login',
-        path: '/admin/logs/login',
-        exact: true,
-        permission: Permission.LoginLogs.Read,
-      },
-      {
-        title: 'nav.auditLogs',
-        icon: 'mdi-history',
-        path: '/admin/logs/audit',
-        exact: true,
-        permission: Permission.AuditLogs.Read,
-      },
-    ],
-  },
 ];
+
+export const ADMIN_GROUP_LABEL = 'nav.groupManagement';
+export const IAM_GROUP_LABEL = 'nav.groupIam';
 
 export function flattenRoutePermissions(): { prefix: string; permission: Permission }[] {
   const result: { prefix: string; permission: Permission }[] = [];

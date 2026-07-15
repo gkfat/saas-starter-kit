@@ -1,51 +1,9 @@
 <template>
-  <div>
-    <div class="text-h5 mb-6">{{ $t('admin.title') }}</div>
-    <v-row>
-      <v-col cols="12" sm="6" md="3">
-        <v-card :to="'/admin/users'" elevation="2" hover>
-          <v-card-text class="d-flex align-center ga-4">
-            <v-icon icon="mdi-account-group" size="36" color="primary" />
-            <div>
-              <div class="text-overline text-medium-emphasis">{{ $t('admin.management') }}</div>
-              <div class="text-h6">{{ $t('admin.users') }}</div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" sm="6" md="3">
-        <v-card :to="'/iam/roles'" elevation="2" hover>
-          <v-card-text class="d-flex align-center ga-4">
-            <v-icon icon="mdi-shield-account" size="36" color="secondary" />
-            <div>
-              <div class="text-overline text-medium-emphasis">{{ $t('admin.management') }}</div>
-              <div class="text-h6">{{ $t('admin.roles') }}</div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" sm="6" md="3">
-        <v-card :to="'/admin/logs/login'" elevation="2" hover>
-          <v-card-text class="d-flex align-center ga-4">
-            <v-icon icon="mdi-login" size="36" color="success" />
-            <div>
-              <div class="text-overline text-medium-emphasis">{{ $t('admin.logs') }}</div>
-              <div class="text-h6">{{ $t('admin.loginLogs') }}</div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <v-col cols="12" sm="6" md="3">
-        <v-card :to="'/admin/logs/audit'" elevation="2" hover>
-          <v-card-text class="d-flex align-center ga-4">
-            <v-icon icon="mdi-history" size="36" color="warning" />
-            <div>
-              <div class="text-overline text-medium-emphasis">{{ $t('admin.logs') }}</div>
-              <div class="text-h6">{{ $t('admin.auditLogs') }}</div>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-  </div>
+  <LayoutNoPermissionNotice v-if="!hasAnyAccess" />
 </template>
+
+<script setup lang="ts">
+import { ADMIN_GROUP_LABEL } from '~/config/app-routes';
+
+const { hasAnyAccess } = await useGroupRedirect(ADMIN_GROUP_LABEL);
+</script>
