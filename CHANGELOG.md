@@ -31,3 +31,4 @@
 - 調整 UI layout
 - 調整權限結構與共用 enum
 - 調整帳號結構，改為以 username + password 作為主要登入 provider
+- 優化個人資料頁面 UI

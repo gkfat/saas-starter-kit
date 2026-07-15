@@ -10,7 +10,12 @@
     "search": "搜尋",
     "loading": "載入中...",
     "noData": "無資料",
-    "actions": "操作"
+    "actions": "操作",
+    "bound": "已綁定",
+    "notBound": "未綁定",
+    "bind": "綁定",
+    "unbind": "解除綁定",
+    "verify": "驗證"
   },
   "lang": {
     "zh-TW": "繁體中文",
@@ -81,13 +86,14 @@
   },
   "profile": {
     "title": "個人資料",
-    "displayName": "Display Name",
+    "displayName": "顯示名稱",
     "email": "Email",
-    "role": "Role",
+    "role": "角色",
     "phone": "手機號碼",
     "phoneNotVerified": "未驗證",
     "verifyPhone": "驗證手機號碼",
-    "phonePlaceholder": "手機號碼（含國碼，例如 +886912345678）",
+    "phonePlaceholder": "手機號碼",
+    "phoneInvalid": "請輸入正確的手機號碼（09 開頭共 10 碼，或 9 開頭共 9 碼）",
     "enterOtp": "輸入驗證碼",
     "confirmOtp": "確認驗證",
     "resendOtp": "重新發送",
@@ -95,10 +101,24 @@
     "otpSendFailed": "驗證碼發送失敗",
     "otpFailed": "驗證失敗",
     "loginMethods": "登入方式",
+    "googleLogin": "Google 登入",
     "bindGoogle": "綁定 Google 帳號",
     "googleBound": "已綁定 Google 帳號",
     "bindGoogleSuccess": "Google 帳號綁定成功",
-    "bindGoogleFailed": "Google 帳號綁定失敗"
+    "bindGoogleFailed": "Google 帳號綁定失敗",
+    "unbindGoogleSuccess": "已解除 Google 帳號綁定",
+    "unbindGoogleFailed": "解除綁定失敗",
+    "unbindGoogleLastProvider": "無法解除唯一的登入方式",
+    "unbindGoogleConfirmTitle": "解除 Google 帳號綁定",
+    "unbindGoogleConfirmMessage": "確定要解除 Google 帳號的登入綁定嗎？",
+    "editDisplayName": "編輯",
+    "save": "儲存",
+    "cancel": "取消",
+    "displayNameUpdateSuccess": "顯示名稱更新成功",
+    "displayNameUpdateFailed": "顯示名稱更新失敗",
+    "displayNameRequired": "顯示名稱不可為空白",
+    "displayNameTooLong": "顯示名稱長度不可超過 20 字元",
+    "profileCardTitle": "基本資料"
   },
   "users": {
     "title": "使用者管理",
@@ -164,5 +184,10 @@
     "roles": "角色",
     "loginLogs": "登入紀錄",
     "auditLogs": "稽核紀錄"
+  },
+  "role": {
+    "admin": "管理員",
+    "member": "會員",
+    "superadmin": "超級管理員"
   }
 }

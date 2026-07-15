@@ -9,7 +9,9 @@ import {
   findUserWithHashByEmail,
   syncUserOnLogin,
   addProviderToUser,
+  removeProviderFromUser,
   updateUserPhone,
+  updateUserDisplayName,
   listUsers,
 } from './users.repo';
 import type { User, UserWithHash } from './users.types';
@@ -66,8 +68,25 @@ export async function bindGoogleProvider(tenantId: string, uid: string): Promise
   return addProviderToUser(tenantId, uid, 'google');
 }
 
+export async function unbindGoogleProvider(tenantId: string, uid: string): Promise<void> {
+  const user = await findUserByUid(tenantId, uid);
+  if (!user) return;
+  if (user.providers.length <= 1) {
+    throw Object.assign(new Error('無法移除唯一的登入方式'), { code: 'last-provider' });
+  }
+  return removeProviderFromUser(tenantId, uid, 'google');
+}
+
 export async function syncUserPhone(tenantId: string, uid: string, phone: string): Promise<void> {
   return updateUserPhone(tenantId, uid, phone);
+}
+
+export async function syncUserDisplayName(
+  tenantId: string,
+  uid: string,
+  displayName: string,
+): Promise<void> {
+  return updateUserDisplayName(tenantId, uid, displayName);
 }
 
 export async function getAllUsers(tenantId: string): Promise<User[]> {

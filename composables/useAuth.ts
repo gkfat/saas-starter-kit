@@ -7,6 +7,7 @@ import {
   signInWithCustomToken,
   signInWithPopup,
   signOut,
+  unlink,
   type ConfirmationResult,
 } from 'firebase/auth';
 import { getClientApp } from '~/utils/firebase-client';
@@ -136,6 +137,27 @@ export function useAuth() {
     store.rehydrate(user as Parameters<typeof store.rehydrate>[0], freshToken);
   }
 
+  async function unlinkGoogleProvider(): Promise<void> {
+    const auth = getFirebaseAuth();
+    const currentUser = auth.currentUser;
+    if (!currentUser) throw new Error('Must be logged in to unlink Google');
+
+    await unlink(currentUser, GoogleAuthProvider.PROVIDER_ID);
+
+    const freshToken = await currentUser.getIdToken(true);
+    store.updateIdToken(freshToken);
+
+    await $fetch('/api/profile/google-provider', {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${freshToken}` },
+    });
+
+    const user = await $fetch('/api/auth/me', {
+      headers: { Authorization: `Bearer ${freshToken}` },
+    });
+    store.rehydrate(user as Parameters<typeof store.rehydrate>[0], freshToken);
+  }
+
   async function logout() {
     const auth = getFirebaseAuth();
     try {
@@ -161,6 +183,7 @@ export function useAuth() {
     sendPhoneLinkOtp,
     confirmPhoneLinkOtp,
     linkGoogleProvider,
+    unlinkGoogleProvider,
     logout,
   };
 }

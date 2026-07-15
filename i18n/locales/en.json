@@ -10,7 +10,12 @@
     "search": "Search",
     "loading": "Loading...",
     "noData": "No data",
-    "actions": "Actions"
+    "actions": "Actions",
+    "bound": "Linked",
+    "notBound": "Not linked",
+    "bind": "Link",
+    "unbind": "Unlink",
+    "verify": "Verify"
   },
   "lang": {
     "zh-TW": "繁體中文",
@@ -87,7 +92,8 @@
     "phone": "Phone Number",
     "phoneNotVerified": "Not verified",
     "verifyPhone": "Verify Phone Number",
-    "phonePlaceholder": "Phone number (with country code, e.g. +886912345678)",
+    "phonePlaceholder": "Phone number",
+    "phoneInvalid": "Enter a valid mobile number (e.g. 0912345678 or 912345678)",
     "enterOtp": "Enter verification code",
     "confirmOtp": "Verify",
     "resendOtp": "Resend",
@@ -95,10 +101,24 @@
     "otpSendFailed": "Failed to send verification code",
     "otpFailed": "Verification failed",
     "loginMethods": "Login Methods",
+    "googleLogin": "Google Login",
     "bindGoogle": "Link Google Account",
     "googleBound": "Google account linked",
     "bindGoogleSuccess": "Google account linked successfully",
-    "bindGoogleFailed": "Failed to link Google account"
+    "bindGoogleFailed": "Failed to link Google account",
+    "unbindGoogleSuccess": "Google account unlinked",
+    "unbindGoogleFailed": "Failed to unlink Google account",
+    "unbindGoogleLastProvider": "Cannot unlink your only login method",
+    "unbindGoogleConfirmTitle": "Unlink Google Account",
+    "unbindGoogleConfirmMessage": "Are you sure you want to unlink your Google account?",
+    "editDisplayName": "Edit",
+    "save": "Save",
+    "cancel": "Cancel",
+    "displayNameUpdateSuccess": "Display name updated successfully",
+    "displayNameUpdateFailed": "Failed to update display name",
+    "displayNameRequired": "Display name cannot be empty",
+    "displayNameTooLong": "Display name must be at most 20 characters",
+    "profileCardTitle": "Basic Info"
   },
   "users": {
     "title": "User Management",
@@ -164,5 +184,10 @@
     "roles": "Roles",
     "loginLogs": "Login Logs",
     "auditLogs": "Audit Logs"
+  },
+  "role": {
+    "admin": "Admin",
+    "member": "Member",
+    "superadmin": "Super Admin"
   }
 }

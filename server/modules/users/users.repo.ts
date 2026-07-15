@@ -118,8 +118,31 @@ export async function addProviderToUser(
   }
 }
 
+export async function removeProviderFromUser(
+  tenantId: string,
+  uid: string,
+  provider: string,
+): Promise<void> {
+  const ref = userRef(tenantId, uid);
+  const doc = await ref.get();
+  if (!doc.exists) return;
+
+  const user = doc.data() as User;
+  if (user.providers.includes(provider)) {
+    await ref.update({ providers: user.providers.filter((p) => p !== provider) });
+  }
+}
+
 export async function updateUserPhone(tenantId: string, uid: string, phone: string): Promise<void> {
   await userRef(tenantId, uid).update({ phone });
+}
+
+export async function updateUserDisplayName(
+  tenantId: string,
+  uid: string,
+  displayName: string,
+): Promise<void> {
+  await userRef(tenantId, uid).update({ displayName });
 }
 
 export async function listUsers(tenantId: string): Promise<User[]> {
