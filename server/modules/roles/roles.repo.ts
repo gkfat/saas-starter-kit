@@ -64,6 +64,10 @@ export async function upsertUserRole(userId: string, role: string): Promise<void
   await userRolesRef(userId).set({ role });
 }
 
+export async function removeUserRole(userId: string): Promise<void> {
+  await userRolesRef(userId).delete();
+}
+
 export async function listRoles(): Promise<Role[]> {
   const snapshot = await rolesCollection().get();
   return snapshot.docs.map((doc) => RoleSchema.parse(doc.data()));

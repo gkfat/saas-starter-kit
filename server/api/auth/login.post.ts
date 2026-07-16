@@ -4,7 +4,7 @@ import {
   processPasswordLogin,
   createCustomToken,
 } from '../../modules/auth';
-import { getUserWithHashByIdentifier } from '../../modules/users';
+import { getUserWithHashByIdentifier, touchUserOnLogin } from '../../modules/users';
 import { verifyPassword } from '../../shared/crypto';
 import { resetOnSuccess } from '../../modules/rate-limit';
 import { recordLoginLog } from '../../modules/logs';
@@ -58,6 +58,7 @@ export default defineEventHandler(async (event) => {
         requestId,
       }),
       createCustomToken(firestoreUser!.uid),
+      touchUserOnLogin({ uid: firestoreUser!.uid, displayName: null, phone: null }),
     ]);
 
     return {

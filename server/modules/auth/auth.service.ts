@@ -103,6 +103,23 @@ export async function isSuperAdminUid(uid: string): Promise<boolean> {
   }
 }
 
+export async function getAuthAccountStatus(
+  uid: string,
+): Promise<{ isSuperAdmin: boolean; disabled: boolean }> {
+  try {
+    const authUser = await adminAuth().getUser(uid);
+    return {
+      isSuperAdmin: authUser.customClaims?.['role'] === Role.SuperAdmin,
+      disabled: authUser.disabled,
+    };
+  } catch (err) {
+    if ((err as { code?: string }).code === 'auth/user-not-found') {
+      return { isSuperAdmin: false, disabled: false };
+    }
+    throw err;
+  }
+}
+
 export async function processPasswordLogin(params: {
   uid: string;
   username: string;

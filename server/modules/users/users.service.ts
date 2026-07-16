@@ -12,7 +12,9 @@ import {
   removeProviderFromUser,
   updateUserPhone,
   updateUserDisplayName,
+  updateUserPassword,
   listUsers,
+  deleteUser,
 } from './users.repo';
 import type { User, UserWithHash } from './users.types';
 
@@ -24,13 +26,27 @@ export async function registerUser(data: {
   phone: string | null;
   providers: string[];
   passwordHash: string | null;
+  role?: string;
+  passwordSetupPending?: boolean;
 }): Promise<void> {
   const existing = await findUserByUsername(data.username);
   if (existing) {
     throw Object.assign(new Error('此帳號名稱已被使用'), { code: 'username-taken' });
   }
   await createUser(data);
-  await assignUserRole(data.uid, Role.Member);
+  await assignUserRole(data.uid, data.role ?? Role.Member);
+}
+
+export async function createUserByAdmin(data: {
+  uid: string;
+  username: string;
+  displayName: string;
+  email: string | null;
+  phone: string | null;
+  passwordHash: string | null;
+  role: string;
+}): Promise<void> {
+  await registerUser({ ...data, providers: [], passwordSetupPending: true });
 }
 
 export async function getUserWithHashByIdentifier(
@@ -82,6 +98,14 @@ export async function syncUserDisplayName(uid: string, displayName: string): Pro
   return updateUserDisplayName(uid, displayName);
 }
 
+export async function setUserPassword(uid: string, passwordHash: string): Promise<void> {
+  return updateUserPassword(uid, passwordHash);
+}
+
 export async function getAllUsers(): Promise<User[]> {
   return listUsers();
+}
+
+export async function deleteUserAccount(uid: string): Promise<void> {
+  await deleteUser(uid);
 }

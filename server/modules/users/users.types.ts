@@ -5,6 +5,8 @@ export type User = {
   email: string | null;
   phone: string | null;
   providers: string[];
+  passwordSetupPending: boolean;
+  lastLoginAt: string | null;
   createdAt: string;
 };
 

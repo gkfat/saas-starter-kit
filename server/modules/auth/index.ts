@@ -5,6 +5,7 @@ export {
   processPasswordLogin,
   createCustomToken,
   isSuperAdminUid,
+  getAuthAccountStatus,
 } from './auth.service';
 export type { AuthUser, LoginProvider } from './auth.types';
 export {

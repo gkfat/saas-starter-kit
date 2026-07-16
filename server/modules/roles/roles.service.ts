@@ -8,6 +8,7 @@ import {
   listRoles,
   upsertRolePermissions,
   upsertUserRole,
+  removeUserRole,
 } from './roles.repo';
 import type { Permission, Role } from './roles.types';
 import { UserRoleSchema } from './roles.schema';
@@ -69,6 +70,10 @@ export async function assignUserRole(userId: string, role: string): Promise<void
 
 export async function getRoleForUser(userId: string): Promise<string | null> {
   return getUserRole(userId);
+}
+
+export async function deleteUserRole(userId: string): Promise<void> {
+  await removeUserRole(userId);
 }
 
 export async function getAllRoles(): Promise<Role[]> {

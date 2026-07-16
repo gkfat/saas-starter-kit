@@ -19,6 +19,8 @@ export const RolePermissions: Record<Role, Permission[]> = {
   admin: [
     Permission.Users.Read,
     Permission.Users.Write,
+    Permission.Users.Create,
+    Permission.Users.Delete,
     Permission.Roles.Read,
     Permission.Roles.Write,
     Permission.Permissions.Read,

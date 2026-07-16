@@ -2,6 +2,7 @@
   "common": {
     "logout": "Logout",
     "confirm": "Confirm",
+    "copied": "Copied",
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
@@ -61,7 +62,10 @@
     "sendOtp": "Send Code",
     "verifyOtp": "Verify",
     "passwordMismatch": "Passwords do not match",
+    "setPassword": "Set Password",
+    "setPasswordSuccess": "Password set successfully, please log in",
     "error": {
+      "invalidSetupToken": "This link is invalid or has expired",
       "invalidCredential": "Incorrect username or password",
       "invalidEmail": "Invalid email format",
       "invalidUsername": "Username must be 6–8 alphanumeric characters",
@@ -126,6 +130,7 @@
     "name": "Name",
     "email": "Email",
     "displayName": "Display Name",
+    "displayNameOptional": "Display Name (optional)",
     "phone": "Phone",
     "role": "Role",
     "status": "Status",
@@ -133,8 +138,29 @@
     "noData": "No users found",
     "searchByEmail": "Search by email",
     "searchByUsernameOrEmail": "Search by username or email",
+    "filterByRole": "Filter by role",
     "editRole": "Edit Role",
-    "updateRoleSuccess": "User role updated"
+    "updateRoleSuccess": "User role updated",
+    "createUser": "Create User",
+    "createSuccess": "User created",
+    "exportCsv": "Export CSV",
+    "setupLinkTitle": "Password Setup Link",
+    "setupLinkHint": "This link is single-use. Copy and share it with the user as soon as possible — they can use it to set a password and log in.",
+    "copyLink": "Copy Link",
+    "lastLoginAt": "Last Login",
+    "status": {
+      "label": "Account Status",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "pendingPassword": "Password Not Set"
+    },
+    "disableUser": "Disable User",
+    "enableUser": "Enable User",
+    "disableConfirm": "Are you sure you want to change the status of \"{username}\"?",
+    "updateStatusSuccess": "User account status updated",
+    "deleteUser": "Delete User",
+    "deleteConfirm": "Are you sure you want to permanently delete \"{username}\"? This cannot be undone.",
+    "deleteSuccess": "User deleted"
   },
   "roles": {
     "title": "Roles",
@@ -187,6 +213,8 @@
   "permission": {
     "users:read": "Read users",
     "users:write": "Write users",
+    "users:create": "Create user accounts",
+    "users:delete": "Delete user accounts",
     "roles:read": "Read roles",
     "roles:write": "Edit role permissions",
     "permissions:read": "Read permissions",

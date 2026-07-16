@@ -2,6 +2,7 @@ export {
   getPermissionsForRole,
   updateRolePermissions,
   assignUserRole,
+  deleteUserRole,
   getRoleForUser,
   getAllRoles,
   getAllPermissions,

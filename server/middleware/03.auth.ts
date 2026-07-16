@@ -8,6 +8,7 @@ const PUBLIC_PATHS = new Set([
   '/api/auth/google-login',
   '/api/auth/google-register',
   '/api/auth/otp/verify',
+  '/api/auth/set-password',
 ]);
 
 export default defineEventHandler(async (event) => {

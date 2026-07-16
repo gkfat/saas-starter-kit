@@ -57,6 +57,7 @@ export async function createUser(data: {
   phone: string | null;
   providers: string[];
   passwordHash: string | null;
+  passwordSetupPending?: boolean;
 }): Promise<void> {
   const ref = userRef(data.uid);
   await ref.set({
@@ -67,6 +68,8 @@ export async function createUser(data: {
     phone: data.phone,
     providers: data.providers,
     passwordHash: data.passwordHash,
+    passwordSetupPending: data.passwordSetupPending ?? false,
+    lastLoginAt: null,
     createdAt: new Date().toISOString(),
   });
 }
@@ -80,13 +83,11 @@ export async function syncUserOnLogin(data: {
   const doc = await ref.get();
   if (!doc.exists) return null;
 
-  const update: Record<string, string> = {};
+  const update: Record<string, string> = { lastLoginAt: new Date().toISOString() };
   if (data.displayName) update.displayName = data.displayName;
   if (data.phone) update.phone = data.phone;
 
-  if (Object.keys(update).length > 0) {
-    await ref.update(update);
-  }
+  await ref.update(update);
 
   return { ...(doc.data() as User), ...update };
 }
@@ -121,7 +122,24 @@ export async function updateUserDisplayName(uid: string, displayName: string): P
   await userRef(uid).update({ displayName });
 }
 
+export async function updateUserPassword(uid: string, passwordHash: string): Promise<void> {
+  const ref = userRef(uid);
+  const doc = await ref.get();
+  if (!doc.exists) return;
+
+  const user = doc.data() as User;
+  const providers = user.providers.includes('password')
+    ? user.providers
+    : [...user.providers, 'password'];
+
+  await ref.update({ passwordHash, providers, passwordSetupPending: false });
+}
+
 export async function listUsers(): Promise<User[]> {
   const snapshot = await usersCollection().orderBy('createdAt', 'desc').get();
   return snapshot.docs.map((doc) => stripHash(doc.data() as UserWithHash));
+}
+
+export async function deleteUser(uid: string): Promise<void> {
+  await userRef(uid).delete();
 }
