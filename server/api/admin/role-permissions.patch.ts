@@ -15,22 +15,21 @@ const BodySchema = z.object({
 export default defineEventHandler(async (event) => {
   requirePermission(event, Permission.Roles.Write);
 
-  const { tenantId, userId, role, requestId } = event.context as AuthenticatedContext;
+  const { userId, role, requestId } = event.context as AuthenticatedContext;
   const body = await readBody(event);
   const { roleName, permissions } = BodySchema.parse(body);
 
-  await updateRolePermissions(tenantId, roleName, permissions);
+  await updateRolePermissions(roleName, permissions);
 
   if (role !== Role.SuperAdmin) {
-    const actorUser = await getUserByUid(tenantId, userId);
+    const actorUser = await getUserByUid(userId);
 
-    recordAuditLog(tenantId, {
+    recordAuditLog({
       severity: 'INFO',
       timestamp: new Date().toISOString(),
       requestId,
       actor: {
         userId,
-        tenantId,
         role: role ?? 'unknown',
         ...(actorUser?.username ? { username: actorUser.username } : {}),
       },

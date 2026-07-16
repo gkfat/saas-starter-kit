@@ -7,7 +7,6 @@ export const UserSchema = z.object({
   email: z.string().email().nullable(),
   phone: z.string().nullable(),
   providers: z.array(z.string()),
-  tenantId: z.string(),
   createdAt: z.string(),
 });
 

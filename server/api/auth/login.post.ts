@@ -22,20 +22,19 @@ export default defineEventHandler(async (event) => {
 
   if (parsed.data.provider === 'password') {
     const { identifier, password } = parsed.data;
-    const tenantId = 'default';
 
-    const firestoreUser = await getUserWithHashByIdentifier(tenantId, identifier);
+    const firestoreUser = await getUserWithHashByIdentifier(identifier);
 
     const valid =
       firestoreUser?.passwordHash != null &&
       (await verifyPassword(firestoreUser.passwordHash, password));
 
     if (!valid) {
-      await recordLoginLog(tenantId, {
+      await recordLoginLog({
         severity: 'WARNING',
         timestamp: new Date().toISOString(),
         requestId,
-        actor: { userId: 'unknown', tenantId, role: 'member' },
+        actor: { userId: 'unknown', role: 'member' },
         metadata: {},
         provider: 'password',
         ip,
@@ -45,12 +44,11 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 401, message: '帳號或密碼錯誤' });
     }
 
-    await resetOnSuccess(tenantId, `login:account:${identifier}`);
+    await resetOnSuccess(`login:account:${identifier}`);
 
     const [user, customToken] = await Promise.all([
       processPasswordLogin({
         uid: firestoreUser!.uid,
-        tenantId,
         username: firestoreUser!.username,
         email: firestoreUser!.email,
         displayName: firestoreUser!.displayName,
@@ -69,7 +67,6 @@ export default defineEventHandler(async (event) => {
       displayName: user.displayName,
       phone: user.phone,
       providers: user.providers,
-      tenantId: user.tenantId,
       role: user.role,
       permissions: user.permissions,
       customToken,
@@ -87,7 +84,6 @@ export default defineEventHandler(async (event) => {
     displayName: user.displayName,
     phone: user.phone,
     providers: user.providers,
-    tenantId: user.tenantId,
     role: user.role,
     permissions: user.permissions,
   };

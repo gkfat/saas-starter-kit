@@ -9,19 +9,18 @@ type CheckAndConsumeContext = {
 };
 
 export async function checkAndConsume(
-  tenantId: string,
   key: string,
   policy: RateLimitPolicy,
   context: CheckAndConsumeContext,
 ): Promise<RateLimitResult> {
-  const result = await consumeRateLimit(tenantId, key, policy);
+  const result = await consumeRateLimit(key, policy);
 
   if (!result.allowed) {
-    await recordLoginLog(tenantId, {
+    await recordLoginLog({
       severity: 'WARNING',
       timestamp: new Date().toISOString(),
       requestId: context.requestId,
-      actor: { userId: 'unknown', tenantId, role: 'member' },
+      actor: { userId: 'unknown', role: 'member' },
       metadata: { reason: 'rate_limited', key, retryAfterSeconds: result.retryAfterSeconds },
       provider: 'password',
       ip: context.ip,
@@ -33,6 +32,6 @@ export async function checkAndConsume(
   return result;
 }
 
-export async function resetOnSuccess(tenantId: string, key: string): Promise<void> {
-  await resetRateLimit(tenantId, key);
+export async function resetOnSuccess(key: string): Promise<void> {
+  await resetRateLimit(key);
 }

@@ -32,7 +32,7 @@
 1. Browser: Firebase Client SDK handles sign-in (composables/useAuth.ts)
 2. Browser gets idToken → POST /api/auth/login
 3. Server: auth.service.verifyIdToken() via Admin SDK
-4. Server injects userId, tenantId, role, permissions into event.context
+4. Server injects userId, role, permissions into event.context
 5. Protected routes read from event.context (typed as AuthenticatedContext)
 ```
 

@@ -8,16 +8,15 @@ type RateLimitDoc = {
   lockedUntil: number | null;
 };
 
-function rateLimitRef(tenantId: string, key: string) {
-  return adminDb().doc(`tenants/${tenantId}/${prefixCollection('rate_limits')}/${key}`);
+function rateLimitRef(key: string) {
+  return adminDb().doc(`${prefixCollection('rate_limits')}/${key}`);
 }
 
 export async function consumeRateLimit(
-  tenantId: string,
   key: string,
   policy: RateLimitPolicy,
 ): Promise<RateLimitResult> {
-  const ref = rateLimitRef(tenantId, key);
+  const ref = rateLimitRef(key);
   const now = Date.now();
 
   return adminDb().runTransaction(async (tx) => {
@@ -52,7 +51,7 @@ export async function consumeRateLimit(
   });
 }
 
-export async function resetRateLimit(tenantId: string, key: string): Promise<void> {
-  const ref = rateLimitRef(tenantId, key);
+export async function resetRateLimit(key: string): Promise<void> {
+  const ref = rateLimitRef(key);
   await ref.set({ count: 0, windowStart: Date.now(), lockedUntil: null });
 }

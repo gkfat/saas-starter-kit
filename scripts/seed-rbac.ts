@@ -14,7 +14,6 @@ const app = initializeApp({
 });
 
 const db = getFirestore(app);
-const TENANT_ID = process.env.TENANT_ID ?? 'default';
 
 const PERMISSIONS = (Object.entries(PermissionMeta) as [Permission, string][]).map(
   ([name, description]) => ({ name, description }),
@@ -27,19 +26,18 @@ const ROLES = (Object.entries(RoleMeta) as [Role, string][]).map(([name, descrip
 
 (async () => {
   const batch = db.batch();
-  const base = `tenants/${TENANT_ID}`;
 
   for (const perm of PERMISSIONS) {
-    batch.set(db.doc(`${base}/${prefixCollection('permissions')}/${perm.name}`), perm);
+    batch.set(db.doc(`${prefixCollection('permissions')}/${perm.name}`), perm);
   }
 
   for (const role of ROLES) {
-    batch.set(db.doc(`${base}/${prefixCollection('roles')}/${role.name}`), role);
-    batch.set(db.doc(`${base}/${prefixCollection('role_permissions')}/${role.name}`), {
+    batch.set(db.doc(`${prefixCollection('roles')}/${role.name}`), role);
+    batch.set(db.doc(`${prefixCollection('role_permissions')}/${role.name}`), {
       permissions: RolePermissions[role.name as Role] ?? [],
     });
   }
 
   await batch.commit();
-  console.log(`RBAC seed done for tenant: ${TENANT_ID}`);
+  console.log('RBAC seed done.');
 })();

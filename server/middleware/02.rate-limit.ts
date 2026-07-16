@@ -11,12 +11,10 @@ export default defineEventHandler(async (event) => {
 
   const ip = getRequestIP(event, { xForwardedFor: true }) ?? '';
   const requestId = event.context.requestId ?? '';
-  const tenantId = 'default';
   const context = { requestId, ip };
 
   if (url === '/api/auth/register') {
     const result = await checkAndConsume(
-      tenantId,
       `register:ip:${ip}`,
       RATE_LIMIT_POLICIES.register,
       context,
@@ -36,12 +34,7 @@ export default defineEventHandler(async (event) => {
   const identifier = body.identifier ?? '';
   const loginContext = { ...context, username: identifier };
 
-  const ipResult = await checkAndConsume(
-    tenantId,
-    `login:ip:${ip}`,
-    RATE_LIMIT_POLICIES.login,
-    loginContext,
-  );
+  const ipResult = await checkAndConsume(`login:ip:${ip}`, RATE_LIMIT_POLICIES.login, loginContext);
   if (!ipResult.allowed) {
     throw createError({
       statusCode: 429,
@@ -50,7 +43,6 @@ export default defineEventHandler(async (event) => {
   }
 
   const accountResult = await checkAndConsume(
-    tenantId,
     `login:account:${identifier}`,
     RATE_LIMIT_POLICIES.login,
     loginContext,

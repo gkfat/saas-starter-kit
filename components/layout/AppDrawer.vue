@@ -11,9 +11,6 @@
       <v-icon icon="mdi-fire" color="primary" size="24" class="flex-shrink-0" />
       <div v-if="!rail || mobile" class="ml-3 overflow-hidden">
         <div class="text-body-2 font-weight-medium text-truncate">saas-starter-kit</div>
-        <div class="text-caption text-medium-emphasis text-truncate">
-          {{ user?.tenantId ?? '—' }}
-        </div>
       </div>
     </div>
 
@@ -68,7 +65,9 @@
             <div class="text-body-2 font-weight-medium text-truncate">
               {{ user?.displayName ?? user?.email }}
             </div>
-            <div class="text-caption text-medium-emphasis text-truncate">{{ user?.role }}</div>
+            <div class="text-caption text-medium-emphasis text-truncate">
+              {{ $t(`role.${user?.role}`) }}
+            </div>
           </div>
         </div>
         <v-btn

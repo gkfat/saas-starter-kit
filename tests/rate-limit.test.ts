@@ -8,7 +8,6 @@
  *
  * 未涵蓋：
  * - 登入頁鎖定警示文案（需瀏覽器操作）
- * - 跨 tenant 限流隔離（API 端點目前寫死 tenantId=default，無法透過 HTTP 驗證）
  */
 import { afterAll, describe, expect, it } from 'vitest';
 import { cert, initializeApp } from 'firebase-admin/app';
@@ -18,7 +17,6 @@ import 'dotenv/config';
 import { prefixCollection } from '../server/shared/firestore-prefix';
 
 const BASE_URL = process.env.TEST_BASE_URL ?? 'http://localhost:3000';
-const TENANT_ID = process.env.TENANT_ID ?? 'default';
 // username/password 需為 6–8 碼英數字（見 shared/utils/validation.ts），故 RUN_ID 取 5 碼 + 1 碼序號後綴
 const RUN_ID = Date.now().toString(36).slice(-5);
 const TEST_PASSWORD = 'Test1234';
@@ -69,17 +67,17 @@ async function loginGoogle(ip: string) {
 }
 
 afterAll(async () => {
-  const usersCol = `tenants/${TENANT_ID}/${prefixCollection('users')}`;
+  const usersCol = prefixCollection('users');
   for (const username of createdUsernames) {
     const snap = await db.collection(usersCol).where('username', '==', username).limit(1).get();
     if (snap.empty) continue;
     const uid = snap.docs[0].data().uid as string;
     await db.doc(`${usersCol}/${uid}`).delete();
-    await db.doc(`tenants/${TENANT_ID}/${prefixCollection('user_roles')}/${uid}`).delete();
+    await db.doc(`${prefixCollection('user_roles')}/${uid}`).delete();
     await auth.deleteUser(uid).catch(() => {});
   }
 
-  const rateLimitsCol = `tenants/${TENANT_ID}/${prefixCollection('rate_limits')}`;
+  const rateLimitsCol = prefixCollection('rate_limits');
   await Promise.all(
     [...rateLimitKeys].map((key) =>
       db

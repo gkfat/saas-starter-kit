@@ -25,9 +25,9 @@ The system SHALL provide a CLI seed script (`scripts/seed-superadmin.ts`) that c
 - **WHEN** the seed script is run and a Firebase Auth account for `SUPERADMIN_EMAIL` exists but does NOT have `role: 'superadmin'` in its custom claims
 - **THEN** the script throws an error and exits without modifying the existing account
 
-### Requirement: Only one superadmin account is permitted per tenant
+### Requirement: Only one superadmin account is permitted
 
-The system SHALL enforce that at most one Firebase Auth account holds the `role: 'superadmin'` custom claim per tenant. The seed script MUST NOT create a second superadmin if one already exists.
+The system SHALL enforce that at most one Firebase Auth account holds the `role: 'superadmin'` custom claim. The seed script MUST NOT create a second superadmin if one already exists.
 
 #### Scenario: Attempt to seed a second superadmin
 

@@ -127,7 +127,6 @@
     "email": "Email",
     "displayName": "顯示名稱",
     "phone": "手機",
-    "tenant": "租戶",
     "role": "角色",
     "status": "狀態",
     "createdAt": "建立時間",

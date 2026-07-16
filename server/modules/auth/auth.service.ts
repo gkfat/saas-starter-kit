@@ -21,11 +21,11 @@ export async function processLogin(params: ProcessLoginParams): Promise<AuthUser
   try {
     rawUser = await verifyIdToken(idToken);
   } catch {
-    await recordLoginLog('default', {
+    await recordLoginLog({
       severity: 'WARNING',
       timestamp: new Date().toISOString(),
       requestId,
-      actor: { userId: 'unknown', tenantId: 'default', role: 'member' },
+      actor: { userId: 'unknown', role: 'member' },
       metadata,
       provider,
       ip,
@@ -35,23 +35,23 @@ export async function processLogin(params: ProcessLoginParams): Promise<AuthUser
   }
 
   if (rawUser.role !== Role.SuperAdmin) {
-    const role = (await getRoleForUser(rawUser.tenantId, rawUser.uid)) ?? 'member';
-    const permissions = await getPermissionsForRole(rawUser.tenantId, role);
+    const role = (await getRoleForUser(rawUser.uid)) ?? 'member';
+    const permissions = await getPermissionsForRole(role);
     rawUser = { ...rawUser, role, permissions };
   }
 
-  const firestoreUser = await touchUserOnLogin(rawUser.tenantId, {
+  const firestoreUser = await touchUserOnLogin({
     uid: rawUser.uid,
     displayName: rawUser.displayName,
     phone: rawUser.phone,
   });
 
   if (rawUser.role !== Role.SuperAdmin) {
-    await recordLoginLog(rawUser.tenantId, {
+    await recordLoginLog({
       severity: 'INFO',
       timestamp: new Date().toISOString(),
       requestId,
-      actor: { userId: rawUser.uid, tenantId: rawUser.tenantId, role: rawUser.role },
+      actor: { userId: rawUser.uid, role: rawUser.role },
       metadata,
       provider,
       ip,
@@ -68,7 +68,6 @@ export async function processLogin(params: ProcessLoginParams): Promise<AuthUser
     displayName: firestoreUser?.displayName ?? rawUser.displayName,
     phone: firestoreUser?.phone ?? rawUser.phone,
     providers: firestoreUser?.providers ?? [],
-    tenantId: rawUser.tenantId,
     role: rawUser.role,
     permissions: rawUser.permissions,
   };
@@ -80,7 +79,6 @@ export async function verifyIdToken(
   const decoded = await adminAuth().verifyIdToken(idToken);
 
   const role = (decoded['role'] as string | undefined) ?? 'member';
-  const tenantId = (decoded['tenantId'] as string | undefined) ?? 'default';
   const permissions = (decoded['permissions'] as string[] | undefined) ?? [];
 
   return {
@@ -90,7 +88,6 @@ export async function verifyIdToken(
     displayName: (decoded['name'] as string | undefined) ?? null,
     phone: (decoded['phone_number'] as string | undefined) ?? null,
     providers: [],
-    tenantId,
     role,
     permissions,
   };
@@ -108,7 +105,6 @@ export async function isSuperAdminUid(uid: string): Promise<boolean> {
 
 export async function processPasswordLogin(params: {
   uid: string;
-  tenantId: string;
   username: string;
   email: string | null;
   displayName: string;
@@ -117,19 +113,19 @@ export async function processPasswordLogin(params: {
   ip: string;
   requestId: string;
 }): Promise<AuthUser> {
-  const { uid, tenantId, username, email, displayName, phone, providers, ip, requestId } = params;
+  const { uid, username, email, displayName, phone, providers, ip, requestId } = params;
 
   const isSuperAdmin = await isSuperAdminUid(uid);
 
-  const role = isSuperAdmin ? Role.SuperAdmin : ((await getRoleForUser(tenantId, uid)) ?? 'member');
-  const permissions = isSuperAdmin ? [] : await getPermissionsForRole(tenantId, role);
+  const role = isSuperAdmin ? Role.SuperAdmin : ((await getRoleForUser(uid)) ?? 'member');
+  const permissions = isSuperAdmin ? [] : await getPermissionsForRole(role);
 
   if (!isSuperAdmin) {
-    await recordLoginLog(tenantId, {
+    await recordLoginLog({
       severity: 'INFO',
       timestamp: new Date().toISOString(),
       requestId,
-      actor: { userId: uid, tenantId, role },
+      actor: { userId: uid, role },
       metadata: {},
       provider: 'password',
       ip,
@@ -139,7 +135,7 @@ export async function processPasswordLogin(params: {
     });
   }
 
-  return { uid, username, email, displayName, phone, providers, tenantId, role, permissions };
+  return { uid, username, email, displayName, phone, providers, role, permissions };
 }
 
 export async function createCustomToken(uid: string): Promise<string> {

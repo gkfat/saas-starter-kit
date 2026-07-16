@@ -16,7 +16,6 @@ const app = initializeApp({
 
 const auth = getAuth(app);
 const db = getFirestore(app);
-const TENANT_ID = process.env.TENANT_ID ?? 'default';
 
 const DEMO_USERS = [
   {
@@ -38,8 +37,7 @@ const DEMO_USERS = [
 ];
 
 async function upsertDemoUser(user: (typeof DEMO_USERS)[number]) {
-  const base = `tenants/${TENANT_ID}`;
-  const usersCol = `${base}/${prefixCollection('users')}`;
+  const usersCol = prefixCollection('users');
 
   // Check if Firestore doc with this username already exists
   const existing = await db
@@ -70,11 +68,10 @@ async function upsertDemoUser(user: (typeof DEMO_USERS)[number]) {
     phone: user.phone,
     providers: ['password'],
     passwordHash,
-    tenantId: TENANT_ID,
     createdAt: new Date().toISOString(),
   });
 
-  batch.set(db.doc(`${base}/${prefixCollection('user_roles')}/${uid}`), {
+  batch.set(db.doc(`${prefixCollection('user_roles')}/${uid}`), {
     role: user.role,
   });
 

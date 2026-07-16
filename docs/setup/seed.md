@@ -17,14 +17,6 @@ FIREBASE_CLIENT_EMAIL=
 FIREBASE_PRIVATE_KEY=
 ```
 
-預設 tenant 為 `default`，可透過環境變數覆蓋：
-
-```env
-TENANT_ID=my-tenant
-```
-
-> Runtime 的 `tenantId` 從 Firebase Auth token claims 動態解析，`TENANT_ID` 僅供 seed scripts 使用。
-
 ---
 
 ## 1. Seed RBAC
@@ -35,7 +27,7 @@ TENANT_ID=my-tenant
 pnpm seed:rbac
 ```
 
-**建立的資料（tenant: `default`）：**
+**建立的資料：**
 
 | 類型            | 名稱                                        |
 | --------------- | ------------------------------------------- |
@@ -74,7 +66,7 @@ pnpm seed:superadmin
 | 帳號已存在且 claims 正確 | 跳過，輸出 `[SKIP]` 警告           |
 | 帳號已存在但 claims 不符 | 拋出錯誤，不修改現有帳號           |
 
-Superadmin 身份**僅透過 Firebase Auth custom claims 辨識**，不寫入 Firestore。每個 tenant 限一組。
+Superadmin 身份**僅透過 Firebase Auth custom claims 辨識**，不寫入 Firestore。
 
 ---
 

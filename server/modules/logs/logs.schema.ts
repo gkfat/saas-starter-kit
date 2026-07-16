@@ -7,7 +7,6 @@ export const BaseLogSchema = z.object({
   requestId: z.string(),
   actor: z.object({
     userId: z.string(),
-    tenantId: z.string(),
     role: z.string(),
     username: z.string().optional(),
   }),

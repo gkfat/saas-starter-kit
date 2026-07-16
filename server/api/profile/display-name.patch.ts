@@ -17,7 +17,7 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  await syncUserDisplayName(ctx.tenantId, ctx.userId, parsed.data.displayName);
+  await syncUserDisplayName(ctx.userId, parsed.data.displayName);
 
   return { ok: true };
 });

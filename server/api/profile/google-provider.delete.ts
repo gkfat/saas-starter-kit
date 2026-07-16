@@ -5,7 +5,7 @@ export default defineEventHandler(async (event) => {
   const ctx = event.context as AuthenticatedContext;
 
   try {
-    await unbindGoogleProvider(ctx.tenantId, ctx.userId);
+    await unbindGoogleProvider(ctx.userId);
   } catch (err: unknown) {
     const code = (err as { code?: string }).code;
     if (code === 'last-provider') {

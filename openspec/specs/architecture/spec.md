@@ -40,7 +40,6 @@ export type CreateUserDto = z.infer<typeof CreateUserDto>
 type RequestContext = {
   requestId: string; // injected by 01.tracing.ts
   userId?: string; // injected by 03.auth.ts
-  tenantId?: string;
   role?: string;
   permissions?: string[];
 };
@@ -81,8 +80,8 @@ server/
 
 ## Middleware Execution Order
 
-| File            | Role                                                                      |
-| --------------- | ------------------------------------------------------------------------- |
-| `01.tracing.ts` | Generate `requestId`, inject into context                                 |
-| `02.logging.ts` | Record API log in GCP Structured Logging format                           |
-| `03.auth.ts`    | Verify Firebase ID Token, inject `userId`/`tenantId`/`role`/`permissions` |
+| File            | Role                                                           |
+| --------------- | -------------------------------------------------------------- |
+| `01.tracing.ts` | Generate `requestId`, inject into context                      |
+| `02.logging.ts` | Record API log in GCP Structured Logging format                |
+| `03.auth.ts`    | Verify Firebase ID Token, inject `userId`/`role`/`permissions` |

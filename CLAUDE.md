@@ -55,7 +55,7 @@ api/   → server/middleware/ (tracing → logging → auth) → modules/*/servi
 1. Browser: Firebase Client SDK handles sign-in (`composables/useAuth.ts`)
 2. Browser gets `idToken` → POSTs to `/api/auth/login`
 3. Server: `auth.service.verifyIdToken()` validates token via Admin SDK
-4. Server injects `userId`, `tenantId`, `role`, `permissions` into `event.context`
+4. Server injects `userId`, `role`, `permissions` into `event.context`
 5. Protected API routes read from `event.context` (typed as `RequestContext`)
 
 Superadmin uses Firebase Auth custom claims `{ role: 'superadmin' }` — never stored in Firestore.
@@ -66,10 +66,6 @@ Superadmin uses Firebase Auth custom claims `{ role: 'superadmin' }` — never s
 
 - Unauthenticated → redirect to `/login`
 - Already logged in visiting `/login` or `/otp` → redirect to `/`
-
-### Multi-tenant
-
-All Firestore paths are prefixed `tenants/{tenantId}/`. The `tenantId` comes from custom claims; defaults to `'default'` when absent (Phase 3 RBAC will tighten this).
 
 ### Logging
 
@@ -82,7 +78,6 @@ All Firestore paths are prefixed `tenants/{tenantId}/`. The `tenantId` comes fro
 type RequestContext = {
   requestId: string; // injected by 01.tracing.ts
   userId?: string; // injected by 03.auth.ts
-  tenantId?: string;
   role?: string;
   permissions?: string[];
 };

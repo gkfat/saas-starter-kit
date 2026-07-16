@@ -10,9 +10,6 @@
         <v-chip class="mr-2" color="primary" variant="tonal">
           {{ store.user?.role }}
         </v-chip>
-        <v-chip color="secondary" variant="tonal">
-          {{ store.user?.tenantId }}
-        </v-chip>
       </v-card-text>
     </v-card>
   </div>

@@ -9,7 +9,6 @@ type AuthUser = {
   displayName: string | null;
   phone: string | null;
   providers: string[];
-  tenantId: string;
   role: string;
   permissions: string[];
 };

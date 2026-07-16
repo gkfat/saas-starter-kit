@@ -1,42 +1,37 @@
 # Data Spec
 
-## Multi-Tenant Design
+## Collection Layout
 
-All data is isolated by `tenantId` at the top level, and all collection names include an environment prefix (`dev_` or `prod_`):
+All collection names include an environment prefix (`dev_` or `prod_`):
 
 ```
-tenants/{tenantId}/
-  ├── {prefix}users/{userId}
-  ├── {prefix}roles/{roleId}
-  ├── {prefix}permissions/{permissionId}
-  ├── {prefix}role_permissions/{rolePermissionId}
-  ├── {prefix}user_roles/{userRoleId}
-  ├── {prefix}audit_logs/{logId}
-  └── {prefix}login_logs/{logId}
+{prefix}users/{userId}
+{prefix}roles/{roleId}
+{prefix}permissions/{permissionId}
+{prefix}role_permissions/{rolePermissionId}
+{prefix}user_roles/{userRoleId}
+{prefix}audit_logs/{logId}
+{prefix}login_logs/{logId}
 ```
 
 - `{prefix}` is determined by `prefixCollection()` — `dev_` or `prod_` based on `APP_ENV`
-- `tenantId` comes from Firebase Auth custom claims
-- Defaults to `'default'` when absent
-- Every Firestore query must include `tenantId` filter
 
 ## Collection Schemas
 
 ```
 users {
   uid          string     // Firebase Auth UID, also used as Firestore doc ID
-  username     string     // 6–8 alphanumeric, unique across tenant, required
+  username     string     // 6–8 alphanumeric, globally unique, required
   displayName  string     // optional display name
   email        string?    // optional, used for Google Provider binding
   phone        string?    // optional, informational binding
   providers    string[]   // e.g. ['password'], ['password', 'google'], ['google']
-  tenantId     string
   createdAt    Timestamp
 }
-roles            { id, name, tenantId, createdAt }
-permissions      { id, name, description, tenantId }
-role_permissions { roleId, permissionId, tenantId }
-user_roles       { userId, roleId, tenantId }
+roles            { id, name, createdAt }
+permissions      { id, name, description }
+role_permissions { roleId, permissionId }
+user_roles       { userId, roleId }
 audit_logs       { ...base_log, type: 'audit', action, resourceId, diff }
 login_logs       { ...base_log, type: 'login', provider, ip, result }
 ```
@@ -50,9 +45,9 @@ The `users` collection document schema includes `username` as a required field; 
 - **WHEN** a new user is created via registration
 - **THEN** Firestore `users` document contains `username` (non-null), `providers` (non-empty array), and `email`/`phone` as null if not provided
 
-#### Scenario: Username must be unique within tenant
+#### Scenario: Username must be globally unique
 
-- **WHEN** service attempts to create a user with a username already present in the same tenant's `users` collection
+- **WHEN** service attempts to create a user with a username already present in the `users` collection
 - **THEN** repo layer returns a conflict result and no document is written
 
 ## Repo Layer Rules

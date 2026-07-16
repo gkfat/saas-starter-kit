@@ -27,7 +27,6 @@ const headers = computed(() => [
   { title: t('users.email'), key: 'email' },
   { title: t('users.displayName'), key: 'displayName' },
   { title: t('users.phone'), key: 'phone' },
-  { title: t('users.tenant'), key: 'tenantId' },
   { title: t('users.createdAt'), key: 'createdAt' },
 ]);
 

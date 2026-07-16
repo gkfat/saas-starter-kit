@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'No phone number found in token' });
   }
 
-  await syncUserPhone(ctx.tenantId, ctx.userId, ctx.phone);
+  await syncUserPhone(ctx.userId, ctx.phone);
 
   return { ok: true };
 });

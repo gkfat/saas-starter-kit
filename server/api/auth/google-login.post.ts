@@ -10,7 +10,6 @@ export default defineEventHandler(async (event) => {
   }
 
   const { idToken } = parsed.data;
-  const tenantId = 'default';
 
   let googleUser: Awaited<ReturnType<typeof verifyIdToken>>;
   try {
@@ -19,7 +18,7 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, message: 'Invalid ID token' });
   }
 
-  const firestoreUser = await getUserByUid(tenantId, googleUser.uid);
+  const firestoreUser = await getUserByUid(googleUser.uid);
 
   if (!firestoreUser || !firestoreUser.providers.includes('google')) {
     return {

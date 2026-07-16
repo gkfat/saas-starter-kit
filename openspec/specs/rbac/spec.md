@@ -23,11 +23,10 @@ Hybrid RBAC + Permission:
 ## Firestore Collections
 
 ```
-tenants/{tenantId}/
-  ├── roles/{roleId}             { id, name, tenantId, createdAt }
-  ├── permissions/{permId}       { id, name, description, tenantId }
-  ├── role_permissions/{id}      { roleId, permissionId, tenantId }
-  └── user_roles/{id}            { userId, roleId, tenantId }
+roles/{roleId}             { id, name, createdAt }
+permissions/{permId}       { id, name, description }
+role_permissions/{id}      { roleId, permissionId }
+user_roles/{id}            { userId, roleId }
 ```
 
 ## RBAC Middleware

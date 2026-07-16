@@ -9,7 +9,6 @@ export type BaseLog = {
   requestId: string;
   actor: {
     userId: string;
-    tenantId: string;
     role: string;
     username?: string;
   };

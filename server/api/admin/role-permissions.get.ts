@@ -1,10 +1,8 @@
 import { getAllRolePermissions } from '~/server/modules/roles';
 import { requirePermission } from '~/server/shared/rbac';
-import type { AuthenticatedContext } from '~/server/shared/types/context';
 import { Permission } from '~/shared/permissions';
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler((event) => {
   requirePermission(event, Permission.Roles.Read);
-  const { tenantId } = event.context as AuthenticatedContext;
-  return getAllRolePermissions(tenantId);
+  return getAllRolePermissions();
 });

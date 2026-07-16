@@ -31,7 +31,6 @@ export default defineEventHandler(async (event) => {
   try {
     const user = await verifyIdToken(token);
     event.context.userId = user.uid;
-    event.context.tenantId = user.tenantId;
     if (user.phone) event.context.phone = user.phone;
     if (user.email) event.context.email = user.email;
     if (user.displayName) event.context.displayName = user.displayName;
@@ -40,8 +39,8 @@ export default defineEventHandler(async (event) => {
       event.context.role = Role.SuperAdmin;
       event.context.permissions = [];
     } else {
-      const role = (await getRoleForUser(user.tenantId, user.uid)) ?? 'member';
-      const permissions = await getPermissionsForRole(user.tenantId, role);
+      const role = (await getRoleForUser(user.uid)) ?? 'member';
+      const permissions = await getPermissionsForRole(role);
       event.context.role = role;
       event.context.permissions = permissions;
     }

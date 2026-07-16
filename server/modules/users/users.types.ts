@@ -5,7 +5,6 @@ export type User = {
   email: string | null;
   phone: string | null;
   providers: string[];
-  tenantId: string;
   createdAt: string;
 };
 

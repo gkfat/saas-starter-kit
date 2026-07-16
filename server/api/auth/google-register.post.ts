@@ -13,7 +13,6 @@ export default defineEventHandler(async (event) => {
   }
 
   const { username, idToken } = parsed.data;
-  const tenantId = 'default';
 
   let googleUser: Awaited<ReturnType<typeof verifyIdToken>>;
   try {
@@ -23,7 +22,7 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    await registerUser(tenantId, {
+    await registerUser({
       uid: googleUser.uid,
       username,
       displayName: googleUser.displayName ?? username,

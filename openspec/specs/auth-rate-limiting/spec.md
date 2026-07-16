@@ -53,14 +53,9 @@ The system SHALL detect an HTTP `429` response from `/api/auth/login` and displa
 - **WHEN** the login page receives an HTTP `429` response from `/api/auth/login`
 - **THEN** the page displays the localized "account locked" warning message instead of the default login failure message
 
-### Requirement: Rate limit state is isolated per tenant
+### Requirement: Rate limit state is stored per key
 
-The system SHALL scope all rate limit counters to the resolved `tenantId`, storing them under `tenants/{tenantId}/rate_limits/{key}`, so that request activity in one tenant does not affect rate limit state in another tenant.
-
-#### Scenario: Same IP across different tenants counted independently
-
-- **WHEN** the same source IP submits requests against two different tenants
-- **THEN** each tenant's rate limit counters are evaluated and updated independently
+The system SHALL scope all rate limit counters to the resolved key, storing them under `rate_limits/{key}`.
 
 ### Requirement: Logout and Google auth endpoints are not subject to auth rate limiting
 

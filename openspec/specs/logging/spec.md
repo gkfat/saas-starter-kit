@@ -12,7 +12,6 @@ type BaseLog = {
   requestId: string; // tracing
   actor: {
     userId: string;
-    tenantId: string;
     role: string;
   };
   metadata: Record<string, unknown>;
@@ -32,7 +31,7 @@ type AuditLog = BaseLog & {
 };
 ```
 
-Stored in: `tenants/{tenantId}/audit_logs/{logId}`
+Stored in: `audit_logs/{logId}`
 
 ### login_log
 
@@ -45,7 +44,7 @@ type LoginLog = BaseLog & {
 };
 ```
 
-Stored in: `tenants/{tenantId}/login_logs/{logId}`
+Stored in: `login_logs/{logId}`
 
 ### API log
 
@@ -86,7 +85,7 @@ audit_log SHALL 在 API handler 操作成功後寫入，不在 service 層寫入
 #### Scenario: actor 欄位來自 RequestContext
 
 - **WHEN** API handler 呼叫 `recordAuditLog`
-- **THEN** `actor.userId`、`actor.tenantId` SHALL 來自 `event.context`，`actor.role` 若為 undefined 則使用 `'unknown'`
+- **THEN** `actor.userId` SHALL 來自 `event.context`，`actor.role` 若為 undefined 則使用 `'unknown'`
 
 ### Requirement: 用戶角色變更寫入 audit_log
 

@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Provides a protected admin interface for managing users, roles, and logs within a tenant. Access is gated by the `admin:access` permission.
+Provides a protected admin interface for managing users, roles, and logs. Access is gated by the `admin:access` permission.
 
 ## Requirements
 

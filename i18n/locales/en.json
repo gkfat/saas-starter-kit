@@ -127,7 +127,6 @@
     "email": "Email",
     "displayName": "Display Name",
     "phone": "Phone",
-    "tenant": "Tenant",
     "role": "Role",
     "status": "Status",
     "createdAt": "Created At",

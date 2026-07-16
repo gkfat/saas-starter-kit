@@ -10,12 +10,12 @@ Admin UI 的全域 shell 結構，定義 sidebar 導航、mobile 導航、Breadc
 
 ### Requirement: Sidebar 整合導航與使用者操作
 
-Admin UI 的側邊 sidebar SHALL 作為唯一的全域導航容器，包含 project name、tenant context、群組導航項目、使用者資訊與登出按鈕。系統 SHALL NOT 顯示獨立的頂部 AppHeader。
+Admin UI 的側邊 sidebar SHALL 作為唯一的全域導航容器，包含 project name、群組導航項目、使用者資訊與登出按鈕。系統 SHALL NOT 顯示獨立的頂部 AppHeader。
 
 #### Scenario: Sidebar 顯示 project name
 
 - **WHEN** 使用者進入任何 Admin 頁面
-- **THEN** sidebar 頂部 SHALL 顯示 "saas-starter-kit" 文字與 tenant 名稱
+- **THEN** sidebar 頂部 SHALL 顯示 "saas-starter-kit" 文字
 
 #### Scenario: Sidebar 顯示導航群組
 

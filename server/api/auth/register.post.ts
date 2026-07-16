@@ -15,7 +15,6 @@ export default defineEventHandler(async (event) => {
   }
 
   const { username, password, email, phone } = parsed.data;
-  const tenantId = 'default';
 
   let uid: string;
   try {
@@ -28,7 +27,7 @@ export default defineEventHandler(async (event) => {
   const passwordHash = await hashPassword(password);
 
   try {
-    await registerUser(tenantId, {
+    await registerUser({
       uid,
       username,
       displayName: username,

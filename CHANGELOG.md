@@ -35,3 +35,5 @@
 - 調整權限結構與共用 enum
 - 調整帳號結構，改為以 username + password 作為主要登入 provider
 - 優化個人資料頁面 UI
+- 移除多租戶（tenant）資料結構，改為單一租戶架構
+- 角色管理頁面與角色指派下拉選單不再顯示 superadmin

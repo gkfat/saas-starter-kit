@@ -13,8 +13,6 @@ if (!username || !password) {
   throw new Error('SUPERADMIN_USERNAME and SUPERADMIN_PASSWORD must be set in .env');
 }
 
-const TENANT_ID = process.env.TENANT_ID ?? 'default';
-
 const app = initializeApp({
   credential: cert({
     projectId: process.env.FIREBASE_PROJECT_ID,
@@ -27,7 +25,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 (async () => {
-  const usersCol = `tenants/${TENANT_ID}/${prefixCollection('users')}`;
+  const usersCol = prefixCollection('users');
 
   // Check if Firestore doc with this username already exists
   const existing = await db.collection(usersCol).where('username', '==', username).limit(1).get();
@@ -53,7 +51,6 @@ const db = getFirestore(app);
     phone: null,
     providers: ['password'],
     passwordHash,
-    tenantId: TENANT_ID,
     createdAt: new Date().toISOString(),
   });
   console.log(`[OK] Superadmin Firestore doc created: ${username}`);

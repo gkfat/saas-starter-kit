@@ -13,26 +13,20 @@ const BodySchema = z.object({
 
 export default defineEventHandler(async (event) => {
   requirePermission(event, Permission.Users.Write);
-  const {
-    tenantId,
-    userId: actorId,
-    role: actorRole,
-    requestId,
-  } = event.context as AuthenticatedContext;
+  const { userId: actorId, role: actorRole, requestId } = event.context as AuthenticatedContext;
   const userId = getRouterParam(event, 'id');
   if (!userId) throw createError({ statusCode: 400, message: 'Missing user id' });
   const body = BodySchema.parse(await readBody(event));
-  await assignUserRole(tenantId, userId, body.role);
+  await assignUserRole(userId, body.role);
 
   if (actorRole !== Role.SuperAdmin) {
-    const actorUser = await getUserByUid(tenantId, actorId);
-    recordAuditLog(tenantId, {
+    const actorUser = await getUserByUid(actorId);
+    recordAuditLog({
       severity: 'INFO',
       timestamp: new Date().toISOString(),
       requestId,
       actor: {
         userId: actorId,
-        tenantId,
         role: actorRole ?? 'unknown',
         ...(actorUser?.username ? { username: actorUser.username } : {}),
       },
