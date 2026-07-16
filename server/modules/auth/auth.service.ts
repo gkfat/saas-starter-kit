@@ -46,18 +46,20 @@ export async function processLogin(params: ProcessLoginParams): Promise<AuthUser
     phone: rawUser.phone,
   });
 
-  await recordLoginLog(rawUser.tenantId, {
-    severity: 'INFO',
-    timestamp: new Date().toISOString(),
-    requestId,
-    actor: { userId: rawUser.uid, tenantId: rawUser.tenantId, role: rawUser.role },
-    metadata,
-    provider,
-    ip,
-    result: 'success',
-    ...(rawUser.email ? { email: rawUser.email } : {}),
-    ...(firestoreUser?.username ? { username: firestoreUser.username } : {}),
-  });
+  if (rawUser.role !== Role.SuperAdmin) {
+    await recordLoginLog(rawUser.tenantId, {
+      severity: 'INFO',
+      timestamp: new Date().toISOString(),
+      requestId,
+      actor: { userId: rawUser.uid, tenantId: rawUser.tenantId, role: rawUser.role },
+      metadata,
+      provider,
+      ip,
+      result: 'success',
+      ...(rawUser.email ? { email: rawUser.email } : {}),
+      ...(firestoreUser?.username ? { username: firestoreUser.username } : {}),
+    });
+  }
 
   return {
     uid: rawUser.uid,
@@ -94,6 +96,16 @@ export async function verifyIdToken(
   };
 }
 
+export async function isSuperAdminUid(uid: string): Promise<boolean> {
+  try {
+    const authUser = await adminAuth().getUser(uid);
+    return authUser.customClaims?.['role'] === Role.SuperAdmin;
+  } catch (err) {
+    if ((err as { code?: string }).code === 'auth/user-not-found') return false;
+    throw err;
+  }
+}
+
 export async function processPasswordLogin(params: {
   uid: string;
   tenantId: string;
@@ -107,21 +119,25 @@ export async function processPasswordLogin(params: {
 }): Promise<AuthUser> {
   const { uid, tenantId, username, email, displayName, phone, providers, ip, requestId } = params;
 
-  const role = (await getRoleForUser(tenantId, uid)) ?? 'member';
-  const permissions = await getPermissionsForRole(tenantId, role);
+  const isSuperAdmin = await isSuperAdminUid(uid);
 
-  await recordLoginLog(tenantId, {
-    severity: 'INFO',
-    timestamp: new Date().toISOString(),
-    requestId,
-    actor: { userId: uid, tenantId, role },
-    metadata: {},
-    provider: 'password',
-    ip,
-    result: 'success',
-    ...(email ? { email } : {}),
-    username,
-  });
+  const role = isSuperAdmin ? Role.SuperAdmin : ((await getRoleForUser(tenantId, uid)) ?? 'member');
+  const permissions = isSuperAdmin ? [] : await getPermissionsForRole(tenantId, role);
+
+  if (!isSuperAdmin) {
+    await recordLoginLog(tenantId, {
+      severity: 'INFO',
+      timestamp: new Date().toISOString(),
+      requestId,
+      actor: { userId: uid, tenantId, role },
+      metadata: {},
+      provider: 'password',
+      ip,
+      result: 'success',
+      ...(email ? { email } : {}),
+      username,
+    });
+  }
 
   return { uid, username, email, displayName, phone, providers, tenantId, role, permissions };
 }

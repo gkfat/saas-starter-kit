@@ -3,6 +3,7 @@ import { requirePermission } from '~/server/shared/rbac';
 import type { AuthenticatedContext } from '~/server/shared/types/context';
 import { FeatureFlag } from '~/shared/feature-flags';
 import { Permission } from '~/shared/permissions';
+import { Role } from '~/shared/roles';
 
 export default defineEventHandler(async (event) => {
   if (!useRuntimeConfig().public.featureFlags[FeatureFlag.AuditLog]) {
@@ -11,5 +12,6 @@ export default defineEventHandler(async (event) => {
 
   requirePermission(event, Permission.AuditLogs.Read);
   const { tenantId } = event.context as AuthenticatedContext;
-  return listAuditLogs(tenantId);
+  const logs = await listAuditLogs(tenantId);
+  return logs.filter((log) => log.actor.role !== Role.SuperAdmin);
 });
