@@ -70,6 +70,7 @@
       "googleEmailConflict": "This Google account's email is already linked to another account",
       "userDisabled": "Account is disabled, please contact admin",
       "tooManyRequests": "Too many login attempts, please try again later",
+      "accountLocked": "This account has been temporarily locked due to repeated failed login attempts. Please try again later.",
       "emailAlreadyInUse": "Email is already in use, please use a different email or sign in",
       "weakPassword": "Password is too weak, please use a stronger password",
       "default": "Login failed, please try again",

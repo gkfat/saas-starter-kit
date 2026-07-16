@@ -25,6 +25,7 @@
 - 實作 Toast 元件與 API error handler
 - 實作 i18n 多語系
 - 導入 dayjs 做時間轉換
+- 實作註冊、登入限流
 
 ### Changed
 

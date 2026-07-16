@@ -6,6 +6,8 @@ import {
 } from '../../modules/auth';
 import { getUserWithHashByIdentifier } from '../../modules/users';
 import { verifyPassword } from '../../shared/crypto';
+import { resetOnSuccess } from '../../modules/rate-limit';
+import { recordLoginLog } from '../../modules/logs';
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
@@ -29,8 +31,21 @@ export default defineEventHandler(async (event) => {
       (await verifyPassword(firestoreUser.passwordHash, password));
 
     if (!valid) {
+      await recordLoginLog(tenantId, {
+        severity: 'WARNING',
+        timestamp: new Date().toISOString(),
+        requestId,
+        actor: { userId: 'unknown', tenantId, role: 'member' },
+        metadata: {},
+        provider: 'password',
+        ip,
+        result: 'failure',
+        username: identifier,
+      });
       throw createError({ statusCode: 401, message: '帳號或密碼錯誤' });
     }
+
+    await resetOnSuccess(tenantId, `login:account:${identifier}`);
 
     const [user, customToken] = await Promise.all([
       processPasswordLogin({

@@ -110,7 +110,12 @@ async function handleLogin() {
     await login(identifier.value, password.value);
     router.push('/dashboard');
   } catch (e: unknown) {
-    showError(getLoginErrorMessage(e));
+    const statusCode = (e as { data?: { statusCode?: number } }).data?.statusCode;
+    if (statusCode === 429) {
+      showError(t('auth.error.accountLocked'));
+    } else {
+      showError(getLoginErrorMessage(e));
+    }
   } finally {
     loading.value = false;
   }

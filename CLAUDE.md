@@ -10,9 +10,10 @@ pnpm build        # Production build
 pnpm lint         # ESLint check
 pnpm lint:fix     # ESLint auto-fix
 pnpm format       # Prettier format
+pnpm test         # Run backend tests (Vitest, tests/**/*.test.ts)
 ```
 
-No test suite yet. Lint runs automatically on staged files via Husky pre-commit hook.
+Tests live under `tests/`. Some are integration tests that require `pnpm dev` running against a real Firebase project (see per-file header comments for prerequisites). Lint runs automatically on staged files via Husky pre-commit hook.
 
 ## Environment
 
