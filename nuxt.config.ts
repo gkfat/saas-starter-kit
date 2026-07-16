@@ -55,6 +55,10 @@ export default defineNuxtConfig({
       firebaseStorageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
       firebaseMessagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
       firebaseAppId: process.env.VITE_FIREBASE_APP_ID,
+      featureFlags: {
+        auditLog: process.env.FEATURE_AUDIT_LOG_ENABLED !== 'false',
+        loginLog: process.env.FEATURE_LOGIN_LOG_ENABLED !== 'false',
+      },
     },
   },
 });

@@ -113,6 +113,7 @@ const open = defineModel<boolean>({ default: false });
 const { mobile, width: viewportWidth } = useDisplay();
 const { rail, toggle } = useSidebarState();
 const { hasPermission } = usePermission();
+const { isFeatureEnabled } = useFeatureFlags();
 const { logout } = useAuth();
 const router = useRouter();
 const route = useRoute();
@@ -130,7 +131,11 @@ const drawerOpen = computed({
 const visibleGroups = computed(() =>
   APP_ROUTES.map((group) => ({
     ...group,
-    items: group.items.filter((item) => !item.permission || hasPermission(item.permission)),
+    items: group.items.filter(
+      (item) =>
+        (!item.permission || hasPermission(item.permission)) &&
+        (!item.featureFlag || isFeatureEnabled(item.featureFlag)),
+    ),
   })).filter((group) => group.items.length > 0),
 );
 

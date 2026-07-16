@@ -1,3 +1,4 @@
+import { FeatureFlag } from '~/shared/feature-flags';
 import { Permission } from '~/shared/permissions';
 
 export type RouteItem = {
@@ -5,6 +6,7 @@ export type RouteItem = {
   icon: string;
   path?: string;
   permission?: Permission;
+  featureFlag?: FeatureFlag;
   exact?: boolean;
   children?: RouteItem[];
 };
@@ -46,6 +48,7 @@ export const APP_ROUTES: RouteGroup[] = [
         path: '/admin/logs/login',
         exact: true,
         permission: Permission.LoginLogs.Read,
+        featureFlag: FeatureFlag.LoginLog,
       },
       {
         title: 'nav.auditLogs',
@@ -53,6 +56,7 @@ export const APP_ROUTES: RouteGroup[] = [
         path: '/admin/logs/audit',
         exact: true,
         permission: Permission.AuditLogs.Read,
+        featureFlag: FeatureFlag.AuditLog,
       },
     ],
   },
@@ -90,6 +94,26 @@ export function flattenRoutePermissions(): { prefix: string; permission: Permiss
       for (const child of item.children ?? []) {
         if (child.permission && child.path) {
           result.push({ prefix: child.path, permission: child.permission });
+        }
+      }
+    }
+  }
+
+  return result;
+}
+
+export function flattenRouteFeatureFlags(): { prefix: string; featureFlag: FeatureFlag }[] {
+  const result: { prefix: string; featureFlag: FeatureFlag }[] = [];
+
+  for (const group of APP_ROUTES) {
+    for (const item of group.items) {
+      if (item.featureFlag && item.path) {
+        result.push({ prefix: item.path, featureFlag: item.featureFlag });
+      }
+
+      for (const child of item.children ?? []) {
+        if (child.featureFlag && child.path) {
+          result.push({ prefix: child.path, featureFlag: child.featureFlag });
         }
       }
     }

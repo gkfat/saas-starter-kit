@@ -29,5 +29,5 @@ export type AuditLog = BaseLog & {
   type: 'audit';
   action: string;
   resourceId?: string;
-  diff?: Record<string, { before: unknown; after: unknown }>;
+  diff?: Record<string, { before?: unknown; after?: unknown }>;
 };

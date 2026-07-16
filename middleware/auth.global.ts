@@ -1,10 +1,12 @@
 import { useAuthStore } from '~/stores/auth';
+import { useFeatureFlags } from '~/composables/useFeatureFlags';
 import { usePermission } from '~/composables/usePermission';
-import { flattenRoutePermissions } from '~/config/app-routes';
+import { flattenRouteFeatureFlags, flattenRoutePermissions } from '~/config/app-routes';
 
 const PUBLIC_ROUTES = new Set(['/login', '/auth/register']);
 
 const PERMISSION_ROUTES = flattenRoutePermissions();
+const FEATURE_FLAG_ROUTES = flattenRouteFeatureFlags();
 
 export default defineNuxtRouteMiddleware((to) => {
   const auth = useAuthStore();
@@ -23,6 +25,12 @@ export default defineNuxtRouteMiddleware((to) => {
   const { hasPermission } = usePermission();
   const matched = PERMISSION_ROUTES.find((r) => to.path.startsWith(r.prefix));
   if (matched && !hasPermission(matched.permission)) {
+    return navigateTo('/dashboard');
+  }
+
+  const { isFeatureEnabled } = useFeatureFlags();
+  const matchedFlag = FEATURE_FLAG_ROUTES.find((r) => to.path.startsWith(r.prefix));
+  if (matchedFlag && !isFeatureEnabled(matchedFlag.featureFlag)) {
     return navigateTo('/dashboard');
   }
 });
