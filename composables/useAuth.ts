@@ -19,7 +19,21 @@ type GoogleLoginResult =
 
 export function useAuth() {
   const store = useAuthStore();
+  const { t } = useI18n();
   let recaptchaVerifier: RecaptchaVerifier | null = null;
+
+  function getLoginErrorMessage(e: unknown): string {
+    const code = (e as { code?: string }).code ?? '';
+    const map: Record<string, string> = {
+      'auth/invalid-credential': t('auth.error.invalidCredential'),
+      'auth/wrong-password': t('auth.error.invalidCredential'),
+      'auth/user-not-found': t('auth.error.invalidCredential'),
+      'auth/invalid-email': t('auth.error.invalidCredential'),
+      'auth/user-disabled': t('auth.error.userDisabled'),
+      'auth/too-many-requests': t('auth.error.tooManyRequests'),
+    };
+    return map[code] ?? t('auth.error.default');
+  }
 
   function getFirebaseAuth() {
     if (!import.meta.client) throw new Error('Firebase Auth is browser-only');
@@ -185,5 +199,6 @@ export function useAuth() {
     linkGoogleProvider,
     unlinkGoogleProvider,
     logout,
+    getLoginErrorMessage,
   };
 }

@@ -3,7 +3,7 @@ import { useFeatureFlags } from '~/composables/useFeatureFlags';
 import { usePermission } from '~/composables/usePermission';
 import { flattenRouteFeatureFlags, flattenRoutePermissions } from '~/config/app-routes';
 
-const PUBLIC_ROUTES = new Set(['/login', '/auth/register', '/auth/set-password']);
+const PUBLIC_ROUTES = new Set(['/login', '/register', '/auth/set-password']);
 
 const PERMISSION_ROUTES = flattenRoutePermissions();
 const FEATURE_FLAG_ROUTES = flattenRouteFeatureFlags();

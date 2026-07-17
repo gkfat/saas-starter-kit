@@ -9,25 +9,38 @@
             <p class="text-body-2 text-error">{{ $t('auth.error.invalidSetupToken') }}</p>
           </template>
 
-          <v-form v-else @submit.prevent="handleSubmit">
+          <v-form v-else @submit.prevent="onSubmit">
             <v-text-field
               v-model="password"
+              v-bind="passwordAttrs"
               :label="$t('auth.password')"
               type="password"
-              required
+              :error-messages="errors.password"
               :disabled="loading"
               :hint="$t('auth.passwordHint')"
               persistent-hint
+              hide-details="auto"
               class="mb-1"
             />
             <v-text-field
               v-model="confirmPassword"
+              v-bind="confirmPasswordAttrs"
               :label="$t('auth.confirmPassword')"
               type="password"
-              required
+              :error-messages="errors.confirmPassword"
               :disabled="loading"
+              hide-details="auto"
+              class="mb-1"
             />
-            <v-btn type="submit" color="primary" block :loading="loading" class="mb-3 mt-2">
+            <v-btn
+              type="submit"
+              color="primary"
+              variant="flat"
+              block
+              :loading="loading"
+              :disabled="!meta.valid"
+              class="mb-3 mt-2"
+            >
               {{ $t('auth.setPassword') }}
             </v-btn>
           </v-form>
@@ -38,6 +51,9 @@
 </template>
 
 <script setup lang="ts">
+import { toTypedSchema } from '@vee-validate/zod';
+import { useForm } from 'vee-validate';
+import { z } from 'zod';
 import { isValidPassword } from '~/shared/utils/validation';
 
 definePageMeta({ layout: 'blank' });
@@ -49,25 +65,34 @@ const { t } = useI18n();
 
 const token = computed(() => (typeof route.query.token === 'string' ? route.query.token : ''));
 
-const password = ref('');
-const confirmPassword = ref('');
 const loading = ref(false);
 
-async function handleSubmit() {
-  if (!isValidPassword(password.value)) {
-    showError(t('auth.error.invalidPassword'));
-    return;
-  }
-  if (password.value !== confirmPassword.value) {
-    showError(t('auth.passwordMismatch'));
-    return;
-  }
+const validationSchema = toTypedSchema(
+  z
+    .object({
+      password: z.string().refine(isValidPassword, t('auth.error.invalidPassword')),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t('auth.passwordMismatch'),
+      path: ['confirmPassword'],
+    }),
+);
 
+const { defineField, errors, meta, handleSubmit } = useForm({
+  validationSchema,
+  initialValues: { password: '', confirmPassword: '' },
+});
+
+const [password, passwordAttrs] = defineField('password');
+const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword');
+
+const onSubmit = handleSubmit(async (values) => {
   loading.value = true;
   try {
     await $fetch('/api/auth/set-password', {
       method: 'POST',
-      body: { token: token.value, password: password.value },
+      body: { token: token.value, password: values.password },
     });
     showSuccess(t('auth.setPasswordSuccess'));
     router.push('/login');
@@ -76,5 +101,5 @@ async function handleSubmit() {
   } finally {
     loading.value = false;
   }
-}
+});
 </script>

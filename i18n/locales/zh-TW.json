@@ -16,7 +16,9 @@
     "notBound": "未綁定",
     "bind": "綁定",
     "unbind": "解除綁定",
-    "verify": "驗證"
+    "verify": "驗證",
+    "required": "此欄位為必填",
+    "or": "或"
   },
   "lang": {
     "zh-TW": "繁體中文",
@@ -52,7 +54,7 @@
     "passwordHint": "6–8 碼英數字，不含特殊符號",
     "chooseUsername": "選擇帳號名稱",
     "confirmUsername": "確認並完成註冊",
-    "loginWithGoogle": "透過 Google 登入",
+    "loginWithGoogle": "透過 Google 繼續",
     "loginWithPhone": "使用手機號碼登入",
     "noAccount": "還沒有帳號？",
     "hasAccount": "已有帳號？",
@@ -133,7 +135,12 @@
     "displayNameOptional": "顯示名稱（選填）",
     "phone": "手機",
     "role": "角色",
-    "status": "狀態",
+    "status": {
+      "label": "帳號狀態",
+      "enabled": "已啟用",
+      "disabled": "已停用",
+      "pendingPassword": "尚未變更預設密碼"
+    },
     "createdAt": "建立時間",
     "noData": "無使用者資料",
     "searchByEmail": "以 Email 搜尋",
@@ -148,12 +155,6 @@
     "setupLinkHint": "此連結為一次性，請盡快複製並轉交給使用者，使用者可透過此連結設定密碼並登入。",
     "copyLink": "複製連結",
     "lastLoginAt": "最近登入時間",
-    "status": {
-      "label": "帳號狀態",
-      "enabled": "已啟用",
-      "disabled": "已停用",
-      "pendingPassword": "尚未變更預設密碼"
-    },
     "disableUser": "停用使用者",
     "enableUser": "啟用使用者",
     "disableConfirm": "確定要變更「{username}」的帳號狀態嗎？",

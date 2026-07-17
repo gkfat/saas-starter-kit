@@ -103,7 +103,7 @@ const validationSchema = toTypedSchema(
   z.object({
     username: z.string().refine(isValidUsername, t('auth.error.invalidUsername')),
     displayName: z.string().optional(),
-    email: z.union([z.string().email(), z.literal('')]).optional(),
+    email: z.union([z.string().email(t('auth.error.invalidEmail')), z.literal('')]).optional(),
     phone: z.string().optional(),
     role: z.string().min(1, t('auth.error.registerDefault')),
   }),

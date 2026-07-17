@@ -6,9 +6,11 @@
         <div class="text-caption text-medium-emphasis mb-1">{{ $t('users.role') }}</div>
         <v-select
           v-model="selectedRole"
+          v-bind="selectedRoleAttrs"
           :items="roleOptions"
           item-title="title"
           item-value="value"
+          :error-messages="errors.selectedRole"
           hide-details="auto"
         />
         <div class="mt-3">
@@ -26,15 +28,23 @@
       <v-card-actions class="pa-4">
         <v-spacer />
         <v-btn variant="flat" class="border" @click="close">{{ $t('common.cancel') }}</v-btn>
-        <v-btn color="primary" variant="flat" :loading="saving" @click="save">{{
-          $t('common.save')
-        }}</v-btn>
+        <v-btn
+          color="primary"
+          variant="flat"
+          :loading="saving"
+          :disabled="!meta.valid"
+          @click="save"
+          >{{ $t('common.save') }}</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script setup lang="ts">
+import { toTypedSchema } from '@vee-validate/zod';
+import { useForm } from 'vee-validate';
+import { z } from 'zod';
 import { useAuthStore } from '~/stores/auth';
 import type { UserRow } from '~/shared/users';
 
@@ -56,14 +66,28 @@ const { showSuccess } = useToast();
 const { withErrorToast } = useApiError();
 
 const saving = ref(false);
-const selectedRole = ref('');
 
-const selectedRolePermissions = computed(() => props.rolePermissions[selectedRole.value] ?? []);
+const validationSchema = toTypedSchema(
+  z.object({
+    selectedRole: z.string().min(1),
+  }),
+);
+
+const { defineField, errors, meta, resetForm } = useForm({
+  validationSchema,
+  initialValues: { selectedRole: '' },
+});
+
+const [selectedRole, selectedRoleAttrs] = defineField('selectedRole');
+
+const selectedRolePermissions = computed(
+  () => props.rolePermissions[selectedRole.value ?? ''] ?? [],
+);
 
 watch(
   () => props.modelValue,
   (open) => {
-    if (open) selectedRole.value = props.user?.role ?? '';
+    if (open) resetForm({ values: { selectedRole: props.user?.role ?? '' } });
   },
 );
 

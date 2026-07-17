@@ -67,21 +67,28 @@
           <div class="text-caption text-medium-emphasis mb-1">{{ $t('profile.displayName') }}</div>
           <v-text-field
             v-model="displayNameInput"
+            v-bind="displayNameInputAttrs"
             hide-details="auto"
             :disabled="displayNameLoading"
-            :error-messages="displayNameError"
+            :error-messages="displayNameFormErrors.displayNameInput"
           />
         </v-card-text>
         <v-card-actions class="pa-4">
           <v-spacer />
-          <v-btn variant="text" :disabled="displayNameLoading" @click="cancelEditDisplayName">
+          <v-btn
+            variant="flat"
+            class="border"
+            :disabled="displayNameLoading"
+            @click="cancelEditDisplayName"
+          >
             {{ $t('profile.cancel') }}
           </v-btn>
           <v-btn
             color="primary"
+            variant="flat"
             :loading="displayNameLoading"
-            :disabled="!isDisplayNameValid"
-            @click="handleSaveDisplayName"
+            :disabled="!displayNameFormMeta.valid"
+            @click="onSaveDisplayName"
           >
             {{ $t('profile.save') }}
           </v-btn>
@@ -99,11 +106,12 @@
             </div>
             <v-text-field
               v-model="phoneLocal"
+              v-bind="phoneLocalAttrs"
               prefix="+886"
               type="tel"
               hide-details="auto"
               :disabled="loading"
-              :error-messages="phoneError"
+              :error-messages="phoneFormErrors.phoneLocal"
             />
             <div id="recaptcha-container" />
           </template>
@@ -115,23 +123,29 @@
         <v-card-actions class="pa-4">
           <v-spacer />
           <template v-if="!confirmationResult">
-            <v-btn variant="text" :disabled="loading" @click="verifyPhoneDialog = false">
+            <v-btn
+              variant="flat"
+              class="border"
+              :disabled="loading"
+              @click="verifyPhoneDialog = false"
+            >
               {{ $t('profile.cancel') }}
             </v-btn>
             <v-btn
               color="primary"
+              variant="flat"
               :loading="loading"
-              :disabled="!isPhoneValid"
-              @click="handleSendOtp"
+              :disabled="!phoneFormMeta.valid"
+              @click="onSendOtp"
             >
               {{ $t('auth.sendOtp') }}
             </v-btn>
           </template>
           <template v-else>
-            <v-btn variant="text" :disabled="loading" @click="resetOtp">
+            <v-btn variant="flat" class="border" :disabled="loading" @click="resetOtp">
               {{ $t('profile.resendOtp') }}
             </v-btn>
-            <v-btn color="primary" :loading="loading" @click="handleConfirmOtp">
+            <v-btn color="primary" variant="flat" :loading="loading" @click="handleConfirmOtp">
               {{ $t('profile.confirmOtp') }}
             </v-btn>
           </template>
@@ -142,7 +156,10 @@
 </template>
 
 <script setup lang="ts">
+import { toTypedSchema } from '@vee-validate/zod';
 import type { ConfirmationResult } from 'firebase/auth';
+import { useForm } from 'vee-validate';
+import { z } from 'zod';
 import { useAuthStore } from '~/stores/auth';
 
 const store = useAuthStore();
@@ -150,40 +167,57 @@ const { sendPhoneLinkOtp, confirmPhoneLinkOtp } = useAuth();
 const { showError, showSuccess } = useToast();
 const { t } = useI18n();
 
-const phoneLocal = ref('');
 const otp = ref('');
 const loading = ref(false);
 const confirmationResult = ref<ConfirmationResult | null>(null);
 
-const fullPhone = computed(() => `+886${phoneLocal.value.replace(/^0+/, '')}`);
-
-const isPhoneValid = computed(() => /^0?9\d{8}$/.test(phoneLocal.value));
-
-const phoneError = computed(() => {
-  if (!phoneLocal.value || isPhoneValid.value) return '';
-  return t('profile.phoneInvalid');
-});
-
-const editingDisplayName = ref(false);
-const displayNameInput = ref('');
 const displayNameLoading = ref(false);
+const editingDisplayName = ref(false);
 
 const verifyPhoneDialog = ref(false);
 
-const isDisplayNameValid = computed(() => {
-  const trimmed = displayNameInput.value.trim();
-  return trimmed.length > 0 && trimmed.length <= 20;
+const displayNameValidationSchema = toTypedSchema(
+  z.object({
+    displayNameInput: z
+      .string()
+      .trim()
+      .min(1, t('profile.displayNameRequired'))
+      .max(20, t('profile.displayNameTooLong')),
+  }),
+);
+const {
+  defineField: defineDisplayNameField,
+  errors: displayNameFormErrors,
+  meta: displayNameFormMeta,
+  handleSubmit: handleDisplayNameSubmit,
+  resetForm: resetDisplayNameForm,
+} = useForm({
+  validationSchema: displayNameValidationSchema,
+  initialValues: { displayNameInput: '' },
 });
+const [displayNameInput, displayNameInputAttrs] = defineDisplayNameField('displayNameInput');
 
-const displayNameError = computed(() => {
-  const trimmed = displayNameInput.value.trim();
-  if (trimmed.length === 0) return t('profile.displayNameRequired');
-  if (trimmed.length > 20) return t('profile.displayNameTooLong');
-  return '';
+const phoneValidationSchema = toTypedSchema(
+  z.object({
+    phoneLocal: z.string().regex(/^0?9\d{8}$/, t('profile.phoneInvalid')),
+  }),
+);
+const {
+  defineField: definePhoneField,
+  errors: phoneFormErrors,
+  meta: phoneFormMeta,
+  handleSubmit: handlePhoneSubmit,
+  resetForm: resetPhoneForm,
+} = useForm({
+  validationSchema: phoneValidationSchema,
+  initialValues: { phoneLocal: '' },
 });
+const [phoneLocal, phoneLocalAttrs] = definePhoneField('phoneLocal');
+
+const fullPhone = computed(() => `+886${(phoneLocal.value ?? '').replace(/^0+/, '')}`);
 
 function startEditDisplayName() {
-  displayNameInput.value = store.user?.displayName ?? '';
+  resetDisplayNameForm({ values: { displayNameInput: store.user?.displayName ?? '' } });
   editingDisplayName.value = true;
 }
 
@@ -191,9 +225,9 @@ function cancelEditDisplayName() {
   editingDisplayName.value = false;
 }
 
-async function handleSaveDisplayName() {
-  if (!isDisplayNameValid.value || !store.user) return;
-  const trimmed = displayNameInput.value.trim();
+const onSaveDisplayName = handleDisplayNameSubmit(async (values) => {
+  if (!store.user) return;
+  const trimmed = values.displayNameInput.trim();
   displayNameLoading.value = true;
   try {
     await $fetch('/api/profile/display-name', {
@@ -209,17 +243,16 @@ async function handleSaveDisplayName() {
   } finally {
     displayNameLoading.value = false;
   }
-}
+});
 
 function openVerifyPhoneDialog() {
-  phoneLocal.value = '';
+  resetPhoneForm();
   otp.value = '';
   confirmationResult.value = null;
   verifyPhoneDialog.value = true;
 }
 
-async function handleSendOtp() {
-  if (!isPhoneValid.value) return;
+const onSendOtp = handlePhoneSubmit(async () => {
   loading.value = true;
   try {
     confirmationResult.value = await sendPhoneLinkOtp(fullPhone.value, 'recaptcha-container');
@@ -228,7 +261,7 @@ async function handleSendOtp() {
   } finally {
     loading.value = false;
   }
-}
+});
 
 async function handleConfirmOtp() {
   if (!confirmationResult.value || !store.user) return;

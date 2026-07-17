@@ -16,7 +16,9 @@
     "notBound": "Not linked",
     "bind": "Link",
     "unbind": "Unlink",
-    "verify": "Verify"
+    "verify": "Verify",
+    "required": "This field is required",
+    "or": "or"
   },
   "lang": {
     "zh-TW": "繁體中文",
@@ -52,7 +54,7 @@
     "passwordHint": "6–8 alphanumeric characters, no special symbols",
     "chooseUsername": "Choose a Username",
     "confirmUsername": "Confirm & Complete Registration",
-    "loginWithGoogle": "Sign in with Google",
+    "loginWithGoogle": "Continue with Google",
     "loginWithPhone": "Sign in with Phone",
     "noAccount": "Don't have an account?",
     "hasAccount": "Already have an account?",
@@ -133,7 +135,12 @@
     "displayNameOptional": "Display Name (optional)",
     "phone": "Phone",
     "role": "Role",
-    "status": "Status",
+    "status": {
+      "label": "Account Status",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "pendingPassword": "Password Not Set"
+    },
     "createdAt": "Created At",
     "noData": "No users found",
     "searchByEmail": "Search by email",
@@ -148,12 +155,6 @@
     "setupLinkHint": "This link is single-use. Copy and share it with the user as soon as possible — they can use it to set a password and log in.",
     "copyLink": "Copy Link",
     "lastLoginAt": "Last Login",
-    "status": {
-      "label": "Account Status",
-      "enabled": "Enabled",
-      "disabled": "Disabled",
-      "pendingPassword": "Password Not Set"
-    },
     "disableUser": "Disable User",
     "enableUser": "Enable User",
     "disableConfirm": "Are you sure you want to change the status of \"{username}\"?",

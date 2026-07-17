@@ -8,8 +8,10 @@
       </v-card-text>
       <v-card-actions class="pa-4">
         <v-spacer />
-        <v-btn variant="text" class="border" @click="copyLink">{{ $t('users.copyLink') }}</v-btn>
-        <v-btn color="primary" variant="text" @click="close">{{ $t('common.confirm') }}</v-btn>
+        <v-btn color="secondary" variant="flat" class="border" @click="copyLink">{{
+          $t('users.copyLink')
+        }}</v-btn>
+        <v-btn color="primary" variant="flat" @click="close">{{ $t('common.confirm') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
