@@ -201,6 +201,17 @@
     "title": "Settings",
     "language": "Language"
   },
+  "filterBar": {
+    "apply": "Apply",
+    "reset": "Reset",
+    "clear": "Clear",
+    "selectAll": "Select All",
+    "appliedFilters": "Applied Filters",
+    "selectPlaceholder": "Select {label}",
+    "allSelected": "All {label}",
+    "selectedCount": "{count} selected",
+    "pleaseSet": "Please set {label}"
+  },
   "admin": {
     "noPermission": "No Access",
     "noPermissionHint": "You don't have permission to access any admin page."
