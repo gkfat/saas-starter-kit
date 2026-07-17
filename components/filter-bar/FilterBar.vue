@@ -1,5 +1,5 @@
 <template>
-  <v-card class="border">
+  <CardsAppCard>
     <v-card-text class="pa-3" :class="{ 'pb-1': appliedFilters.length > 0 }">
       <v-row dense>
         <template v-for="field in config.fields" :key="field.key">
@@ -28,14 +28,14 @@
 
       <v-row dense class="justify-end">
         <v-col cols="auto">
-          <v-btn variant="flat" class="border" @click="handleReset">{{
+          <ButtonsAppButton kind="secondary" @click="handleReset">{{
             $t('filterBar.reset')
-          }}</v-btn>
+          }}</ButtonsAppButton>
         </v-col>
         <v-col cols="auto">
-          <v-btn color="primary" elevation="0" prepend-icon="mdi-magnify" @click="handleSearch">
+          <ButtonsAppButton kind="primary" prepend-icon="mdi-magnify" @click="handleSearch">
             {{ $t('common.search') }}
-          </v-btn>
+          </ButtonsAppButton>
         </v-col>
       </v-row>
     </v-card-text>
@@ -49,7 +49,7 @@
         <AppliedFiltersBar :filters="appliedFilters" @remove="removeFilter" />
       </v-card-text>
     </template>
-  </v-card>
+  </CardsAppCard>
 </template>
 
 <script setup lang="ts">

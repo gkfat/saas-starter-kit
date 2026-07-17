@@ -1,11 +1,11 @@
 <template>
   <div>
-    <v-card elevation="2" rounded="lg" class="border h-100">
+    <CardsAppCard class="h-100">
       <v-card-title class="d-flex align-center justify-end py-3">
         <span class="mr-auto">{{ $t('profile.profileCardTitle') }}</span>
-        <v-btn size="small" variant="text" class="border" @click="startEditDisplayName">
+        <ButtonsAppButton kind="secondary" size="small" @click="startEditDisplayName">
           {{ $t('profile.editDisplayName') }}
-        </v-btn>
+        </ButtonsAppButton>
       </v-card-title>
       <v-card-text>
         <v-row>
@@ -20,9 +20,9 @@
             <v-row v-else no-gutters align="center" class="ga-2">
               <v-col cols="auto" class="text-medium-emphasis">{{ $t('common.notBound') }}</v-col>
               <v-col cols="auto">
-                <v-btn size="small" variant="text" class="border" disabled>
+                <ButtonsAppButton kind="secondary" size="small" disabled>
                   {{ $t('common.bind') }}
-                </v-btn>
+                </ButtonsAppButton>
               </v-col>
             </v-row>
           </v-col>
@@ -50,18 +50,18 @@
                 $t('profile.phoneNotVerified')
               }}</v-col>
               <v-col cols="auto">
-                <v-btn size="small" variant="text" class="border" @click="openVerifyPhoneDialog">
+                <ButtonsAppButton kind="secondary" size="small" @click="openVerifyPhoneDialog">
                   {{ $t('common.verify') }}
-                </v-btn>
+                </ButtonsAppButton>
               </v-col>
             </v-row>
           </v-col>
         </v-row>
       </v-card-text>
-    </v-card>
+    </CardsAppCard>
 
     <v-dialog v-model="editingDisplayName" max-width="400" persistent>
-      <v-card>
+      <CardsDialogCard>
         <v-card-title class="pa-4">{{ $t('profile.editDisplayName') }}</v-card-title>
         <v-card-text>
           <div class="text-caption text-medium-emphasis mb-1">{{ $t('profile.displayName') }}</div>
@@ -75,29 +75,27 @@
         </v-card-text>
         <v-card-actions class="pa-4">
           <v-spacer />
-          <v-btn
-            variant="flat"
-            class="border"
+          <ButtonsAppButton
+            kind="secondary"
             :disabled="displayNameLoading"
             @click="cancelEditDisplayName"
           >
             {{ $t('profile.cancel') }}
-          </v-btn>
-          <v-btn
-            color="primary"
-            variant="flat"
+          </ButtonsAppButton>
+          <ButtonsAppButton
+            kind="primary"
             :loading="displayNameLoading"
             :disabled="!displayNameFormMeta.valid"
             @click="onSaveDisplayName"
           >
             {{ $t('profile.save') }}
-          </v-btn>
+          </ButtonsAppButton>
         </v-card-actions>
-      </v-card>
+      </CardsDialogCard>
     </v-dialog>
 
     <v-dialog v-model="verifyPhoneDialog" max-width="400" persistent>
-      <v-card>
+      <CardsDialogCard>
         <v-card-title class="pa-4">{{ $t('profile.verifyPhone') }}</v-card-title>
         <v-card-text>
           <template v-if="!confirmationResult">
@@ -123,34 +121,32 @@
         <v-card-actions class="pa-4">
           <v-spacer />
           <template v-if="!confirmationResult">
-            <v-btn
-              variant="flat"
-              class="border"
+            <ButtonsAppButton
+              kind="secondary"
               :disabled="loading"
               @click="verifyPhoneDialog = false"
             >
               {{ $t('profile.cancel') }}
-            </v-btn>
-            <v-btn
-              color="primary"
-              variant="flat"
+            </ButtonsAppButton>
+            <ButtonsAppButton
+              kind="primary"
               :loading="loading"
               :disabled="!phoneFormMeta.valid"
               @click="onSendOtp"
             >
               {{ $t('auth.sendOtp') }}
-            </v-btn>
+            </ButtonsAppButton>
           </template>
           <template v-else>
-            <v-btn variant="flat" class="border" :disabled="loading" @click="resetOtp">
+            <ButtonsAppButton kind="secondary" :disabled="loading" @click="resetOtp">
               {{ $t('profile.resendOtp') }}
-            </v-btn>
-            <v-btn color="primary" variant="flat" :loading="loading" @click="handleConfirmOtp">
+            </ButtonsAppButton>
+            <ButtonsAppButton kind="primary" :loading="loading" @click="handleConfirmOtp">
               {{ $t('profile.confirmOtp') }}
-            </v-btn>
+            </ButtonsAppButton>
           </template>
         </v-card-actions>
-      </v-card>
+      </CardsDialogCard>
     </v-dialog>
   </div>
 </template>

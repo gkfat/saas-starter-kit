@@ -2,7 +2,7 @@
   <div>
     <LayoutBreadcrumb />
     <LayoutPageHeader :title="$t('logs.loginTitle')" />
-    <v-card elevation="2">
+    <CardsAppCard>
       <v-data-table
         :headers="headers"
         :items="logs ?? []"
@@ -31,7 +31,7 @@
           <span class="text-medium-emphasis">{{ $t('logs.noData') }}</span>
         </template>
       </v-data-table>
-    </v-card>
+    </CardsAppCard>
   </div>
 </template>
 

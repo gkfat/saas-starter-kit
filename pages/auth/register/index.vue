@@ -2,7 +2,7 @@
   <v-container class="fill-height" fluid>
     <v-row align="center" justify="center">
       <v-col cols="12" sm="8" md="4">
-        <v-card class="pa-6 border" rounded="lg" elevation="4">
+        <CardsAppCard class="pa-6" elevation="4">
           <v-card-title class="text-h5 mb-4">{{ $t('auth.createAccount') }}</v-card-title>
 
           <RegisterForm @success="router.push('/login')" />
@@ -11,7 +11,7 @@
             {{ $t('auth.hasAccount') }}
             <NuxtLink to="/login">{{ $t('auth.loginLink') }}</NuxtLink>
           </div>
-        </v-card>
+        </CardsAppCard>
       </v-col>
     </v-row>
   </v-container>

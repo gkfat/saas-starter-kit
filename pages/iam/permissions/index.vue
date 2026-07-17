@@ -2,13 +2,13 @@
   <div>
     <LayoutBreadcrumb />
     <LayoutPageHeader :title="$t('permissions.title')" />
-    <v-card elevation="2">
+    <CardsAppCard>
       <v-data-table :headers="headers" :items="permissions" :loading="pending" item-value="name">
         <template #no-data>
           <span class="text-medium-emphasis">{{ $t('permissions.noData') }}</span>
         </template>
       </v-data-table>
-    </v-card>
+    </CardsAppCard>
   </div>
 </template>
 

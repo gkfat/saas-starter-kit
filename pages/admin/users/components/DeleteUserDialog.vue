@@ -1,18 +1,20 @@
 <template>
   <v-dialog :model-value="modelValue" max-width="400" persistent @update:model-value="close">
-    <v-card>
+    <CardsDialogCard>
       <v-card-title class="pa-4">{{ $t('users.deleteUser') }}</v-card-title>
       <v-card-text>
         {{ $t('users.deleteConfirm', { username: user?.username }) }}
       </v-card-text>
       <v-card-actions class="pa-4">
         <v-spacer />
-        <v-btn variant="flat" class="border" @click="close">{{ $t('common.cancel') }}</v-btn>
-        <v-btn color="error" variant="flat" :loading="deleting" @click="confirm">{{
+        <ButtonsAppButton kind="secondary" @click="close">{{
+          $t('common.cancel')
+        }}</ButtonsAppButton>
+        <ButtonsAppButton kind="primary" color="error" :loading="deleting" @click="confirm">{{
           $t('common.confirm')
-        }}</v-btn>
+        }}</ButtonsAppButton>
       </v-card-actions>
-    </v-card>
+    </CardsDialogCard>
   </v-dialog>
 </template>
 

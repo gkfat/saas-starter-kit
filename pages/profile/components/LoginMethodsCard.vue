@@ -1,6 +1,6 @@
 <template>
   <div class="h-100">
-    <v-card elevation="2" rounded="lg" class="border h-100" :min-width="280">
+    <CardsAppCard class="h-100" :min-width="280">
       <v-card-title class="py-3">
         {{ $t('profile.loginMethods') }}
       </v-card-title>
@@ -13,48 +13,55 @@
                 {{ isGoogleBound ? $t('common.bound') : $t('common.notBound') }}
               </v-col>
               <v-col cols="auto">
-                <v-btn
+                <ButtonsAppButton
                   v-if="isGoogleBound"
+                  kind="secondary"
                   size="small"
-                  variant="text"
-                  class="border"
                   :loading="googleLoading"
                   :disabled="!canUnbindGoogle"
                   @click="confirmUnbindDialog = true"
                 >
                   {{ $t('common.unbind') }}
-                </v-btn>
-                <v-btn
+                </ButtonsAppButton>
+                <ButtonsAppButton
                   v-else
+                  kind="secondary"
                   size="small"
-                  variant="text"
-                  class="border"
                   :loading="googleLoading"
                   @click="handleLinkGoogle"
                 >
                   {{ $t('common.bind') }}
-                </v-btn>
+                </ButtonsAppButton>
               </v-col>
             </v-row>
           </v-col>
         </v-row>
       </v-card-text>
-    </v-card>
+    </CardsAppCard>
 
     <v-dialog v-model="confirmUnbindDialog" max-width="400">
-      <v-card>
+      <CardsDialogCard>
         <v-card-title class="pa-4">{{ $t('profile.unbindGoogleConfirmTitle') }}</v-card-title>
         <v-card-text>{{ $t('profile.unbindGoogleConfirmMessage') }}</v-card-text>
         <v-card-actions class="pa-4">
           <v-spacer />
-          <v-btn variant="text" :disabled="googleLoading" @click="confirmUnbindDialog = false">
+          <ButtonsAppButton
+            kind="secondary"
+            :disabled="googleLoading"
+            @click="confirmUnbindDialog = false"
+          >
             {{ $t('common.cancel') }}
-          </v-btn>
-          <v-btn color="error" :loading="googleLoading" @click="handleUnlinkGoogle">
+          </ButtonsAppButton>
+          <ButtonsAppButton
+            kind="primary"
+            color="error"
+            :loading="googleLoading"
+            @click="handleUnlinkGoogle"
+          >
             {{ $t('common.unbind') }}
-          </v-btn>
+          </ButtonsAppButton>
         </v-card-actions>
-      </v-card>
+      </CardsDialogCard>
     </v-dialog>
   </div>
 </template>

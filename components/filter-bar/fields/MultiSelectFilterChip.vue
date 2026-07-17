@@ -59,10 +59,12 @@
         <v-divider />
         <v-card-actions>
           <v-spacer />
-          <v-btn variant="text" @click="clearSelection">{{ $t('filterBar.clear') }}</v-btn>
-          <v-btn variant="text" color="primary" @click="applyValue">{{
+          <ButtonsAppButton kind="secondary" @click="clearSelection">{{
+            $t('filterBar.clear')
+          }}</ButtonsAppButton>
+          <ButtonsAppButton kind="primary" @click="applyValue">{{
             $t('filterBar.apply')
-          }}</v-btn>
+          }}</ButtonsAppButton>
         </v-card-actions>
       </div>
     </v-card>

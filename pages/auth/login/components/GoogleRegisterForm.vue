@@ -13,21 +13,20 @@
         hide-details="auto"
         class="mb-2"
       />
-      <v-btn
+      <ButtonsAppButton
         type="submit"
-        color="primary"
-        variant="flat"
+        kind="primary"
         block
         :loading="loading"
         :disabled="!meta.valid"
         class="mb-3"
       >
         {{ $t('auth.confirmUsername') }}
-      </v-btn>
+      </ButtonsAppButton>
     </v-form>
-    <v-btn variant="flat" class="border" block :disabled="loading" @click="emit('cancel')">
+    <ButtonsAppButton kind="secondary" block :disabled="loading" @click="emit('cancel')">
       {{ $t('common.cancel') }}
-    </v-btn>
+    </ButtonsAppButton>
   </div>
 </template>
 

@@ -1,6 +1,6 @@
 <template>
   <v-dialog :model-value="modelValue" max-width="400" persistent @update:model-value="close">
-    <v-card>
+    <CardsDialogCard>
       <v-card-title class="pa-4">{{ $t('users.editRole') }} — {{ user?.username }}</v-card-title>
       <v-card-text>
         <div class="text-caption text-medium-emphasis mb-1">{{ $t('users.role') }}</div>
@@ -27,17 +27,14 @@
       </v-card-text>
       <v-card-actions class="pa-4">
         <v-spacer />
-        <v-btn variant="flat" class="border" @click="close">{{ $t('common.cancel') }}</v-btn>
-        <v-btn
-          color="primary"
-          variant="flat"
-          :loading="saving"
-          :disabled="!meta.valid"
-          @click="save"
-          >{{ $t('common.save') }}</v-btn
-        >
+        <ButtonsAppButton kind="secondary" @click="close">{{
+          $t('common.cancel')
+        }}</ButtonsAppButton>
+        <ButtonsAppButton kind="primary" :loading="saving" :disabled="!meta.valid" @click="save">{{
+          $t('common.save')
+        }}</ButtonsAppButton>
       </v-card-actions>
-    </v-card>
+    </CardsDialogCard>
   </v-dialog>
 </template>
 

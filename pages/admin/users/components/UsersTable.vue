@@ -1,5 +1,5 @@
 <template>
-  <v-card elevation="2">
+  <CardsAppCard>
     <v-data-table
       :headers="headers"
       :items="users"
@@ -20,16 +20,16 @@
         <span>{{ item.role ? $t(`role.${item.role}`) : '-' }}</span>
       </template>
       <template #[`item.status`]="{ item }">
-        <v-btn
+        <ButtonsAppButton
+          kind="text"
           size="small"
           :color="statusColor(item)"
-          variant="text"
           class="border text-caption"
           prepend-icon="mdi-cog"
           @click="canWriteUsers && emit('toggle-status', item)"
         >
           {{ statusLabel(item) }}
-        </v-btn>
+        </ButtonsAppButton>
       </template>
       <template #[`item.lastLoginAt`]="{ item }">
         <span :title="item.lastLoginAt ? formatDateTime(item.lastLoginAt) : undefined">{{
@@ -41,37 +41,26 @@
       </template>
       <template #[`item.actions`]="{ item }">
         <v-row no-gutters class="ga-1 flex-nowrap">
-          <v-btn
+          <ButtonsIconActionBtn
             v-if="canWriteUsers"
             icon="mdi-pencil"
-            size="small"
-            variant="flat"
-            class="border"
-            rounded="lg"
             @click="emit('edit', item)"
           />
-          <v-btn
+          <ButtonsIconActionBtn
             v-if="canWriteUsers && item.passwordSetupPending"
             icon="mdi-link-variant"
-            size="small"
-            variant="flat"
-            class="border"
-            rounded="lg"
             @click="emit('regenerate-link', item)"
           />
-          <v-btn
+          <ButtonsIconActionBtn
             v-if="canDeleteUsers && item.disabled"
             icon="mdi-delete-outline"
-            size="small"
-            variant="flat"
-            rounded="lg"
-            class="border text-error"
+            class="text-error"
             @click="emit('delete', item)"
           />
         </v-row>
       </template>
     </v-data-table>
-  </v-card>
+  </CardsAppCard>
 </template>
 
 <script setup lang="ts">

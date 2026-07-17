@@ -70,16 +70,16 @@
             </div>
           </div>
         </div>
-        <v-btn
-          variant="text"
-          class="border text-none"
+        <ButtonsAppButton
+          kind="secondary"
+          class="text-none"
           :loading="loading"
           block
           @click="handleLogout"
         >
           <v-icon>mdi-logout</v-icon>
           <span v-if="!rail || mobile" class="ml-3">{{ $t('common.logout') }}</span>
-        </v-btn>
+        </ButtonsAppButton>
       </div>
       <template v-if="!mobile">
         <v-divider />

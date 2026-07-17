@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pa-4 pa-sm-6">
+  <v-container fluid>
     <slot />
   </v-container>
 </template>

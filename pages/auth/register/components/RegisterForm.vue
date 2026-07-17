@@ -39,17 +39,16 @@
         />
       </v-col>
       <v-col>
-        <v-btn
+        <ButtonsAppButton
           type="submit"
+          kind="primary"
           size="x-large"
-          color="primary"
-          variant="flat"
           block
           :loading="loading"
           :disabled="!meta.valid"
         >
           {{ $t('auth.register') }}
-        </v-btn>
+        </ButtonsAppButton>
       </v-col>
     </v-row>
   </v-form>

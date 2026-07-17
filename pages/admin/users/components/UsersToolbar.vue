@@ -1,17 +1,16 @@
 <template>
   <div class="d-flex ga-2 mb-4">
-    <v-btn variant="text" class="border" prepend-icon="mdi-export" @click="emit('export')">
+    <ButtonsAppButton kind="secondary" prepend-icon="mdi-export" @click="emit('export')">
       {{ $t('users.exportCsv') }}
-    </v-btn>
-    <v-btn
+    </ButtonsAppButton>
+    <ButtonsAppButton
       v-if="canCreateUsers"
-      color="primary"
-      variant="flat"
+      kind="primary"
       prepend-icon="mdi-account-plus"
       @click="emit('create')"
     >
       {{ $t('users.createUser') }}
-    </v-btn>
+    </ButtonsAppButton>
   </div>
 </template>
 

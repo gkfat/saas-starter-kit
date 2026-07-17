@@ -2,7 +2,7 @@
   <div>
     <LayoutBreadcrumb />
     <LayoutPageHeader :title="$t('dashboard.title')" />
-    <v-card elevation="2">
+    <CardsAppCard>
       <v-card-text>
         <div class="text-body-2 text-medium-emphasis mb-3">
           {{ store.user?.email ?? store.user?.uid }}
@@ -11,7 +11,7 @@
           {{ store.user?.role }}
         </v-chip>
       </v-card-text>
-    </v-card>
+    </CardsAppCard>
   </div>
 </template>
 

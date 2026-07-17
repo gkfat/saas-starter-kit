@@ -2,7 +2,7 @@
   <div>
     <LayoutBreadcrumb />
     <LayoutPageHeader :title="$t('roles.title')" />
-    <v-card elevation="2">
+    <CardsAppCard>
       <v-data-table
         :headers="headers"
         :items="rolesWithPermissions"
@@ -18,13 +18,13 @@
         </template>
 
         <template v-if="isSuperadmin" #[`item.actions`]="{ item }">
-          <v-btn icon="mdi-pencil" size="small" variant="text" @click="openEdit(item)" />
+          <ButtonsIconActionBtn icon="mdi-pencil" @click="openEdit(item)" />
         </template>
       </v-data-table>
-    </v-card>
+    </CardsAppCard>
 
-    <v-dialog v-model="dialog" max-width="480">
-      <v-card>
+    <v-dialog v-model="dialog" max-width="480" persistent>
+      <CardsDialogCard>
         <v-card-title class="pa-4"
           >{{ $t('roles.editPermissions') }} —
           {{ editing ? $t(`role.${editing.name}`) : '' }}</v-card-title
@@ -42,10 +42,14 @@
         </v-card-text>
         <v-card-actions class="pa-4">
           <v-spacer />
-          <v-btn variant="text" @click="dialog = false">{{ $t('common.cancel') }}</v-btn>
-          <v-btn color="primary" :loading="saving" @click="save">{{ $t('common.save') }}</v-btn>
+          <ButtonsAppButton kind="secondary" @click="dialog = false">{{
+            $t('common.cancel')
+          }}</ButtonsAppButton>
+          <ButtonsAppButton kind="primary" :loading="saving" @click="save">{{
+            $t('common.save')
+          }}</ButtonsAppButton>
         </v-card-actions>
-      </v-card>
+      </CardsDialogCard>
     </v-dialog>
   </div>
 </template>
@@ -74,9 +78,9 @@ const [
   { data: rolePermissions, refresh: refreshRolePermissions },
   { data: allPermissions },
 ] = await Promise.all([
-  useAuthFetch('/api/admin/roles', { default: () => [] }),
-  useAuthFetch('/api/admin/role-permissions', { default: () => ({}) }),
-  useAuthFetch('/api/admin/permissions', { default: () => [] }),
+  useAuthFetch<Array<{ name: string }>>('/api/admin/roles', { default: () => [] }),
+  useAuthFetch<Record<string, string[]>>('/api/admin/role-permissions', { default: () => ({}) }),
+  useAuthFetch<Array<{ name: string }>>('/api/admin/permissions', { default: () => [] }),
 ]);
 
 const rolesWithPermissions = computed(() =>

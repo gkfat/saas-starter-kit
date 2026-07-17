@@ -2,7 +2,7 @@
   <v-container class="fill-height" fluid>
     <v-row align="center" justify="center">
       <v-col cols="12" sm="8" md="4">
-        <v-card class="pa-6" elevation="4">
+        <CardsAppCard class="pa-6" elevation="4">
           <v-card-title class="text-h5 mb-4">{{ $t('auth.setPassword') }}</v-card-title>
 
           <template v-if="!token">
@@ -10,41 +10,46 @@
           </template>
 
           <v-form v-else @submit.prevent="onSubmit">
-            <v-text-field
-              v-model="password"
-              v-bind="passwordAttrs"
-              :label="$t('auth.password')"
-              type="password"
-              :error-messages="errors.password"
-              :disabled="loading"
-              :hint="$t('auth.passwordHint')"
-              persistent-hint
-              hide-details="auto"
-              class="mb-1"
-            />
-            <v-text-field
-              v-model="confirmPassword"
-              v-bind="confirmPasswordAttrs"
-              :label="$t('auth.confirmPassword')"
-              type="password"
-              :error-messages="errors.confirmPassword"
-              :disabled="loading"
-              hide-details="auto"
-              class="mb-1"
-            />
-            <v-btn
-              type="submit"
-              color="primary"
-              variant="flat"
-              block
-              :loading="loading"
-              :disabled="!meta.valid"
-              class="mb-3 mt-2"
-            >
-              {{ $t('auth.setPassword') }}
-            </v-btn>
+            <v-row no-gutters class="ga-3 flex-column mb-3">
+              <v-col>
+                <v-text-field
+                  v-model="password"
+                  v-bind="passwordAttrs"
+                  :label="$t('auth.password')"
+                  type="password"
+                  :error-messages="errors.password"
+                  :disabled="loading"
+                  :hint="$t('auth.passwordHint')"
+                  persistent-hint
+                  hide-details="auto"
+                />
+              </v-col>
+              <v-col>
+                <v-text-field
+                  v-model="confirmPassword"
+                  v-bind="confirmPasswordAttrs"
+                  :label="$t('auth.confirmPassword')"
+                  type="password"
+                  :error-messages="errors.confirmPassword"
+                  :disabled="loading"
+                  hide-details="auto"
+                />
+              </v-col>
+              <v-col>
+                <ButtonsAppButton
+                  size="large"
+                  type="submit"
+                  kind="primary"
+                  block
+                  :loading="loading"
+                  :disabled="!meta.valid"
+                >
+                  {{ $t('auth.setPassword') }}
+                </ButtonsAppButton>
+              </v-col>
+            </v-row>
           </v-form>
-        </v-card>
+        </CardsAppCard>
       </v-col>
     </v-row>
   </v-container>

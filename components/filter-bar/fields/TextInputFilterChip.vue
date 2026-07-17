@@ -29,10 +29,12 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn variant="text" @click="cancelValue">{{ $t('common.cancel') }}</v-btn>
-        <v-btn variant="text" color="primary" @click="applyValue">{{
+        <ButtonsAppButton kind="secondary" @click="cancelValue">{{
+          $t('common.cancel')
+        }}</ButtonsAppButton>
+        <ButtonsAppButton kind="primary" @click="applyValue">{{
           $t('filterBar.apply')
-        }}</v-btn>
+        }}</ButtonsAppButton>
       </v-card-actions>
     </v-card>
   </v-menu>

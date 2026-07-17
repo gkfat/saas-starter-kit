@@ -1,6 +1,6 @@
 <template>
   <v-dialog :model-value="modelValue" max-width="400" persistent @update:model-value="close">
-    <v-card>
+    <CardsDialogCard>
       <v-card-title class="pa-4">{{
         user?.disabled ? $t('users.enableUser') : $t('users.disableUser')
       }}</v-card-title>
@@ -9,16 +9,20 @@
       </v-card-text>
       <v-card-actions class="pa-4">
         <v-spacer />
-        <v-btn variant="flat" class="border" @click="close">{{ $t('common.cancel') }}</v-btn>
-        <v-btn
+        <ButtonsAppButton kind="secondary" @click="close">{{
+          $t('common.cancel')
+        }}</ButtonsAppButton>
+        <ButtonsAppButton
+          kind="primary"
           :color="user?.disabled ? 'success' : 'error'"
-          variant="flat"
           :loading="saving"
           @click="confirm"
-          >{{ user?.disabled ? $t('users.confirmEnable') : $t('users.confirmDisable') }}</v-btn
+          >{{
+            user?.disabled ? $t('users.confirmEnable') : $t('users.confirmDisable')
+          }}</ButtonsAppButton
         >
       </v-card-actions>
-    </v-card>
+    </CardsDialogCard>
   </v-dialog>
 </template>
 

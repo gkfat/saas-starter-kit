@@ -1,6 +1,6 @@
 <template>
   <v-dialog :model-value="modelValue" max-width="480" persistent @update:model-value="close">
-    <v-card>
+    <CardsDialogCard>
       <v-card-title class="pa-4">{{ $t('users.setupLinkTitle') }}</v-card-title>
       <v-card-text>
         <p class="text-body-2 mb-3">{{ $t('users.setupLinkHint') }}</p>
@@ -8,12 +8,14 @@
       </v-card-text>
       <v-card-actions class="pa-4">
         <v-spacer />
-        <v-btn color="secondary" variant="flat" class="border" @click="copyLink">{{
+        <ButtonsAppButton kind="primary" color="secondary" @click="copyLink">{{
           $t('users.copyLink')
-        }}</v-btn>
-        <v-btn color="primary" variant="flat" @click="close">{{ $t('common.confirm') }}</v-btn>
+        }}</ButtonsAppButton>
+        <ButtonsAppButton kind="primary" @click="close">{{
+          $t('common.confirm')
+        }}</ButtonsAppButton>
       </v-card-actions>
-    </v-card>
+    </CardsDialogCard>
   </v-dialog>
 </template>
 

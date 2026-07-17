@@ -1,6 +1,6 @@
 <template>
   <v-dialog :model-value="modelValue" max-width="480" persistent @update:model-value="close">
-    <v-card>
+    <CardsDialogCard>
       <v-card-title class="pa-4">{{ $t('users.createUser') }}</v-card-title>
       <v-card-text>
         <v-row dense class="flex-column">
@@ -61,17 +61,18 @@
       </v-card-text>
       <v-card-actions class="pa-4">
         <v-spacer />
-        <v-btn variant="flat" class="border" @click="close">{{ $t('common.cancel') }}</v-btn>
-        <v-btn
-          color="primary"
-          variant="flat"
+        <ButtonsAppButton kind="secondary" @click="close">{{
+          $t('common.cancel')
+        }}</ButtonsAppButton>
+        <ButtonsAppButton
+          kind="primary"
           :loading="creating"
           :disabled="!meta.valid"
           @click="onSubmit"
-          >{{ $t('common.create') }}</v-btn
+          >{{ $t('common.create') }}</ButtonsAppButton
         >
       </v-card-actions>
-    </v-card>
+    </CardsDialogCard>
   </v-dialog>
 </template>
 
