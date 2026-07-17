@@ -157,6 +157,8 @@
     "disableUser": "Disable User",
     "enableUser": "Enable User",
     "disableConfirm": "Are you sure you want to change the status of \"{username}\"?",
+    "confirmDisable": "Confirm Disable",
+    "confirmEnable": "Confirm Enable",
     "updateStatusSuccess": "User account status updated",
     "deleteUser": "Delete User",
     "deleteConfirm": "Are you sure you want to permanently delete \"{username}\"? This cannot be undone.",

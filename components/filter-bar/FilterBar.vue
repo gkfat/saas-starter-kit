@@ -28,7 +28,9 @@
 
       <v-row dense class="justify-end">
         <v-col cols="auto">
-          <v-btn variant="outlined" @click="handleReset">{{ $t('filterBar.reset') }}</v-btn>
+          <v-btn variant="flat" class="border" @click="handleReset">{{
+            $t('filterBar.reset')
+          }}</v-btn>
         </v-col>
         <v-col cols="auto">
           <v-btn color="primary" elevation="0" prepend-icon="mdi-magnify" @click="handleSearch">
