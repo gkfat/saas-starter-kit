@@ -18,7 +18,7 @@ export const LoginDto = z.discriminatedUnion('provider', [PasswordLoginDto, OAut
 export type LoginDto = z.infer<typeof LoginDto>;
 
 export const RegisterDto = z.object({
-  username: z.string().refine(isValidUsername, '帳號須為 6–8 碼英數字'),
+  username: z.string().refine(isValidUsername, '帳號須為 6–8 碼，全英文或英文加數字'),
   password: z.string().refine(isValidPassword, '密碼須為 6–8 碼英數字'),
   email: z.string().email().optional(),
   phone: z.string().optional(),
@@ -26,7 +26,7 @@ export const RegisterDto = z.object({
 export type RegisterDto = z.infer<typeof RegisterDto>;
 
 export const GoogleRegisterDto = z.object({
-  username: z.string().refine(isValidUsername, '帳號須為 6–8 碼英數字'),
+  username: z.string().refine(isValidUsername, '帳號須為 6–8 碼，全英文或英文加數字'),
   idToken: z.string().min(1),
 });
 export type GoogleRegisterDto = z.infer<typeof GoogleRegisterDto>;

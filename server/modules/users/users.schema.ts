@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { isValidUsername } from '~/shared/utils/validation';
 
 export const CreateUserByAdminDto = z.object({
-  username: z.string().refine(isValidUsername, '帳號須為 6–8 碼英數字'),
+  username: z.string().refine(isValidUsername, '帳號須為 6–8 碼，全英文或英文加數字'),
   displayName: z.string().min(1).optional(),
   email: z.string().email().optional(),
   phone: z.string().optional(),
