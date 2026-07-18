@@ -6,6 +6,7 @@ export type RouteItem = {
   icon: string;
   path?: string;
   permission?: Permission;
+  redirectTo?: string;
   featureFlag?: FeatureFlag;
   exact?: boolean;
   children?: RouteItem[];
@@ -24,6 +25,8 @@ export const APP_ROUTES: RouteGroup[] = [
         icon: 'mdi-view-dashboard',
         path: '/dashboard',
         exact: true,
+        permission: Permission.Dashboard.Read,
+        redirectTo: '/profile',
       },
       {
         title: 'nav.profile',
@@ -82,18 +85,30 @@ export const APP_ROUTES: RouteGroup[] = [
 export const ADMIN_GROUP_LABEL = 'nav.groupManagement';
 export const IAM_GROUP_LABEL = 'nav.groupIam';
 
-export function flattenRoutePermissions(): { prefix: string; permission: Permission }[] {
-  const result: { prefix: string; permission: Permission }[] = [];
+export function flattenRoutePermissions(): {
+  prefix: string;
+  permission: Permission;
+  redirectTo?: string;
+}[] {
+  const result: { prefix: string; permission: Permission; redirectTo?: string }[] = [];
 
   for (const group of APP_ROUTES) {
     for (const item of group.items) {
       if (item.permission && item.path) {
-        result.push({ prefix: item.path, permission: item.permission });
+        result.push({
+          prefix: item.path,
+          permission: item.permission,
+          redirectTo: item.redirectTo,
+        });
       }
 
       for (const child of item.children ?? []) {
         if (child.permission && child.path) {
-          result.push({ prefix: child.path, permission: child.permission });
+          result.push({
+            prefix: child.path,
+            permission: child.permission,
+            redirectTo: child.redirectTo,
+          });
         }
       }
     }

@@ -17,6 +17,7 @@ export const RoleMeta: Record<Role, string> = {
 export const RolePermissions: Record<Role, Permission[]> = {
   superadmin: [],
   admin: [
+    Permission.Dashboard.Read,
     Permission.Users.Read,
     Permission.Users.Write,
     Permission.Users.Create,

@@ -1,4 +1,7 @@
 export const Permission = {
+  Dashboard: {
+    Read: 'dashboard:read',
+  },
   Users: {
     Read: 'users:read',
     Write: 'users:write',
@@ -25,6 +28,7 @@ type NestedValues<T> = T extends string ? T : { [K in keyof T]: NestedValues<T[K
 export type Permission = NestedValues<typeof Permission>;
 
 export const PermissionMeta: Record<Permission, string> = {
+  'dashboard:read': '讀取儀表板統計',
   'users:read': '讀取會員資料',
   'users:write': '寫入會員資料',
   'users:create': '建立會員帳號',

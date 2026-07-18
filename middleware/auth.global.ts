@@ -25,7 +25,7 @@ export default defineNuxtRouteMiddleware((to) => {
   const { hasPermission } = usePermission();
   const matched = PERMISSION_ROUTES.find((r) => to.path.startsWith(r.prefix));
   if (matched && !hasPermission(matched.permission)) {
-    return navigateTo('/dashboard');
+    return navigateTo(matched.redirectTo ?? '/dashboard');
   }
 
   const { isFeatureEnabled } = useFeatureFlags();

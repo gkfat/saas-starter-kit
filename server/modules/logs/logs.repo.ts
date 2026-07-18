@@ -23,6 +23,11 @@ export async function listLoginLogs(): Promise<LoginLog[]> {
   return snapshot.docs.map((doc) => doc.data() as LoginLog);
 }
 
+export async function listLoginLogsSince(since: string): Promise<LoginLog[]> {
+  const snapshot = await loginLogsCollection().where('timestamp', '>=', since).get();
+  return snapshot.docs.map((doc) => doc.data() as LoginLog);
+}
+
 export async function listAuditLogs(): Promise<AuditLog[]> {
   const snapshot = await auditLogsCollection().orderBy('timestamp', 'desc').limit(100).get();
   return snapshot.docs.map((doc) => doc.data() as AuditLog);
