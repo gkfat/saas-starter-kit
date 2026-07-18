@@ -4,7 +4,7 @@
     :rail="!mobile && rail"
     :permanent="!mobile"
     :temporary="mobile"
-    :width="mobile ? viewportWidth : 256"
+    :width="mobile ? Math.min(280, viewportWidth) : 256"
   >
     <!-- Project header -->
     <div class="d-flex align-center px-3 py-3" style="min-height: 64px">

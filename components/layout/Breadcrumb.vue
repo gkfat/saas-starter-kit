@@ -40,12 +40,44 @@
         </v-list-item>
       </v-list>
     </v-menu>
+
+    <v-menu v-if="!mobile">
+      <template #activator="{ props }">
+        <v-btn
+          v-bind="props"
+          variant="text"
+          size="small"
+          class="text-disabled px-1 ml-2 text-none"
+          style="font-size: 11px"
+        >
+          <v-icon size="13" class="mr-1">mdi-earth</v-icon>
+          {{ currentTimezoneLabel }}
+        </v-btn>
+      </template>
+      <v-list density="compact" min-width="200">
+        <v-list-item
+          v-for="tz in timezoneOptions"
+          :key="tz.value"
+          :active="tz.value === timezoneStore.selected"
+          active-color="primary"
+          @click="switchTimezone(tz.value)"
+        >
+          <v-list-item-title style="font-size: 12px">{{ tz.label }}</v-list-item-title>
+        </v-list-item>
+      </v-list>
+    </v-menu>
   </div>
 </template>
 
 <script setup lang="ts">
+import { useDisplay } from 'vuetify';
+import { TimezoneOptions, type TimezoneValue } from '~/shared/timezones';
+import { useTimezoneStore } from '~/stores/timezone';
+
 const route = useRoute();
 const { locale, locales, setLocale } = useI18n();
+const { mobile } = useDisplay();
+const timezoneStore = useTimezoneStore();
 
 const crumbs = computed(() => {
   const segments = route.path.split('/').filter(Boolean);
@@ -61,7 +93,18 @@ const currentLocaleName = computed(
   () => locales.value.find((l) => l.code === locale.value)?.name ?? locale.value,
 );
 
+const timezoneOptions = TimezoneOptions;
+const currentTimezoneLabel = computed(
+  () =>
+    timezoneOptions.find((tz) => tz.value === timezoneStore.selected)?.label ??
+    timezoneStore.selected,
+);
+
 function switchLocale(code: string) {
   setLocale(code as 'zh-TW' | 'en');
+}
+
+function switchTimezone(value: TimezoneValue) {
+  timezoneStore.setTimezone(value);
 }
 </script>

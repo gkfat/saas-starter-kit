@@ -37,6 +37,23 @@
                 </template>
               </v-list-item>
             </v-list>
+
+            <div
+              class="text-caption text-medium-emphasis text-uppercase font-weight-medium mb-2 mt-4"
+            >
+              {{ $t('settings.timezone') }}
+            </div>
+            <v-select
+              :model-value="timezoneStore.selected"
+              :items="timezoneOptions"
+              item-title="label"
+              item-value="value"
+              variant="outlined"
+              density="compact"
+              hide-details
+              :menu-props="{ zIndex: 10000 }"
+              @update:model-value="switchTimezone"
+            />
           </div>
         </div>
       </div>
@@ -45,14 +62,24 @@
 </template>
 
 <script setup lang="ts">
+import { TimezoneOptions, type TimezoneValue } from '~/shared/timezones';
+import { useTimezoneStore } from '~/stores/timezone';
+
 const open = defineModel<boolean>({ default: false });
 
 const { locale, locales, setLocale } = useI18n();
+const timezoneStore = useTimezoneStore();
 
 const currentLocale = computed(() => locale.value);
+const timezoneOptions = TimezoneOptions;
 
 function switchLocale(code: string) {
   setLocale(code as 'zh-TW' | 'en');
+  open.value = false;
+}
+
+function switchTimezone(value: TimezoneValue) {
+  timezoneStore.setTimezone(value);
   open.value = false;
 }
 </script>
@@ -74,7 +101,8 @@ function switchLocale(code: string) {
 
 .settings-panel {
   position: relative;
-  width: 100%;
+  width: 280px;
+  max-width: 100vw;
   height: 100%;
   background: rgb(var(--v-theme-surface));
   color: rgba(var(--v-theme-on-surface), var(--v-high-emphasis-opacity));

@@ -222,7 +222,8 @@
   },
   "settings": {
     "title": "設定",
-    "language": "語言"
+    "language": "語言",
+    "timezone": "時區"
   },
   "filterBar": {
     "apply": "套用",
