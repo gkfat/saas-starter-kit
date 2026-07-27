@@ -27,6 +27,7 @@
   "nav": {
     "groupManagement": "Management",
     "groupIam": "IAM",
+    "groupAbout": "About",
     "dashboard": "Dashboard",
     "profile": "Profile",
     "users": "User Management",
@@ -34,7 +35,8 @@
     "adminRoles": "Roles",
     "adminUsers": "Users",
     "loginLogs": "Login Logs",
-    "auditLogs": "Audit Logs"
+    "auditLogs": "Audit Logs",
+    "home": "Home"
   },
   "auth": {
     "login": "Sign In",
@@ -52,7 +54,6 @@
     "identifier": "Username or Email",
     "usernameHint": "6–8 characters, letters only or letters with numbers, no special symbols",
     "passwordHint": "6–8 alphanumeric characters, no special symbols",
-    "chooseUsername": "Choose a Username",
     "confirmUsername": "Confirm & Complete Registration",
     "loginWithGoogle": "Continue with Google",
     "loginWithPhone": "Sign in with Phone",
@@ -84,6 +85,131 @@
       "googleAlreadyLinked": "Failed to link",
       "popupClosed": "Google sign-in window was closed",
       "popupBlocked": "Your browser blocked the popup window. Please allow popups and try again."
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Build your own membership platform, without building it from scratch",
+      "subtitle": "From member sign-up to back-office management, one system is all you need to start running your membership program. Skip months of development and spend your time growing the business, not solving technical problems.",
+      "ctaPrimary": "Get started free",
+      "ctaSecondary": "See features"
+    },
+    "process": {
+      "title": "How much effort does it take to build a membership system the traditional way?",
+      "traditional": {
+        "label": "The traditional way",
+        "note": "From hiring engineers to launch, this usually takes months",
+        "steps": {
+          "0": "Find an engineer",
+          "1": "Plan requirements",
+          "2": "Build",
+          "3": "Revise",
+          "4": "Test",
+          "5": "Launch"
+        }
+      },
+      "platform": {
+        "label": "With this platform",
+        "note": "A modular system — just pick what you need and skip the rest",
+        "steps": {
+          "0": "Pick the modules you need",
+          "1": "Start running your business"
+        }
+      }
+    },
+    "industries": {
+      "title": "Who is this for?",
+      "subtitle": "Whatever you run, including:",
+      "footnote": "you can quickly stand up your own membership platform.",
+      "items": {
+        "0": "Restaurants",
+        "1": "Cafes",
+        "2": "Gyms",
+        "3": "Beauty & nail salons",
+        "4": "Tutoring centers",
+        "5": "Clinics",
+        "6": "Retail stores",
+        "7": "E-commerce brands"
+      }
+    },
+    "pricingInfo": {
+      "title": "How does pricing work?",
+      "items": {
+        "0": {
+          "title": "Base modules",
+          "tag": "Included in every plan",
+          "description": "Core membership features included from day one, ready to use at no extra cost."
+        },
+        "1": {
+          "title": "Feature modules",
+          "tag": "Add on as needed",
+          "description": "Pick only the modules your business needs, and pay only for what you use."
+        },
+        "2": {
+          "title": "Custom development",
+          "tag": "Quoted on request",
+          "description": "For special workflows, branding, or third-party integrations, we'll scope and quote it separately."
+        },
+        "3": {
+          "title": "Environment setup",
+          "tag": "One-time fee",
+          "description": "Covers deployment, domain setup, SSL certificates, and production environment setup."
+        },
+        "4": {
+          "title": "Maintenance",
+          "tag": "Monthly fee",
+          "description": "Ongoing maintenance, updates, security patches, and technical support to keep the system running smoothly."
+        }
+      }
+    },
+    "getStarted": {
+      "title": "Own your membership system, starting now",
+      "nameLabel": "What should we call you?",
+      "namePlaceholder": "Jane Doe",
+      "businessLabel": "Please briefly describe your business",
+      "businessPlaceholder": "e.g. restaurant chain, fitness studio",
+      "emailLabel": "Your email",
+      "formTitle": "Choose the feature modules you need",
+      "includedLabel": "Included",
+      "optionalLabel": "Optional",
+      "submit": "Send request",
+      "submitSuccess": "We've received your request and will be in touch soon",
+      "submitError": "Something went wrong, please try again later",
+      "validationError": "Please fill in your name and a valid email"
+    },
+    "explore": {
+      "title": "Which modules do we offer?",
+      "categories": {
+        "membership": "Membership",
+        "admin": "Admin & governance",
+        "analytics": "Analytics"
+      }
+    }
+  },
+  "features": {
+    "auth": {
+      "title": "Member sign-up & login",
+      "description": "Supports email/password, Google sign-in, and phone OTP verification, lowering the barrier to join."
+    },
+    "rbac": {
+      "title": "Back-office access control",
+      "description": "Roles and permissions flexibly control what staff can do, so teams can collaborate safely."
+    },
+    "loginLogs": {
+      "title": "Login logs",
+      "description": "Records every login attempt and result for members and staff, so unusual logins can be traced immediately."
+    },
+    "auditLogs": {
+      "title": "Audit logs",
+      "description": "Full logging of back-office data changes and actions, so you can trace issues and stay audit-ready."
+    },
+    "dashboard": {
+      "title": "Member analytics dashboard",
+      "description": "Track member growth and activity in real time to see which campaigns actually work."
+    },
+    "userManagement": {
+      "title": "Member data management",
+      "description": "Create, disable, and delete member accounts, and manage member profiles in one place."
     }
   },
   "dashboard": {

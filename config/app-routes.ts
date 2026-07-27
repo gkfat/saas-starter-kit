@@ -9,6 +9,7 @@ export type RouteItem = {
   redirectTo?: string;
   featureFlag?: FeatureFlag;
   exact?: boolean;
+  public?: boolean;
   children?: RouteItem[];
 };
 
@@ -20,6 +21,7 @@ export type RouteGroup = {
 export const APP_ROUTES: RouteGroup[] = [
   {
     items: [
+      { title: 'nav.home', icon: 'mdi-home-outline', path: '/home', public: true },
       {
         title: 'nav.dashboard',
         icon: 'mdi-view-dashboard',

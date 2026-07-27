@@ -1,6 +1,5 @@
 <template>
   <div>
-    <LayoutBreadcrumb />
     <LayoutPageHeader :title="$t('roles.title')" />
     <CardsAppCard>
       <v-data-table

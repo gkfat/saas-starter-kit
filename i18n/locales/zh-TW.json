@@ -27,6 +27,7 @@
   "nav": {
     "groupManagement": "管理",
     "groupIam": "身份與存取管理",
+    "groupAbout": "關於",
     "dashboard": "儀表板",
     "profile": "個人資料",
     "users": "使用者管理",
@@ -34,7 +35,8 @@
     "adminRoles": "角色管理",
     "adminUsers": "使用者",
     "loginLogs": "登入紀錄",
-    "auditLogs": "稽核紀錄"
+    "auditLogs": "稽核紀錄",
+    "home": "首頁"
   },
   "auth": {
     "login": "登入",
@@ -52,7 +54,6 @@
     "identifier": "帳號或 Email",
     "usernameHint": "6–8 碼，全英文或英文加數字，不含特殊符號",
     "passwordHint": "6–8 碼英數字，不含特殊符號",
-    "chooseUsername": "選擇帳號名稱",
     "confirmUsername": "確認並完成註冊",
     "loginWithGoogle": "透過 Google 繼續",
     "loginWithPhone": "使用手機號碼登入",
@@ -84,6 +85,131 @@
       "googleAlreadyLinked": "綁定失敗",
       "popupClosed": "已取消 Google 登入視窗",
       "popupBlocked": "瀏覽器封鎖了彈出視窗，請允許彈出視窗後再試一次"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "打造屬於自己的會員經營平台，無需重新開發",
+      "subtitle": "從會員註冊、資料管理到後台管理，一套系統即可開始經營會員。不用從零開發，也不用等數個月，把時間留給生意，而不是技術問題。",
+      "ctaPrimary": "免費試用",
+      "ctaSecondary": "查看功能"
+    },
+    "process": {
+      "title": "傳統建置一套會員系統，要花多少工夫？",
+      "traditional": {
+        "label": "傳統做法",
+        "note": "從找工程師到上線，往往要花上數個月",
+        "steps": {
+          "0": "找工程師",
+          "1": "規劃需求",
+          "2": "開發",
+          "3": "修改",
+          "4": "測試",
+          "5": "上線"
+        }
+      },
+      "platform": {
+        "label": "使用本平台",
+        "note": "模組化系統，只挑選必要功能，快速略過這一切",
+        "steps": {
+          "0": "挑選需要的功能模組",
+          "1": "開始營運"
+        }
+      }
+    },
+    "industries": {
+      "title": "適合哪些商家？",
+      "subtitle": "無論您經營的是：",
+      "footnote": "都可以快速建立自己的會員經營平台。",
+      "items": {
+        "0": "餐廳",
+        "1": "咖啡店",
+        "2": "健身房",
+        "3": "美容美甲",
+        "4": "補習班",
+        "5": "診所",
+        "6": "零售門市",
+        "7": "電商品牌"
+      }
+    },
+    "pricingInfo": {
+      "title": "如何收費？",
+      "items": {
+        "0": {
+          "title": "基本模組",
+          "tag": "方案內已包含",
+          "description": "提供會員系統的核心功能，可直接開始使用，無須額外付費。"
+        },
+        "1": {
+          "title": "功能模組",
+          "tag": "依需求自由加購",
+          "description": "依照營運需求選擇需要的功能，只為真正使用的功能付費。"
+        },
+        "2": {
+          "title": "客製化開發",
+          "tag": "依需求報價",
+          "description": "若有特殊流程、品牌需求或第三方系統串接，可另外規劃與報價。"
+        },
+        "3": {
+          "title": "環境建置",
+          "tag": "一次性費用",
+          "description": "包含系統部署、網域設定、SSL 憑證及正式環境建置。"
+        },
+        "4": {
+          "title": "維護服務",
+          "tag": "每月維護費",
+          "description": "提供系統維護、版本更新、安全修補及技術支援，讓系統穩定運作。"
+        }
+      }
+    },
+    "getStarted": {
+      "title": "現在就擁有自己的會員系統",
+      "nameLabel": "如何稱呼您？",
+      "namePlaceholder": "王小明",
+      "businessLabel": "請簡短描述您經營的生意",
+      "businessPlaceholder": "例如：連鎖餐飲、健身工作室",
+      "emailLabel": "您的 Email",
+      "formTitle": "選擇您需要的功能模組",
+      "includedLabel": "已包含",
+      "optionalLabel": "可選擇",
+      "submit": "送出需求",
+      "submitSuccess": "已收到您的需求，我們會盡快與您聯繫",
+      "submitError": "送出失敗，請稍後再試",
+      "validationError": "請填寫姓名與正確的 Email"
+    },
+    "explore": {
+      "title": "我們有哪些模組？",
+      "categories": {
+        "membership": "會員系統",
+        "admin": "後台治理",
+        "analytics": "數據分析"
+      }
+    }
+  },
+  "features": {
+    "auth": {
+      "title": "會員註冊與登入",
+      "description": "支援 Email/密碼、Google 登入與手機號碼 OTP 驗證，會員加入門檻更低。"
+    },
+    "rbac": {
+      "title": "後台權限管理",
+      "description": "以角色與權限彈性控管後台人員可操作的範圍，多人協作也能安心分工。"
+    },
+    "loginLogs": {
+      "title": "登入紀錄",
+      "description": "記錄會員與後台人員的每次登入嘗試與結果，異常登入可即時追蹤來源。"
+    },
+    "auditLogs": {
+      "title": "稽核紀錄",
+      "description": "完整記錄後台資料異動與操作行為，發生問題時可追溯來源，符合稽核需求。"
+    },
+    "dashboard": {
+      "title": "會員數據儀表板",
+      "description": "即時掌握會員成長、活躍度等關鍵指標，用數據判斷哪些活動最有效。"
+    },
+    "userManagement": {
+      "title": "會員資料管理",
+      "description": "建立、停用、刪除會員帳號，集中管理會員基本資料。"
     }
   },
   "dashboard": {

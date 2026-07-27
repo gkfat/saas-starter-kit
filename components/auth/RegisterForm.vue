@@ -14,28 +14,32 @@
           hide-details="auto"
         />
       </v-col>
-      <v-col>
+      <v-col v-if="!isGoogleMode">
         <v-text-field
           v-model="password"
           v-bind="passwordAttrs"
           :label="$t('auth.password')"
-          type="password"
+          :type="showPassword ? 'text' : 'password'"
+          :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
           :error-messages="errors.password"
           :disabled="loading"
           :hint="$t('auth.passwordHint')"
           persistent-hint
           hide-details="auto"
+          @click:append-inner="showPassword = !showPassword"
         />
       </v-col>
-      <v-col>
+      <v-col v-if="!isGoogleMode">
         <v-text-field
           v-model="confirmPassword"
           v-bind="confirmPasswordAttrs"
           :label="$t('auth.confirmPassword')"
-          type="password"
+          :type="showConfirmPassword ? 'text' : 'password'"
+          :append-inner-icon="showConfirmPassword ? 'mdi-eye-off' : 'mdi-eye'"
           :error-messages="errors.confirmPassword"
           :disabled="loading"
           hide-details="auto"
+          @click:append-inner="showConfirmPassword = !showConfirmPassword"
         />
       </v-col>
       <v-col>
@@ -47,7 +51,12 @@
           :loading="loading"
           :disabled="!meta.valid"
         >
-          {{ $t('auth.register') }}
+          {{ $t(isGoogleMode ? 'auth.confirmUsername' : 'auth.register') }}
+        </ButtonsAppButton>
+      </v-col>
+      <v-col v-if="isGoogleMode">
+        <ButtonsAppButton kind="secondary" block :disabled="loading" @click="emit('cancel')">
+          {{ $t('common.cancel') }}
         </ButtonsAppButton>
       </v-col>
     </v-row>
@@ -60,26 +69,48 @@ import { useForm } from 'vee-validate';
 import { z } from 'zod';
 import { isValidUsername, isValidPassword } from '~/shared/utils/validation';
 
-const emit = defineEmits<{
-  success: [];
+const props = defineProps<{
+  idToken?: string;
 }>();
 
-const { register } = useAuth();
+const emit = defineEmits<{
+  success: [];
+  cancel: [];
+}>();
+
+const isGoogleMode = computed(() => !!props.idToken);
+
+const { register, googleRegister } = useAuth();
 const { showError, showSuccess } = useToast();
 const { t } = useI18n();
 
 const loading = ref(false);
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
 
 const validationSchema = toTypedSchema(
   z
     .object({
       username: z.string().refine(isValidUsername, t('auth.error.invalidUsername')),
-      password: z.string().refine(isValidPassword, t('auth.error.invalidPassword')),
-      confirmPassword: z.string(),
+      password: z.string().optional(),
+      confirmPassword: z.string().optional(),
     })
-    .refine((data) => data.password === data.confirmPassword, {
-      message: t('auth.passwordMismatch'),
-      path: ['confirmPassword'],
+    .superRefine((data, ctx) => {
+      if (isGoogleMode.value) return;
+      if (!data.password || !isValidPassword(data.password)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('auth.error.invalidPassword'),
+          path: ['password'],
+        });
+      }
+      if (data.password !== data.confirmPassword) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('auth.passwordMismatch'),
+          path: ['confirmPassword'],
+        });
+      }
     }),
 );
 
@@ -95,8 +126,12 @@ const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword');
 const onSubmit = handleSubmit(async (values) => {
   loading.value = true;
   try {
-    await register(values.username, values.password);
-    showSuccess(t('auth.registerSuccess'));
+    if (isGoogleMode.value) {
+      await googleRegister(values.username, props.idToken as string);
+    } else {
+      await register(values.username, values.password as string);
+      showSuccess(t('auth.registerSuccess'));
+    }
     emit('success');
   } catch (e: unknown) {
     const statusCode = (e as { data?: { statusCode?: number } }).data?.statusCode;

@@ -7,10 +7,15 @@
     :width="mobile ? Math.min(280, viewportWidth) : 256"
   >
     <!-- Project header -->
-    <div class="d-flex align-center px-3 py-3" style="min-height: 64px">
+    <div
+      class="d-flex align-center px-3 py-3"
+      style="min-height: 64px; cursor: pointer"
+      @click="router.push('/')"
+    >
       <v-icon icon="mdi-fire" color="primary" size="24" class="flex-shrink-0" />
       <div v-if="!rail || mobile" class="ml-3 overflow-hidden">
-        <div class="text-body-2 font-weight-medium text-truncate">saas-starter-kit</div>
+        <div class="text-body-2 font-weight-medium text-truncate">SaaS Starter Kit</div>
+        <div class="text-caption text-medium-emphasis text-truncate">v{{ appVersion }}</div>
       </div>
     </div>
 
@@ -56,7 +61,7 @@
 
     <template #append>
       <v-divider />
-      <div class="pa-3">
+      <div v-if="isLoggedIn" class="pa-3">
         <div class="d-flex align-center ga-3 mb-3">
           <v-avatar color="primary" size="32" class="flex-shrink-0">
             <span class="text-body-2 font-weight-medium text-white">{{ avatarLetter }}</span>
@@ -79,6 +84,12 @@
         >
           <v-icon>mdi-logout</v-icon>
           <span v-if="!rail || mobile" class="ml-3">{{ $t('common.logout') }}</span>
+        </ButtonsAppButton>
+      </div>
+      <div v-else class="pa-3">
+        <ButtonsAppButton kind="secondary" class="text-none" block to="/login">
+          <v-icon>mdi-login</v-icon>
+          <span v-if="!rail || mobile" class="ml-3">{{ $t('auth.login') }}</span>
         </ButtonsAppButton>
       </div>
       <template v-if="!mobile">
@@ -118,7 +129,10 @@ const router = useRouter();
 const route = useRoute();
 
 const authStore = useAuthStore();
-const { user } = storeToRefs(authStore);
+const { user, isLoggedIn } = storeToRefs(authStore);
+
+const { public: publicConfig } = useRuntimeConfig();
+const appVersion = publicConfig.appVersion;
 
 const drawerOpen = computed({
   get: () => (mobile.value ? open.value : true),
@@ -132,8 +146,10 @@ const visibleGroups = computed(() =>
     ...group,
     items: group.items.filter(
       (item) =>
-        (!item.permission || hasPermission(item.permission)) &&
-        (!item.featureFlag || isFeatureEnabled(item.featureFlag)),
+        item.public ||
+        (isLoggedIn.value &&
+          (!item.permission || hasPermission(item.permission)) &&
+          (!item.featureFlag || isFeatureEnabled(item.featureFlag))),
     ),
   })).filter((group) => group.items.length > 0),
 );

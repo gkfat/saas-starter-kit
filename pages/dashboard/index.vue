@@ -1,6 +1,5 @@
 <template>
   <div>
-    <LayoutBreadcrumb />
     <LayoutPageHeader :title="$t('dashboard.title')" />
     <v-row v-if="stats" dense align="stretch">
       <v-col cols="12" md="6" lg="4">

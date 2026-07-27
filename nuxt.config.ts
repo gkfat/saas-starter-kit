@@ -4,6 +4,10 @@ export default defineNuxtConfig({
   ssr: false,
   compatibilityDate: '2024-04-03',
 
+  devServer: {
+    port: 3005,
+  },
+
   nitro: {
     alias: {
       '~/shared': resolve('./shared'),
@@ -49,6 +53,7 @@ export default defineNuxtConfig({
     firebaseClientEmail: process.env.FIREBASE_CLIENT_EMAIL,
     firebasePrivateKey: process.env.FIREBASE_PRIVATE_KEY,
     public: {
+      appVersion: process.env.APP_VERSION ?? '0.0.0',
       firebaseApiKey: process.env.VITE_FIREBASE_API_KEY,
       firebaseAuthDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
       firebaseProjectId: process.env.VITE_FIREBASE_PROJECT_ID,

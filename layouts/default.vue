@@ -1,14 +1,14 @@
 <template>
   <v-app>
-    <LayoutAppHeader
-      @toggle-drawer="drawerOpen = !drawerOpen"
-      @toggle-settings="settingsOpen = !settingsOpen"
-    />
     <LayoutAppDrawer v-model="drawerOpen" />
     <LayoutAppSettingsDrawer v-model="settingsOpen" />
 
     <v-main>
       <LayoutPageContent>
+        <LayoutAppHeader
+          @toggle-drawer="drawerOpen = !drawerOpen"
+          @toggle-settings="settingsOpen = !settingsOpen"
+        />
         <slot />
       </LayoutPageContent>
     </v-main>

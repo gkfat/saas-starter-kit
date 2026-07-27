@@ -1,6 +1,5 @@
 <template>
   <div>
-    <LayoutBreadcrumb />
     <LayoutPageHeader :title="$t('permissions.title')" />
     <CardsAppCard>
       <v-data-table :headers="headers" :items="permissions" :loading="pending" item-value="name">

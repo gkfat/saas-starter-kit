@@ -1,6 +1,5 @@
 <template>
   <div>
-    <LayoutBreadcrumb />
     <LayoutPageHeader :title="$t('profile.title')" />
     <v-row align="stretch">
       <v-col cols="12" md="6" lg="auto">

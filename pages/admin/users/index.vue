@@ -1,6 +1,5 @@
 <template>
   <div>
-    <LayoutBreadcrumb />
     <div class="d-flex flex-wrap ga-3 align-center justify-space-between">
       <LayoutPageHeader :title="$t('users.title')" />
       <UsersToolbar :can-create-users="canCreateUsers" @export="exportCsv" @create="openCreate" />

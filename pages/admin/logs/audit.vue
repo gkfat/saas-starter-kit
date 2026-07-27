@@ -1,6 +1,5 @@
 <template>
   <div>
-    <LayoutBreadcrumb />
     <LayoutPageHeader :title="$t('logs.auditTitle')" />
     <CardsAppCard>
       <v-data-table
