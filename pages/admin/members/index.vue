@@ -1,11 +1,16 @@
 <template>
   <div>
     <div class="d-flex flex-wrap ga-3 align-center justify-space-between">
-      <LayoutPageHeader :title="$t('users.title')" />
-      <UsersToolbar :can-create-users="canCreateUsers" @export="exportCsv" @create="openCreate" />
+      <LayoutPageHeader :title="$t('users.memberPageTitle')" />
+      <UsersToolbar
+        :can-create-users="canCreateUsers"
+        :create-label="$t('users.createMember')"
+        @export="exportCsv"
+        @create="openCreate"
+      />
     </div>
 
-    <UsersFilterBar :role-options="roleFilterOptions" @apply="applyFilters" />
+    <UsersFilterBar @apply="applyFilters" />
 
     <UsersTable
       :users="users ?? []"
@@ -26,7 +31,12 @@
       @saved="refresh"
     />
 
-    <CreateUserDialog v-model="createDialog" :role-options="roleOptions" @created="onUserCreated" />
+    <CreateUserDialog
+      v-model="createDialog"
+      mode="member"
+      :role-options="roleOptions"
+      @created="onUserCreated"
+    />
 
     <SetupLinkDialog v-model="linkDialog" :link="linkDialogValue" />
 
@@ -40,14 +50,14 @@
 import { storeToRefs } from 'pinia';
 import { Permission } from '~/shared/permissions';
 import { useAuthStore } from '~/stores/auth';
-import CreateUserDialog from './components/CreateUserDialog.vue';
-import DeleteUserDialog from './components/DeleteUserDialog.vue';
-import EditRoleDialog from './components/EditRoleDialog.vue';
-import SetupLinkDialog from './components/SetupLinkDialog.vue';
-import ToggleStatusDialog from './components/ToggleStatusDialog.vue';
-import UsersFilterBar from './components/UsersFilterBar.vue';
-import UsersTable from './components/UsersTable.vue';
-import UsersToolbar from './components/UsersToolbar.vue';
+import CreateUserDialog from '~/components/users/CreateUserDialog.vue';
+import DeleteUserDialog from '~/components/users/DeleteUserDialog.vue';
+import EditRoleDialog from '~/components/users/EditRoleDialog.vue';
+import SetupLinkDialog from '~/components/users/SetupLinkDialog.vue';
+import ToggleStatusDialog from '~/components/users/ToggleStatusDialog.vue';
+import UsersFilterBar from '~/components/users/UsersFilterBar.vue';
+import UsersTable from '~/components/users/UsersTable.vue';
+import UsersToolbar from '~/components/users/UsersToolbar.vue';
 import type { UserRow } from '~/shared/users';
 
 const auth = useAuthStore();
@@ -57,20 +67,18 @@ const { t } = useI18n();
 const { withErrorToast } = useApiError();
 const { hasPermission } = usePermission();
 
-const canWriteUsers = computed(() => hasPermission(Permission.Users.Write));
-const canCreateUsers = computed(() => hasPermission(Permission.Users.Create));
-const canDeleteUsers = computed(() => hasPermission(Permission.Users.Delete));
+const canWriteUsers = computed(() => hasPermission(Permission.Members.Write));
+const canCreateUsers = computed(() => hasPermission(Permission.Members.Create));
+const canDeleteUsers = computed(() => hasPermission(Permission.Members.Delete));
 
 const appliedSearch = ref('');
-const appliedRoleFilter = ref<string | null>(null);
 const queryParams = computed(() => ({
+  role: 'member',
   ...(appliedSearch.value ? { q: appliedSearch.value } : {}),
-  ...(appliedRoleFilter.value ? { role: appliedRoleFilter.value } : {}),
 }));
 
-function applyFilters({ search, role }: { search: string; role: string | null }) {
+function applyFilters({ search }: { search: string }) {
   appliedSearch.value = search;
-  appliedRoleFilter.value = role;
 }
 
 const [{ data: users, pending, refresh }, { data: roles }, { data: rolePermissions }] =
@@ -85,7 +93,6 @@ const [{ data: users, pending, refresh }, { data: roles }, { data: rolePermissio
 const roleOptions = computed(() =>
   (roles.value ?? []).map((r) => ({ title: t(`role.${r.name}`), value: r.name })),
 );
-const roleFilterOptions = computed(() => roleOptions.value);
 
 const dialog = ref(false);
 const editing = ref<UserRow | null>(null);
@@ -164,7 +171,7 @@ function exportCsv() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `users-${new Date().toISOString().slice(0, 10)}.csv`;
+  link.download = `members-${new Date().toISOString().slice(0, 10)}.csv`;
   link.click();
   URL.revokeObjectURL(url);
 }

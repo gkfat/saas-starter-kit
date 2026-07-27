@@ -7,6 +7,7 @@
         :items="logs ?? []"
         :loading="pending"
         item-value="requestId"
+        class="table-header-nowrap"
       >
         <template #[`item.result`]="{ item }">
           <v-chip

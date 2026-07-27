@@ -7,6 +7,7 @@
         :items="rolesWithPermissions"
         :loading="pending"
         item-value="name"
+        class="table-header-nowrap"
       >
         <template #no-data>
           <span class="text-medium-emphasis">{{ $t('roles.noData') }}</span>
@@ -14,6 +15,15 @@
 
         <template #[`item.name`]="{ item }">
           {{ $t(`role.${item.name}`) }}
+        </template>
+
+        <template #[`item.permissions`]="{ item }">
+          <v-row no-gutters class="py-1 ga-1">
+            <v-chip v-for="perm in item.permissions" :key="perm" size="small" label>
+              {{ $t(`permission.${perm}`) }}
+            </v-chip>
+          </v-row>
+          <span v-if="item.permissions.length === 0" class="text-medium-emphasis">—</span>
         </template>
 
         <template v-if="isSuperadmin" #[`item.actions`]="{ item }">
@@ -85,8 +95,7 @@ const [
 const rolesWithPermissions = computed(() =>
   (roles.value ?? []).map((role) => ({
     ...role,
-    permissions:
-      (rolePermissions.value?.[role.name] ?? []).map((p) => t(`permission.${p}`)).join(', ') || '—',
+    permissions: rolePermissions.value?.[role.name] ?? [],
   })),
 );
 

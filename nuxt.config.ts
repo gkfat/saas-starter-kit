@@ -36,7 +36,7 @@ export default defineNuxtConfig({
     transpile: ['vuetify'],
   },
 
-  css: ['vuetify/styles', '@mdi/font/css/materialdesignicons.css'],
+  css: ['vuetify/styles', '@mdi/font/css/materialdesignicons.css', '~/assets/css/data-table.css'],
 
   vite: {
     define: {

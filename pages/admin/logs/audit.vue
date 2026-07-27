@@ -7,6 +7,7 @@
         :items="logs ?? []"
         :loading="pending"
         item-value="requestId"
+        class="table-header-nowrap"
       >
         <template #[`item.timestamp`]="{ item }">
           <span class="text-caption font-mono">{{ formatDateTime(item.timestamp) }}</span>

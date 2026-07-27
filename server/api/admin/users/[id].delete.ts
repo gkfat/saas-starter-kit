@@ -1,6 +1,6 @@
 import { adminAuth } from '~/server/shared/firebase-admin';
 import { recordAuditLog } from '~/server/modules/logs';
-import { deleteUserRole } from '~/server/modules/roles';
+import { deleteUserRole, getRoleForUser } from '~/server/modules/roles';
 import { deleteUserAccount, getUserByUid } from '~/server/modules/users';
 import { requirePermission } from '~/server/shared/rbac';
 import type { AuthenticatedContext } from '~/server/shared/types/context';
@@ -8,10 +8,15 @@ import { Permission } from '~/shared/permissions';
 import { Role } from '~/shared/roles';
 
 export default defineEventHandler(async (event) => {
-  requirePermission(event, Permission.Users.Delete);
   const { userId: actorId, role: actorRole, requestId } = event.context as AuthenticatedContext;
   const userId = getRouterParam(event, 'id');
   if (!userId) throw createError({ statusCode: 400, message: 'Missing user id' });
+
+  const targetRole = await getRoleForUser(userId);
+  requirePermission(
+    event,
+    targetRole === Role.Member ? Permission.Members.Delete : Permission.AdminAccounts.Delete,
+  );
 
   if (userId === actorId) {
     throw createError({ statusCode: 400, message: '無法刪除自己的帳號' });

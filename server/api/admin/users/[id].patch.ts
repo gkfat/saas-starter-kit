@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { recordAuditLog } from '~/server/modules/logs';
-import { assignUserRole } from '~/server/modules/roles';
+import { assignUserRole, getRoleForUser } from '~/server/modules/roles';
 import { revokeRefreshTokens } from '~/server/modules/auth';
 import { requirePermission } from '~/server/shared/rbac';
 import { adminAuth } from '~/server/shared/firebase-admin';
@@ -19,10 +19,16 @@ const BodySchema = z
   });
 
 export default defineEventHandler(async (event) => {
-  requirePermission(event, Permission.Users.Write);
   const { userId: actorId, role: actorRole, requestId } = event.context as AuthenticatedContext;
   const userId = getRouterParam(event, 'id');
   if (!userId) throw createError({ statusCode: 400, message: 'Missing user id' });
+
+  const targetRole = await getRoleForUser(userId);
+  requirePermission(
+    event,
+    targetRole === Role.Member ? Permission.Members.Write : Permission.AdminAccounts.Write,
+  );
+
   const body = BodySchema.parse(await readBody(event));
 
   if (body.disabled === true && actorId === userId) {

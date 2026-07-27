@@ -10,7 +10,6 @@ import { Permission } from '~/shared/permissions';
 import { Role } from '~/shared/roles';
 
 export default defineEventHandler(async (event) => {
-  requirePermission(event, Permission.Users.Create);
   const { userId: actorId, role: actorRole, requestId } = event.context as AuthenticatedContext;
 
   const parsed = CreateUserByAdminDto.safeParse(await readBody(event));
@@ -23,6 +22,11 @@ export default defineEventHandler(async (event) => {
   const { username, email, phone } = parsed.data;
   const displayName = parsed.data.displayName || username;
   const role = parsed.data.role || Role.Member;
+
+  requirePermission(
+    event,
+    role === Role.Member ? Permission.Members.Create : Permission.AdminAccounts.Create,
+  );
 
   let uid: string;
   try {

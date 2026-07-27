@@ -1,7 +1,7 @@
 <template>
   <v-dialog :model-value="modelValue" max-width="480" persistent @update:model-value="close">
     <CardsDialogCard>
-      <v-card-title class="pa-4">{{ $t('users.createUser') }}</v-card-title>
+      <v-card-title class="pa-4">{{ dialogTitle }}</v-card-title>
       <v-card-text>
         <v-row dense class="flex-column">
           <v-col>
@@ -45,12 +45,12 @@
               hide-details="auto"
             />
           </v-col>
-          <v-col>
+          <v-col v-if="mode === 'admin-account'">
             <div class="text-caption text-medium-emphasis mb-1">{{ $t('users.role') }}</div>
             <v-select
               v-model="role"
               v-bind="roleAttrs"
-              :items="roleOptions"
+              :items="assignableRoleOptions"
               item-title="title"
               item-value="value"
               :error-messages="errors.role"
@@ -86,8 +86,17 @@ import { isValidUsername } from '~/shared/utils/validation';
 
 const props = defineProps<{
   modelValue: boolean;
+  mode: 'member' | 'admin-account';
   roleOptions: Array<{ title: string; value: string }>;
 }>();
+
+const assignableRoleOptions = computed(() =>
+  props.roleOptions.filter((option) => option.value !== Role.Member),
+);
+
+const defaultRole = computed(() =>
+  props.mode === 'member' ? Role.Member : (assignableRoleOptions.value[0]?.value ?? Role.Admin),
+);
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean];
@@ -97,6 +106,10 @@ const emit = defineEmits<{
 const auth = useAuthStore();
 const { t } = useI18n();
 const { showSuccess, showError } = useToast();
+
+const dialogTitle = computed(() =>
+  props.mode === 'member' ? t('users.createMember') : t('users.createAdminAccount'),
+);
 
 const creating = ref(false);
 
@@ -126,7 +139,7 @@ watch(
   (open) => {
     if (open)
       resetForm({
-        values: { username: '', displayName: '', email: '', phone: '', role: Role.Member },
+        values: { username: '', displayName: '', email: '', phone: '', role: defaultRole.value },
       });
   },
 );

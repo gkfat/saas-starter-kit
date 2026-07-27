@@ -5,7 +5,7 @@
       :items="users"
       :loading="pending"
       item-value="uid"
-      class="users-table"
+      class="users-table table-header-nowrap"
     >
       <template #no-data>
         <span class="text-medium-emphasis">{{ $t('users.noData') }}</span>
@@ -110,10 +110,6 @@ function statusColor(item: UserRow): string {
 </script>
 
 <style scoped>
-.users-table :deep(th) {
-  white-space: nowrap;
-}
-
 .users-table :deep(td:last-child) {
   white-space: nowrap;
 }

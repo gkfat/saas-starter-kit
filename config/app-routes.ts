@@ -42,10 +42,16 @@ export const APP_ROUTES: RouteGroup[] = [
     label: 'nav.groupManagement',
     items: [
       {
-        title: 'nav.adminUsers',
-        icon: 'mdi-account-group',
-        path: '/admin/users',
-        permission: Permission.Users.Read,
+        title: 'nav.members',
+        icon: 'mdi-account-multiple',
+        path: '/admin/members',
+        permission: Permission.Members.Read,
+      },
+      {
+        title: 'nav.adminAccounts',
+        icon: 'mdi-account-tie',
+        path: '/admin/admin-accounts',
+        permission: Permission.AdminAccounts.Read,
       },
       {
         title: 'nav.loginLogs',

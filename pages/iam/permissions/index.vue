@@ -2,7 +2,13 @@
   <div>
     <LayoutPageHeader :title="$t('permissions.title')" />
     <CardsAppCard>
-      <v-data-table :headers="headers" :items="permissions" :loading="pending" item-value="name">
+      <v-data-table
+        :headers="headers"
+        :items="permissions"
+        :loading="pending"
+        item-value="name"
+        class="table-header-nowrap"
+      >
         <template #no-data>
           <span class="text-medium-emphasis">{{ $t('permissions.noData') }}</span>
         </template>

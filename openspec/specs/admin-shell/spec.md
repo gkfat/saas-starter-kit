@@ -20,12 +20,17 @@ Admin UI 的側邊 sidebar SHALL 作為唯一的全域導航容器，包含 proj
 #### Scenario: Sidebar 顯示導航群組
 
 - **WHEN** 使用者進入 Admin 頁面
-- **THEN** sidebar SHALL 顯示 General（Dashboard、Profile）、Management（Users、Roles）、Logs（Login Logs、Audit Logs）三個群組，各有 subheader 分隔
+- **THEN** sidebar SHALL 顯示 General（Dashboard、Profile）、Management（會員管理、後台帳號管理、Roles）、Logs（Login Logs、Audit Logs）三個群組，各有 subheader 分隔
 
 #### Scenario: 無 admin:access 權限時隱藏 Management 與 Logs
 
 - **WHEN** 登入使用者無 `admin:access` 權限
 - **THEN** sidebar SHALL 隱藏 Management 與 Logs 群組
+
+#### Scenario: Management 群組項目依權限個別顯示
+
+- **WHEN** 登入使用者具備 `admin:access` 權限，但僅擁有 `members:read`（不具 `admin_accounts:read`）
+- **THEN** Management 群組 SHALL 顯示「會員管理」項目，SHALL NOT 顯示「後台帳號管理」項目
 
 #### Scenario: Sidebar 底部顯示使用者資訊與登出
 

@@ -1,33 +1,11 @@
-# Admin Dashboard Spec
+## REMOVED Requirements
 
-## Purpose
+### Requirement: User management page lists and filters users
 
-Provides a protected admin interface for managing users, roles, and logs. Access is gated by the `admin:access` permission.
+**Reason**: 單一使用者管理頁面拆分為「會員管理」與「後台帳號管理」兩個獨立頁面，各自擁有獨立權限與固定的角色範圍，不再需要讓使用者手動切換 role 篩選。
+**Migration**: 原本 `/admin/users` 的功能由 `/admin/members`（角色範圍固定為 member）與 `/admin/admin-accounts`（角色範圍固定為非 member）取代，見下方 ADDED Requirements。
 
-## Requirements
-
-### Requirement: Admin layout with navigation sidebar
-
-The system SHALL provide a dedicated admin layout (`layouts/admin.vue`) with a sidebar containing navigation links to all admin sections: Users, Roles, Login Logs, Audit Logs.
-
-#### Scenario: Admin navigates to dashboard
-
-- **WHEN** a user with `admin:access` permission visits `/admin`
-- **THEN** the admin layout renders with a sidebar and the dashboard home page content
-
-### Requirement: Admin route guard enforces admin:access permission
-
-The system SHALL redirect any user without `admin:access` permission away from `/admin/*` routes to `/`.
-
-#### Scenario: Unauthorized user visits admin route
-
-- **WHEN** a user without `admin:access` permission navigates to any `/admin/*` path
-- **THEN** `middleware/auth.global.ts` redirects them to `/`
-
-#### Scenario: Authorized user accesses admin route
-
-- **WHEN** a user with `admin:access` permission navigates to `/admin`
-- **THEN** the page renders without redirect
+## ADDED Requirements
 
 ### Requirement: Member management page lists and filters members
 
@@ -75,6 +53,8 @@ Account status SHALL be one of "已停用" (disabled), "尚未變更預設密碼
 
 - **WHEN** the underlying user list contains a user with the superadmin custom claim
 - **THEN** that user does not appear on `/admin/members` nor on `/admin/admin-accounts`
+
+## MODIFIED Requirements
 
 ### Requirement: Admin toggles a user's enabled/disabled status
 
@@ -175,44 +155,3 @@ The system SHALL allow a user with `members:read` permission to export the curre
 
 - **WHEN** a manager clicks "匯出 CSV" with no active search query
 - **THEN** the system generates and downloads a CSV file containing all rows currently loaded in that page's list
-
-### Requirement: New user sets initial password via a one-time link
-
-The system SHALL provide a public page `pages/auth/set-password.vue` that accepts a one-time `token` query parameter. On submit with a valid, unexpired, unused token and a valid password, the system SHALL call `POST /api/auth/set-password`, which sets the user's password, marks the token as used, and the page SHALL redirect to `/login`.
-
-#### Scenario: User sets password via valid link
-
-- **WHEN** a user opens `/auth/set-password?token=<valid>` and submits a valid password
-- **THEN** the system sets the password, invalidates the token, and redirects to `/login`
-
-#### Scenario: Token expired or already used
-
-- **WHEN** a user submits a password with an expired or already-used token
-- **THEN** the system rejects the request with an error and does not change the password
-
-### Requirement: Roles management page displays role-permission mapping
-
-The system SHALL provide `pages/admin/roles/index.vue` that lists all roles and their associated permissions.
-
-#### Scenario: Admin views roles list
-
-- **WHEN** admin navigates to `/admin/roles`
-- **THEN** the page displays all roles with their corresponding permissions
-
-### Requirement: Login logs page displays login history
-
-The system SHALL provide `pages/admin/logs/login.vue` backed by `GET /api/admin/logs/login` (requires `admin:access`), displaying timestamp, email, provider, and result for each login event.
-
-#### Scenario: Admin views login logs
-
-- **WHEN** admin navigates to `/admin/logs/login`
-- **THEN** the page fetches and displays login log entries from Firestore
-
-### Requirement: Audit log page displays data change history
-
-The system SHALL provide `pages/admin/logs/audit.vue` backed by `GET /api/admin/logs/audit` (requires `admin:access`), displaying timestamp, actor, action, and diff for each audit event.
-
-#### Scenario: Admin views audit logs
-
-- **WHEN** admin navigates to `/admin/logs/audit`
-- **THEN** the page fetches and displays audit log entries from Firestore

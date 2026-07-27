@@ -9,7 +9,7 @@
       prepend-icon="mdi-account-plus"
       @click="emit('create')"
     >
-      {{ $t('users.createUser') }}
+      {{ createLabel }}
     </ButtonsAppButton>
   </div>
 </template>
@@ -17,6 +17,7 @@
 <script setup lang="ts">
 defineProps<{
   canCreateUsers: boolean;
+  createLabel: string;
 }>();
 
 const emit = defineEmits<{
