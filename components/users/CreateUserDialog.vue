@@ -80,9 +80,9 @@
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import { z } from 'zod';
-import { useAuthStore } from '~/stores/auth';
 import { Role } from '~/shared/roles';
 import { isValidUsername } from '~/shared/utils/validation';
+import type { CreateUserResponse } from '~/shared/dto/users';
 
 const props = defineProps<{
   modelValue: boolean;
@@ -103,10 +103,9 @@ const emit = defineEmits<{
   created: [setupLink: string];
 }>();
 
-const auth = useAuthStore();
 const { t } = useI18n();
 const { showSuccess, showError } = useToast();
-const { open: openSessionExpiredDialog } = useSessionExpiredDialog();
+const { apiFetch } = useApi();
 
 const dialogTitle = computed(() =>
   props.mode === 'member' ? t('users.createMember') : t('users.createAdminAccount'),
@@ -152,9 +151,9 @@ function close() {
 const onSubmit = handleSubmit(async (values) => {
   creating.value = true;
   try {
-    const { setupLink } = await $fetch<{ uid: string; setupLink: string }>('/api/admin/users', {
+    const result = await apiFetch<CreateUserResponse>('/api/admin/users', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${auth.idToken}` },
+      silent: true,
       body: {
         username: values.username,
         displayName: values.displayName || undefined,
@@ -163,13 +162,13 @@ const onSubmit = handleSubmit(async (values) => {
         role: values.role,
       },
     });
-    close();
-    showSuccess(t('users.createSuccess'));
-    emit('created', setupLink);
+    if (result) {
+      close();
+      showSuccess(t('users.createSuccess'));
+      emit('created', result.setupLink);
+    }
   } catch (e: unknown) {
-    if (isSessionExpiredError(e)) {
-      openSessionExpiredDialog();
-    } else if ((e as { data?: { statusCode?: number } }).data?.statusCode === 409) {
+    if ((e as { data?: { statusCode?: number } }).data?.statusCode === 409) {
       showError(t('auth.error.usernameTaken'));
     } else {
       showError(t('auth.error.registerDefault'));

@@ -11,7 +11,7 @@ export function useAuthFetch<T>(url: string, options: Parameters<typeof useFetch
       ...(options.headers as Record<string, string> | undefined),
     })),
     onResponseError({ response }) {
-      if (response.status === 401 && response._data?.message === 'Invalid or expired token') {
+      if (isSessionExpired(response.status, response._data?.message)) {
         openSessionExpiredDialog();
       }
     },

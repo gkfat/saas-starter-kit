@@ -6,8 +6,9 @@ import { requirePermission } from '~/server/shared/rbac';
 import type { AuthenticatedContext } from '~/server/shared/types/context';
 import { Permission } from '~/shared/permissions';
 import { Role } from '~/shared/roles';
+import type { RegenerateSetupLinkResponse } from '~/shared/dto/users';
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<RegenerateSetupLinkResponse> => {
   const { userId: actorId, role: actorRole, requestId } = event.context as AuthenticatedContext;
   const userId = getRouterParam(event, 'id');
   if (!userId) throw createError({ statusCode: 400, message: 'Missing user id' });

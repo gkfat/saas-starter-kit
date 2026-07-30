@@ -157,12 +157,13 @@ import type { ConfirmationResult } from 'firebase/auth';
 import { useForm } from 'vee-validate';
 import { z } from 'zod';
 import { useAuthStore } from '~/stores/auth';
+import type { OkResponse } from '~/shared/dto/common';
 
 const store = useAuthStore();
 const { sendPhoneLinkOtp, confirmPhoneLinkOtp } = useAuth();
 const { showError, showSuccess } = useToast();
 const { t } = useI18n();
-const { open: openSessionExpiredDialog } = useSessionExpiredDialog();
+const { apiFetch } = useApi();
 
 const otp = ref('');
 const loading = ref(false);
@@ -227,20 +228,18 @@ const onSaveDisplayName = handleDisplayNameSubmit(async (values) => {
   const trimmed = values.displayNameInput.trim();
   displayNameLoading.value = true;
   try {
-    await $fetch('/api/profile/display-name', {
+    const result = await apiFetch<OkResponse>('/api/profile/display-name', {
       method: 'PATCH',
-      headers: { Authorization: `Bearer ${store.idToken ?? ''}` },
+      silent: true,
       body: { displayName: trimmed },
     });
-    store.user.displayName = trimmed;
-    showSuccess(t('profile.displayNameUpdateSuccess'));
-    editingDisplayName.value = false;
-  } catch (e: unknown) {
-    if (isSessionExpiredError(e)) {
-      openSessionExpiredDialog();
-    } else {
-      showError(t('profile.displayNameUpdateFailed'));
+    if (result !== null) {
+      store.user.displayName = trimmed;
+      showSuccess(t('profile.displayNameUpdateSuccess'));
+      editingDisplayName.value = false;
     }
+  } catch {
+    showError(t('profile.displayNameUpdateFailed'));
   } finally {
     displayNameLoading.value = false;
   }

@@ -42,8 +42,8 @@
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import { z } from 'zod';
-import { useAuthStore } from '~/stores/auth';
 import type { UserRow } from '~/shared/users';
+import type { OkResponse } from '~/shared/dto/common';
 
 const props = defineProps<{
   modelValue: boolean;
@@ -57,10 +57,9 @@ const emit = defineEmits<{
   saved: [];
 }>();
 
-const auth = useAuthStore();
 const { t } = useI18n();
 const { showSuccess } = useToast();
-const { withErrorToast } = useApiError();
+const { apiFetch } = useApi();
 
 const saving = ref(false);
 
@@ -95,13 +94,10 @@ function close() {
 async function save() {
   if (!props.user) return;
   saving.value = true;
-  const result = await withErrorToast(() =>
-    $fetch<unknown>(`/api/admin/users/${props.user!.uid}`, {
-      method: 'PATCH',
-      headers: { Authorization: `Bearer ${auth.idToken}` },
-      body: { role: selectedRole.value },
-    }),
-  );
+  const result = await apiFetch<OkResponse>(`/api/admin/users/${props.user.uid}`, {
+    method: 'PATCH',
+    body: { role: selectedRole.value },
+  });
   if (result !== null) {
     close();
     showSuccess(t('users.updateRoleSuccess'));

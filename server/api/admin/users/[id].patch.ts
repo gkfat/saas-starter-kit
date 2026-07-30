@@ -8,6 +8,7 @@ import type { AuthenticatedContext } from '~/server/shared/types/context';
 import { getUserByUid } from '~/server/modules/users';
 import { Permission } from '~/shared/permissions';
 import { Role } from '~/shared/roles';
+import type { OkResponse } from '~/shared/dto/common';
 
 const BodySchema = z
   .object({
@@ -18,7 +19,7 @@ const BodySchema = z
     message: 'role 或 disabled 至少需提供一項',
   });
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<OkResponse> => {
   const { userId: actorId, role: actorRole, requestId } = event.context as AuthenticatedContext;
   const userId = getRouterParam(event, 'id');
   if (!userId) throw createError({ statusCode: 400, message: 'Missing user id' });

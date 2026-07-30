@@ -27,8 +27,8 @@
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '~/stores/auth';
 import type { UserRow } from '~/shared/users';
+import type { OkResponse } from '~/shared/dto/common';
 
 const props = defineProps<{
   modelValue: boolean;
@@ -40,10 +40,9 @@ const emit = defineEmits<{
   confirmed: [];
 }>();
 
-const auth = useAuthStore();
 const { t } = useI18n();
 const { showSuccess } = useToast();
-const { withErrorToast } = useApiError();
+const { apiFetch } = useApi();
 
 const saving = ref(false);
 
@@ -54,13 +53,10 @@ function close() {
 async function confirm() {
   if (!props.user) return;
   saving.value = true;
-  const result = await withErrorToast(() =>
-    $fetch<unknown>(`/api/admin/users/${props.user!.uid}`, {
-      method: 'PATCH',
-      headers: { Authorization: `Bearer ${auth.idToken}` },
-      body: { disabled: !props.user!.disabled },
-    }),
-  );
+  const result = await apiFetch<OkResponse>(`/api/admin/users/${props.user.uid}`, {
+    method: 'PATCH',
+    body: { disabled: !props.user.disabled },
+  });
   if (result !== null) {
     close();
     showSuccess(t('users.updateStatusSuccess'));

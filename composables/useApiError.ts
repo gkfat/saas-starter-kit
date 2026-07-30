@@ -11,6 +11,8 @@ const HTTP_ERROR_MAP: Record<number, string> = {
 
 const DEFAULT_ERROR = '發生未知錯誤，請稍後再試';
 
+const SESSION_EXPIRED_MESSAGE = 'Invalid or expired token';
+
 function getStatusCode(e: unknown): number | undefined {
   if (e != null && typeof e === 'object' && 'statusCode' in e) {
     const code = (e as { statusCode: unknown }).statusCode;
@@ -30,31 +32,18 @@ function getMessage(e: unknown): string | undefined {
   return undefined;
 }
 
+export function isSessionExpired(
+  statusCode: number | undefined,
+  message: string | undefined,
+): boolean {
+  return statusCode === 401 && message === SESSION_EXPIRED_MESSAGE;
+}
+
 export function isSessionExpiredError(e: unknown): boolean {
-  return getStatusCode(e) === 401 && getMessage(e) === 'Invalid or expired token';
+  return isSessionExpired(getStatusCode(e), getMessage(e));
 }
 
 export function handleError(e: unknown): string {
   const code = getStatusCode(e);
   return code !== undefined ? (HTTP_ERROR_MAP[code] ?? DEFAULT_ERROR) : DEFAULT_ERROR;
-}
-
-export function useApiError() {
-  const { showError } = useToast();
-  const { open: openSessionExpiredDialog } = useSessionExpiredDialog();
-
-  async function withErrorToast<T>(fn: () => Promise<T>): Promise<T | null> {
-    try {
-      return await fn();
-    } catch (e) {
-      if (isSessionExpiredError(e)) {
-        openSessionExpiredDialog();
-      } else {
-        showError(handleError(e));
-      }
-      return null;
-    }
-  }
-
-  return { handleError, withErrorToast };
 }

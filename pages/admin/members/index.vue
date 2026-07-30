@@ -47,9 +47,7 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from 'pinia';
 import { Permission } from '~/shared/permissions';
-import { useAuthStore } from '~/stores/auth';
 import CreateUserDialog from '~/components/users/CreateUserDialog.vue';
 import DeleteUserDialog from '~/components/users/DeleteUserDialog.vue';
 import EditRoleDialog from '~/components/users/EditRoleDialog.vue';
@@ -59,12 +57,11 @@ import UsersFilterBar from '~/components/users/UsersFilterBar.vue';
 import UsersTable from '~/components/users/UsersTable.vue';
 import UsersToolbar from '~/components/users/UsersToolbar.vue';
 import type { UserRow } from '~/shared/users';
+import type { RegenerateSetupLinkResponse } from '~/shared/dto/users';
 
-const auth = useAuthStore();
-const { idToken } = storeToRefs(auth);
 const { t } = useI18n();
 
-const { withErrorToast } = useApiError();
+const { apiFetch } = useApi();
 const { hasPermission } = usePermission();
 
 const canWriteUsers = computed(() => hasPermission(Permission.Members.Write));
@@ -118,11 +115,9 @@ function onUserCreated(setupLink: string) {
 }
 
 async function regenerateLink(item: UserRow) {
-  const result = await withErrorToast(() =>
-    $fetch<{ setupLink: string }>(`/api/admin/users/${item.uid}/setup-link`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${idToken.value}` },
-    }),
+  const result = await apiFetch<RegenerateSetupLinkResponse>(
+    `/api/admin/users/${item.uid}/setup-link`,
+    { method: 'POST' },
   );
   if (result) {
     linkDialogValue.value = result.setupLink;

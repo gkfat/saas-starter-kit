@@ -6,13 +6,14 @@ import type { AuthenticatedContext } from '../../shared/types/context';
 import { getUserByUid } from '~/server/modules/users';
 import { Permission } from '~/shared/permissions';
 import { Role } from '~/shared/roles';
+import type { OkResponse } from '~/shared/dto/common';
 
 const BodySchema = z.object({
   roleName: z.string().min(1),
   permissions: z.array(z.string()),
 });
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<OkResponse> => {
   requirePermission(event, Permission.Roles.Write);
 
   const { userId, role, requestId } = event.context as AuthenticatedContext;

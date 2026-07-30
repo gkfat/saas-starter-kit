@@ -66,13 +66,14 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { useAuthStore } from '~/stores/auth';
+import type { OkResponse } from '~/shared/dto/common';
 
 const auth = useAuthStore();
-const { isSuperadmin, idToken } = storeToRefs(auth);
+const { isSuperadmin } = storeToRefs(auth);
 const { t } = useI18n();
 
 const { showSuccess } = useToast();
-const { withErrorToast } = useApiError();
+const { apiFetch } = useApi();
 
 const headers = computed(() => [
   { title: t('roles.name'), key: 'name' },
@@ -115,13 +116,10 @@ function openEdit(item: RoleRow) {
 async function save() {
   if (!editing.value) return;
   saving.value = true;
-  const result = await withErrorToast(() =>
-    $fetch<unknown>('/api/admin/role-permissions', {
-      method: 'PATCH',
-      headers: { Authorization: `Bearer ${idToken.value}` },
-      body: { roleName: editing.value!.name, permissions: selectedPermissions.value },
-    }),
-  );
+  const result = await apiFetch<OkResponse>('/api/admin/role-permissions', {
+    method: 'PATCH',
+    body: { roleName: editing.value.name, permissions: selectedPermissions.value },
+  });
   if (result !== null) {
     dialog.value = false;
     await Promise.all([refreshRoles(), refreshRolePermissions()]);
