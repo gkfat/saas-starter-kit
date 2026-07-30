@@ -68,6 +68,8 @@
     "passwordMismatch": "Passwords do not match",
     "setPassword": "Set Password",
     "setPasswordSuccess": "Password set successfully, please log in",
+    "sessionExpiredTitle": "Session Expired",
+    "sessionExpiredMessage": "Your session has expired, please log in again",
     "error": {
       "invalidSetupToken": "This link is invalid or has expired",
       "invalidCredential": "Incorrect username or password",

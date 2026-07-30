@@ -162,6 +162,7 @@ const store = useAuthStore();
 const { sendPhoneLinkOtp, confirmPhoneLinkOtp } = useAuth();
 const { showError, showSuccess } = useToast();
 const { t } = useI18n();
+const { open: openSessionExpiredDialog } = useSessionExpiredDialog();
 
 const otp = ref('');
 const loading = ref(false);
@@ -234,8 +235,12 @@ const onSaveDisplayName = handleDisplayNameSubmit(async (values) => {
     store.user.displayName = trimmed;
     showSuccess(t('profile.displayNameUpdateSuccess'));
     editingDisplayName.value = false;
-  } catch {
-    showError(t('profile.displayNameUpdateFailed'));
+  } catch (e: unknown) {
+    if (isSessionExpiredError(e)) {
+      openSessionExpiredDialog();
+    } else {
+      showError(t('profile.displayNameUpdateFailed'));
+    }
   } finally {
     displayNameLoading.value = false;
   }

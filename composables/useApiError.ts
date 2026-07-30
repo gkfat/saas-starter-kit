@@ -19,6 +19,21 @@ function getStatusCode(e: unknown): number | undefined {
   return undefined;
 }
 
+function getMessage(e: unknown): string | undefined {
+  if (e != null && typeof e === 'object' && 'data' in e) {
+    const data = (e as { data: unknown }).data;
+    if (data != null && typeof data === 'object' && 'message' in data) {
+      const message = (data as { message: unknown }).message;
+      if (typeof message === 'string') return message;
+    }
+  }
+  return undefined;
+}
+
+export function isSessionExpiredError(e: unknown): boolean {
+  return getStatusCode(e) === 401 && getMessage(e) === 'Invalid or expired token';
+}
+
 export function handleError(e: unknown): string {
   const code = getStatusCode(e);
   return code !== undefined ? (HTTP_ERROR_MAP[code] ?? DEFAULT_ERROR) : DEFAULT_ERROR;
@@ -26,12 +41,17 @@ export function handleError(e: unknown): string {
 
 export function useApiError() {
   const { showError } = useToast();
+  const { open: openSessionExpiredDialog } = useSessionExpiredDialog();
 
   async function withErrorToast<T>(fn: () => Promise<T>): Promise<T | null> {
     try {
       return await fn();
     } catch (e) {
-      showError(handleError(e));
+      if (isSessionExpiredError(e)) {
+        openSessionExpiredDialog();
+      } else {
+        showError(handleError(e));
+      }
       return null;
     }
   }

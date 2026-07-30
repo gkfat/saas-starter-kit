@@ -3,4 +3,5 @@
     <NuxtPage />
   </NuxtLayout>
   <ToastAppToast />
+  <AuthSessionExpiredDialog />
 </template>

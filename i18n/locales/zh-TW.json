@@ -68,6 +68,8 @@
     "passwordMismatch": "兩次密碼輸入不一致",
     "setPassword": "設定密碼",
     "setPasswordSuccess": "密碼設定成功，請重新登入",
+    "sessionExpiredTitle": "驗證已過期",
+    "sessionExpiredMessage": "您的登入驗證已過期，請重新登入",
     "error": {
       "invalidSetupToken": "連結無效或已過期",
       "invalidCredential": "帳號或密碼錯誤",

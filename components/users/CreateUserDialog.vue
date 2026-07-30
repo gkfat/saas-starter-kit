@@ -106,6 +106,7 @@ const emit = defineEmits<{
 const auth = useAuthStore();
 const { t } = useI18n();
 const { showSuccess, showError } = useToast();
+const { open: openSessionExpiredDialog } = useSessionExpiredDialog();
 
 const dialogTitle = computed(() =>
   props.mode === 'member' ? t('users.createMember') : t('users.createAdminAccount'),
@@ -166,8 +167,9 @@ const onSubmit = handleSubmit(async (values) => {
     showSuccess(t('users.createSuccess'));
     emit('created', setupLink);
   } catch (e: unknown) {
-    const statusCode = (e as { data?: { statusCode?: number } }).data?.statusCode;
-    if (statusCode === 409) {
+    if (isSessionExpiredError(e)) {
+      openSessionExpiredDialog();
+    } else if ((e as { data?: { statusCode?: number } }).data?.statusCode === 409) {
       showError(t('auth.error.usernameTaken'));
     } else {
       showError(t('auth.error.registerDefault'));

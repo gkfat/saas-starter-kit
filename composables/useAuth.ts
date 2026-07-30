@@ -4,6 +4,7 @@ import {
   getAuth,
   linkWithPhoneNumber,
   linkWithPopup,
+  onIdTokenChanged,
   signInWithCustomToken,
   signInWithPopup,
   signOut,
@@ -16,6 +17,11 @@ import { useAuthStore } from '~/stores/auth';
 type GoogleLoginResult =
   | { status: 'ready' }
   | { status: 'quick-register'; googleEmail: string; displayName: string | null; idToken: string };
+
+// linkWithPopup 內部的「popup 是否被手動關閉」偵測與實際 OAuth 回呼是非同步競態關係：
+// 即使 promise 已回報 popup-closed-by-user，Firebase SDK 仍可能稍後才把 auth.currentUser
+// 換成彈窗中選擇的 Google 帳號。這裡等待一段緩衝時間，讓該非同步事件有機會浮現後再檢查身份是否被置換。
+const LINK_SESSION_CHECK_DELAY_MS = 500;
 
 export function useAuth() {
   const store = useAuthStore();
@@ -135,7 +141,29 @@ export function useAuth() {
     const currentUser = auth.currentUser;
     if (!currentUser) throw new Error('Must be logged in to link Google');
 
-    await linkWithPopup(currentUser, new GoogleAuthProvider());
+    const originalUid = currentUser.uid;
+    let sessionSwapped = false;
+    const unsubscribe = onIdTokenChanged(auth, (user) => {
+      if (user && user.uid !== originalUid) sessionSwapped = true;
+    });
+
+    let linkError: unknown = null;
+    try {
+      await linkWithPopup(currentUser, new GoogleAuthProvider());
+    } catch (e) {
+      linkError = e;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve, LINK_SESSION_CHECK_DELAY_MS));
+    unsubscribe();
+
+    if (sessionSwapped || auth.currentUser?.uid !== originalUid) {
+      await signOut(auth);
+      store.clearSession();
+      throw new Error('auth/session-integrity-check-failed');
+    }
+
+    if (linkError) throw linkError;
 
     const freshToken = await currentUser.getIdToken(true);
     store.updateIdToken(freshToken);
