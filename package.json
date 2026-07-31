@@ -7,22 +7,30 @@
     "pnpm": ">=9"
   },
   "scripts": {
-    "dev": "nuxt dev",
-    "build": "nuxt build",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "dev:admin": "pnpm --dir apps/admin dev",
+    "dev:server": "pnpm --dir apps/server dev",
+    "dev:liff": "pnpm --dir apps/liff dev",
+    "build": "pnpm -r build",
+    "lint": "eslint . && pnpm -r --if-present lint",
+    "lint:fix": "eslint . --fix && pnpm -r --if-present lint:fix",
     "format": "prettier --write .",
     "prepare": "husky",
     "seed:rbac": "tsx scripts/seed-rbac.ts",
     "seed:superadmin": "tsx scripts/seed-superadmin.ts",
     "seed:demo-users": "tsx scripts/seed-demo-users.ts",
-    "test": "vitest run"
+    "test": "pnpm -r --if-present test"
   },
   "lint-staged": {
-    "*.{ts,vue,mjs}": [
+    "apps/admin/**/*.{ts,vue,mjs}": [
+      "pnpm --dir apps/admin exec eslint --fix"
+    ],
+    "apps/server/**/*.ts": [
+      "pnpm --dir apps/server exec eslint --fix"
+    ],
+    "scripts/**/*.ts": [
+      "eslint --fix"
+    ],
+    "packages/shared/**/*.ts": [
       "eslint --fix"
     ],
     "*.{ts,vue,mjs,json,md,css,scss}": [
@@ -30,31 +38,22 @@
     ]
   },
   "dependencies": {
-    "@mdi/font": "^7.4.47",
-    "@nuxtjs/i18n": "9",
-    "@pinia/nuxt": "^0.11.3",
-    "@vee-validate/zod": "^4.15.1",
-    "dayjs": "^1.11.21",
+    "@saas-starter-kit/shared": "workspace:*",
     "dotenv": "^17.4.2",
-    "firebase": "^11.0.0",
-    "firebase-admin": "^13.0.0",
-    "nuxt": "~3.16.0",
-    "pinia": "^3.0.4",
-    "vee-validate": "^4.15.1",
-    "vuetify": "^3.8.0",
-    "zod": "^3.24.1"
+    "firebase-admin": "^13.0.0"
   },
   "devDependencies": {
-    "@nuxt/eslint": "^0.7.0",
+    "@eslint/js": "^9.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
     "eslint": "^9.0.0",
     "eslint-config-prettier": "^9.0.0",
+    "globals": "^15.15.0",
     "husky": "^9.1.7",
     "lint-staged": "^17.0.7",
     "prettier": "^3.0.0",
-    "sass": "^1.83.4",
     "tsx": "^4.23.0",
-    "typescript": "^5.7.2",
-    "vitest": "^4.1.10"
+    "typescript": "^5.7.2"
   },
   "packageManager": "pnpm@9.15.2+sha512.93e57b0126f0df74ce6bff29680394c0ba54ec47246b9cf321f0121d8d9bb03f750a705f24edc3c1180853afd7c2c3b94196d0a3d53d3e069d9e2793ef11f321"
 }

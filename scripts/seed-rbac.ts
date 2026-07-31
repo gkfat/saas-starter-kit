@@ -1,9 +1,14 @@
 import { cert, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import 'dotenv/config';
-import { prefixCollection } from '../server/shared/firestore-prefix';
-import { type Permission, PermissionMeta } from '../shared/permissions';
-import { type Role, RoleMeta, RolePermissions } from '../shared/roles';
+import { prefixCollection } from '../apps/server/server/shared/firestore-prefix';
+import {
+  type Permission,
+  PermissionMeta,
+  type Role,
+  RoleMeta,
+  RolePermissions,
+} from '@saas-starter-kit/shared';
 
 const app = initializeApp({
   credential: cert({

@@ -2,9 +2,9 @@ import { cert, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import 'dotenv/config';
-import { prefixCollection } from '../server/shared/firestore-prefix';
-import { hashPassword } from '../server/shared/crypto';
-import { Role } from '~/shared/roles';
+import { prefixCollection } from '../apps/server/server/shared/firestore-prefix';
+import { hashPassword } from '../apps/server/server/shared/crypto';
+import { Role } from '@saas-starter-kit/shared';
 
 const app = initializeApp({
   credential: cert({
