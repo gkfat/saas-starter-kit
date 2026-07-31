@@ -4,16 +4,27 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Commands
 
+This is a pnpm workspace monorepo with three apps (`apps/server`, `apps/admin`, `apps/liff`) and a shared package (`packages/shared`).
+
 ```bash
-pnpm dev          # Start dev server
-pnpm build        # Production build
-pnpm lint         # ESLint check
-pnpm lint:fix     # ESLint auto-fix
+# Per-app dev servers
+pnpm dev:server   # apps/server — Nitro API (http://localhost:3000, override via PORT)
+pnpm dev:admin    # apps/admin — Nuxt admin frontend (http://localhost:3005, override via ADMIN_PORT)
+pnpm dev:liff     # apps/liff — LINE LIFF frontend (http://localhost:3006, override via LIFF_PORT)
+
+# Workspace-wide (all apps)
+pnpm build        # Production build for every app
+pnpm lint         # ESLint check for every app
+pnpm lint:fix     # ESLint auto-fix for every app
 pnpm format       # Prettier format
-pnpm test         # Run backend tests (Vitest, tests/**/*.test.ts)
+pnpm test         # Run tests for every app (Vitest)
+
+# Single app (run from repo root)
+pnpm --dir apps/server test
+pnpm --dir apps/admin lint
 ```
 
-Tests live under `tests/`. Some are integration tests that require `pnpm dev` running against a real Firebase project (see per-file header comments for prerequisites). Lint runs automatically on staged files via Husky pre-commit hook.
+Tests live under each app's own `tests/` (currently only `apps/server/tests/`, integration tests that require `pnpm dev:server` running against a real Firebase project — see per-file header comments for prerequisites). Lint runs automatically on staged files via Husky pre-commit hook.
 
 ## Environment
 

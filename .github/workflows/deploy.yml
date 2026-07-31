@@ -1,0 +1,132 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  detect-affected:
+    runs-on: ubuntu-latest
+    outputs:
+      apps: ${{ steps.detect.outputs.apps }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - id: detect
+        run: |
+          BASE_REF="${{ github.event.pull_request.base.sha || github.event.before }}"
+          APPS=$(npx tsx scripts/detect-affected-apps.ts "$BASE_REF")
+          echo "apps=$APPS" >> "$GITHUB_OUTPUT"
+
+  lint-and-test:
+    needs: detect-affected
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm test
+
+  deploy-server:
+    needs: [detect-affected, lint-and-test]
+    if: github.event_name == 'push' && contains(needs.detect-affected.outputs.apps, 'server')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Requires repo secrets: GCP_PROJECT_ID, GCP_REGION, GCP_ARTIFACT_REPO,
+      # and a Workload Identity Federation provider (see google-github-actions/auth).
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build and push image
+        run: |
+          IMAGE="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REPO }}/saas-starter-kit-server:${{ github.sha }}"
+          docker build -f apps/server/Dockerfile -t "$IMAGE" .
+          docker push "$IMAGE"
+          echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy saas-starter-kit-server \
+            --image "$IMAGE" \
+            --region "${{ secrets.GCP_REGION }}" \
+            --project "${{ secrets.GCP_PROJECT_ID }}" \
+            --min-instances 0 \
+            --max-instances 3 \
+            --cpu 1 \
+            --memory 256Mi \
+            --allow-unauthenticated
+
+  deploy-admin:
+    needs: [detect-affected, lint-and-test]
+    if: github.event_name == 'push' && contains(needs.detect-affected.outputs.apps, 'admin')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --dir apps/admin generate
+        env:
+          API_BASE_URL: ${{ secrets.SERVER_URL }}
+
+      # Requires repo secret: FIREBASE_SERVICE_ACCOUNT (see FirebaseExtended/action-hosting-deploy)
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          target: admin
+          projectId: default
+
+  deploy-liff:
+    needs: [detect-affected, lint-and-test]
+    if: github.event_name == 'push' && contains(needs.detect-affected.outputs.apps, 'liff')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --dir apps/liff build
+        env:
+          API_BASE_URL: ${{ secrets.SERVER_URL }}
+
+      - uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          target: liff
+          projectId: default

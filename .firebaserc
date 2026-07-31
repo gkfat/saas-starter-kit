@@ -1,0 +1,13 @@
+{
+  "projects": {
+    "default": "PLACEHOLDER_FIREBASE_PROJECT_ID"
+  },
+  "targets": {
+    "PLACEHOLDER_FIREBASE_PROJECT_ID": {
+      "hosting": {
+        "admin": ["PLACEHOLDER_ADMIN_SITE_ID"],
+        "liff": ["PLACEHOLDER_LIFF_SITE_ID"]
+      }
+    }
+  }
+}

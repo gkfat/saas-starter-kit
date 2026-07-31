@@ -18,7 +18,7 @@
     "seed:rbac": "tsx scripts/seed-rbac.ts",
     "seed:superadmin": "tsx scripts/seed-superadmin.ts",
     "seed:demo-users": "tsx scripts/seed-demo-users.ts",
-    "test": "pnpm -r --if-present test"
+    "test": "vitest run scripts && pnpm -r --if-present test"
   },
   "lint-staged": {
     "apps/admin/**/*.{ts,vue,mjs}": [
@@ -26,6 +26,9 @@
     ],
     "apps/server/**/*.ts": [
       "pnpm --dir apps/server exec eslint --fix"
+    ],
+    "apps/liff/**/*.{ts,vue,mjs}": [
+      "pnpm --dir apps/liff exec eslint --fix"
     ],
     "scripts/**/*.ts": [
       "eslint --fix"
@@ -53,7 +56,8 @@
     "lint-staged": "^17.0.7",
     "prettier": "^3.0.0",
     "tsx": "^4.23.0",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.2",
+    "vitest": "^4.1.10"
   },
   "packageManager": "pnpm@9.15.2+sha512.93e57b0126f0df74ce6bff29680394c0ba54ec47246b9cf321f0121d8d9bb03f750a705f24edc3c1180853afd7c2c3b94196d0a3d53d3e069d9e2793ef11f321"
 }

@@ -8,7 +8,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
 
   devServer: {
-    port: 3005,
+    port: Number(process.env.ADMIN_PORT) || 3005,
   },
 
   modules: ['@nuxt/eslint', '@pinia/nuxt', '@nuxtjs/i18n'],
