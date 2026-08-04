@@ -7,7 +7,7 @@
     "dev": "nitro dev",
     "build": "nitro build",
     "preview": "node .output/server/index.mjs",
-    "typecheck": "nitro typecheck",
+    "typecheck": "nitro prepare && tsc --noEmit",
     "test": "vitest run",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
