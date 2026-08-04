@@ -4,7 +4,7 @@ import { verifyAuthenticatedIdToken } from '~/modules/auth';
 import { bindProvider, findUserAuthRecord, revokeSessionsForUser } from '~/modules/identity';
 import { getUserById, completePasswordSetup } from '~/modules/users';
 import type { AuthenticatedContext } from '~/shared/types/context';
-import { isValidPassword, toSyntheticEmail } from '@saas-starter-kit/shared';
+import { isValidPassword, toSyntheticEmail, Role } from '@saas-starter-kit/shared';
 
 const BodySchema = z.object({
   newPassword: z.string().refine(isValidPassword, '密碼須為 6–8 碼英數字'),
@@ -19,6 +19,28 @@ export default defineEventHandler(async (event) => {
       statusCode: 400,
       message: parsed.error.errors[0]?.message ?? 'Invalid request',
     });
+  }
+
+  if (ctx.role === Role.SuperAdmin) {
+    if (!parsed.data.currentIdToken) {
+      throw createError({ statusCode: 400, message: '請輸入目前密碼' });
+    }
+
+    let currentIdentity: Awaited<ReturnType<typeof verifyAuthenticatedIdToken>>;
+    try {
+      currentIdentity = await verifyAuthenticatedIdToken(parsed.data.currentIdToken);
+    } catch {
+      throw createError({ statusCode: 401, message: '目前密碼驗證失敗' });
+    }
+
+    if (currentIdentity.firebaseUid !== ctx.firebaseUid) {
+      throw createError({ statusCode: 401, message: '目前密碼驗證失敗' });
+    }
+
+    await adminAuth().updateUser(ctx.firebaseUid, { password: parsed.data.newPassword });
+    await adminAuth().revokeRefreshTokens(ctx.firebaseUid);
+
+    return { ok: true };
   }
 
   const user = await getUserById(ctx.userId);

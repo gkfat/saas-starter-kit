@@ -6,6 +6,14 @@
         <ButtonsAppButton kind="secondary" size="small" @click="startEditDisplayName">
           {{ $t('profile.editDisplayName') }}
         </ButtonsAppButton>
+        <ButtonsAppButton
+          kind="secondary"
+          size="small"
+          class="ml-2"
+          @click="openChangePasswordDialog"
+        >
+          {{ $t('profile.changePassword') }}
+        </ButtonsAppButton>
       </v-card-title>
       <v-card-text>
         <v-row>
@@ -148,6 +156,69 @@
         </v-card-actions>
       </CardsDialogCard>
     </v-dialog>
+
+    <v-dialog v-model="changePasswordDialog" max-width="400" persistent>
+      <CardsDialogCard>
+        <v-card-title class="pa-4">{{ $t('profile.changePassword') }}</v-card-title>
+        <v-card-text>
+          <v-row no-gutters class="ga-3 flex-column">
+            <v-col v-if="isPasswordBound">
+              <v-text-field
+                v-model="currentPassword"
+                v-bind="currentPasswordAttrs"
+                :label="$t('profile.currentPassword')"
+                type="password"
+                :error-messages="passwordFormErrors.currentPassword"
+                :disabled="changePasswordLoading"
+                hide-details="auto"
+              />
+            </v-col>
+            <v-col>
+              <v-text-field
+                v-model="newPassword"
+                v-bind="newPasswordAttrs"
+                :label="$t('profile.newPassword')"
+                type="password"
+                :error-messages="passwordFormErrors.newPassword"
+                :disabled="changePasswordLoading"
+                :hint="$t('auth.passwordHint')"
+                persistent-hint
+                hide-details="auto"
+              />
+            </v-col>
+            <v-col>
+              <v-text-field
+                v-model="confirmNewPassword"
+                v-bind="confirmNewPasswordAttrs"
+                :label="$t('profile.confirmNewPassword')"
+                type="password"
+                :error-messages="passwordFormErrors.confirmNewPassword"
+                :disabled="changePasswordLoading"
+                hide-details="auto"
+              />
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions class="pa-4">
+          <v-spacer />
+          <ButtonsAppButton
+            kind="secondary"
+            :disabled="changePasswordLoading"
+            @click="changePasswordDialog = false"
+          >
+            {{ $t('common.cancel') }}
+          </ButtonsAppButton>
+          <ButtonsAppButton
+            kind="primary"
+            :loading="changePasswordLoading"
+            :disabled="!passwordFormMeta.valid"
+            @click="onSubmitChangePassword"
+          >
+            {{ $t('profile.save') }}
+          </ButtonsAppButton>
+        </v-card-actions>
+      </CardsDialogCard>
+    </v-dialog>
   </div>
 </template>
 
@@ -157,10 +228,11 @@ import type { ConfirmationResult } from 'firebase/auth';
 import { useForm } from 'vee-validate';
 import { z } from 'zod';
 import { useAuthStore } from '~/stores/auth';
+import { isValidPassword } from '@saas-starter-kit/shared';
 import type { OkResponse } from '@saas-starter-kit/shared';
 
 const store = useAuthStore();
-const { sendPhoneLinkOtp, confirmPhoneLinkOtp } = useAuth();
+const { sendPhoneLinkOtp, confirmPhoneLinkOtp, changePassword } = useAuth();
 const { showError, showSuccess } = useToast();
 const { t } = useI18n();
 const { apiFetch } = useApi();
@@ -283,4 +355,72 @@ function resetOtp() {
   confirmationResult.value = null;
   otp.value = '';
 }
+
+const changePasswordDialog = ref(false);
+const changePasswordLoading = ref(false);
+
+const isPasswordBound = computed(() => store.user?.providers.includes('password') ?? false);
+
+const passwordValidationSchema = toTypedSchema(
+  z
+    .object({
+      currentPassword: z.string().optional(),
+      newPassword: z.string().refine(isValidPassword, t('auth.error.invalidPassword')),
+      confirmNewPassword: z.string(),
+    })
+    .superRefine((data, ctx) => {
+      if (isPasswordBound.value && !data.currentPassword) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('common.required'),
+          path: ['currentPassword'],
+        });
+      }
+      if (data.newPassword !== data.confirmNewPassword) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('auth.passwordMismatch'),
+          path: ['confirmNewPassword'],
+        });
+      }
+    }),
+);
+
+const {
+  defineField: definePasswordField,
+  errors: passwordFormErrors,
+  meta: passwordFormMeta,
+  handleSubmit: handlePasswordSubmit,
+  resetForm: resetPasswordForm,
+} = useForm({
+  validationSchema: passwordValidationSchema,
+  initialValues: { currentPassword: '', newPassword: '', confirmNewPassword: '' },
+});
+
+const [currentPassword, currentPasswordAttrs] = definePasswordField('currentPassword');
+const [newPassword, newPasswordAttrs] = definePasswordField('newPassword');
+const [confirmNewPassword, confirmNewPasswordAttrs] = definePasswordField('confirmNewPassword');
+
+function openChangePasswordDialog() {
+  resetPasswordForm();
+  changePasswordDialog.value = true;
+}
+
+const onSubmitChangePassword = handlePasswordSubmit(async (values) => {
+  changePasswordLoading.value = true;
+  try {
+    await changePassword(values.newPassword, values.currentPassword || undefined);
+    showSuccess(t('profile.changePasswordSuccess'));
+    changePasswordDialog.value = false;
+  } catch (e: unknown) {
+    const statusCode = (e as { data?: { statusCode?: number } }).data?.statusCode;
+    showError(
+      statusCode === 401
+        ? t('profile.currentPasswordIncorrect')
+        : t('profile.changePasswordFailed'),
+    );
+  } finally {
+    changePasswordLoading.value = false;
+  }
+});
 </script>

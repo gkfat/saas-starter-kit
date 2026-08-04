@@ -1,3 +1,4 @@
+import { Role } from '@saas-starter-kit/shared';
 import { getUserById } from '~/modules/users';
 import { listProvidersForUser } from '~/modules/identity';
 
@@ -8,9 +9,11 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, message: 'Unauthorized' });
   }
 
+  const isSuperAdmin = ctx.role === Role.SuperAdmin;
+
   const [firestoreUser, providers] = await Promise.all([
-    getUserById(ctx.userId),
-    listProvidersForUser(ctx.userId),
+    isSuperAdmin ? Promise.resolve(null) : getUserById(ctx.userId),
+    isSuperAdmin ? Promise.resolve(['password'] as const) : listProvidersForUser(ctx.userId),
   ]);
 
   return {
