@@ -33,29 +33,27 @@ export default defineEventHandler(async (event): Promise<RegenerateSetupLinkResp
   const { adminAppUrl } = useRuntimeConfig();
   const setupLink = `${adminAppUrl}/auth/set-password?token=${setupToken}`;
 
-  if (actorRole !== Role.SuperAdmin) {
-    const actorUser = await getUserById(actorId);
-    recordAuditLog({
-      severity: 'INFO',
-      timestamp: new Date().toISOString(),
-      requestId,
-      actor: {
-        userId: actorId,
-        role: actorRole ?? 'unknown',
-        ...(actorUser?.username ? { username: actorUser.username } : {}),
-      },
-      action: 'user.setup_link.regenerate',
-      metadata: { userId },
-    }).catch((err) =>
-      console.error(
-        JSON.stringify({
-          severity: 'ERROR',
-          message: 'Failed to write audit_log',
-          error: String(err),
-        }),
-      ),
-    );
-  }
+  const actorUser = await getUserById(actorId);
+  recordAuditLog({
+    severity: 'INFO',
+    timestamp: new Date().toISOString(),
+    requestId,
+    actor: {
+      userId: actorId,
+      role: actorRole ?? 'unknown',
+      ...(actorUser?.username ? { username: actorUser.username } : {}),
+    },
+    action: 'user.setup_link.regenerate',
+    metadata: { userId },
+  }).catch((err) =>
+    console.error(
+      JSON.stringify({
+        severity: 'ERROR',
+        message: 'Failed to write audit_log',
+        error: String(err),
+      }),
+    ),
+  );
 
   return { setupLink };
 });

@@ -34,7 +34,7 @@ export default defineEventHandler(async (event): Promise<OkResponse> => {
     throw createError({ statusCode: 400, message: '無法停用自己的帳號' });
   }
 
-  const actorUser = actorRole !== Role.SuperAdmin ? await getUserById(actorId) : null;
+  const actorUser = await getUserById(actorId);
   const auditActor = {
     userId: actorId,
     role: actorRole ?? 'unknown',
@@ -43,24 +43,22 @@ export default defineEventHandler(async (event): Promise<OkResponse> => {
 
   if (body.role !== undefined) {
     await assignUserRole(userId, body.role);
-    if (actorRole !== Role.SuperAdmin) {
-      recordAuditLog({
-        severity: 'INFO',
-        timestamp: new Date().toISOString(),
-        requestId,
-        actor: auditActor,
-        action: 'user.role.assign',
-        metadata: { userId, role: body.role },
-      }).catch((err) =>
-        console.error(
-          JSON.stringify({
-            severity: 'ERROR',
-            message: 'Failed to write audit_log',
-            error: String(err),
-          }),
-        ),
-      );
-    }
+    recordAuditLog({
+      severity: 'INFO',
+      timestamp: new Date().toISOString(),
+      requestId,
+      actor: auditActor,
+      action: 'user.role.assign',
+      metadata: { userId, role: body.role },
+    }).catch((err) =>
+      console.error(
+        JSON.stringify({
+          severity: 'ERROR',
+          message: 'Failed to write audit_log',
+          error: String(err),
+        }),
+      ),
+    );
   }
 
   if (body.disabled !== undefined) {
@@ -68,24 +66,22 @@ export default defineEventHandler(async (event): Promise<OkResponse> => {
     if (body.disabled) {
       await revokeSessionsForUser(userId);
     }
-    if (actorRole !== Role.SuperAdmin) {
-      recordAuditLog({
-        severity: 'INFO',
-        timestamp: new Date().toISOString(),
-        requestId,
-        actor: auditActor,
-        action: 'user.status.update',
-        metadata: { userId, disabled: body.disabled },
-      }).catch((err) =>
-        console.error(
-          JSON.stringify({
-            severity: 'ERROR',
-            message: 'Failed to write audit_log',
-            error: String(err),
-          }),
-        ),
-      );
-    }
+    recordAuditLog({
+      severity: 'INFO',
+      timestamp: new Date().toISOString(),
+      requestId,
+      actor: auditActor,
+      action: 'user.status.update',
+      metadata: { userId, disabled: body.disabled },
+    }).catch((err) =>
+      console.error(
+        JSON.stringify({
+          severity: 'ERROR',
+          message: 'Failed to write audit_log',
+          error: String(err),
+        }),
+      ),
+    );
   }
 
   return { ok: true };

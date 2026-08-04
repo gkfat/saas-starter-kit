@@ -4,7 +4,7 @@ import { updateRolePermissions } from '../../modules/roles';
 import { requirePermission } from '../../shared/rbac';
 import type { AuthenticatedContext } from '../../shared/types/context';
 import { getUserById } from '~/modules/users';
-import { Permission, Role } from '@saas-starter-kit/shared';
+import { Permission } from '@saas-starter-kit/shared';
 import type { OkResponse } from '@saas-starter-kit/shared';
 
 const BodySchema = z.object({
@@ -21,30 +21,28 @@ export default defineEventHandler(async (event): Promise<OkResponse> => {
 
   await updateRolePermissions(roleName, permissions);
 
-  if (role !== Role.SuperAdmin) {
-    const actorUser = await getUserById(userId);
+  const actorUser = await getUserById(userId);
 
-    recordAuditLog({
-      severity: 'INFO',
-      timestamp: new Date().toISOString(),
-      requestId,
-      actor: {
-        userId,
-        role: role ?? 'unknown',
-        ...(actorUser?.username ? { username: actorUser.username } : {}),
-      },
-      action: 'role.permissions.update',
-      metadata: { roleName, permissions },
-    }).catch((err) =>
-      console.error(
-        JSON.stringify({
-          severity: 'ERROR',
-          message: 'Failed to write audit_log',
-          error: String(err),
-        }),
-      ),
-    );
-  }
+  recordAuditLog({
+    severity: 'INFO',
+    timestamp: new Date().toISOString(),
+    requestId,
+    actor: {
+      userId,
+      role: role ?? 'unknown',
+      ...(actorUser?.username ? { username: actorUser.username } : {}),
+    },
+    action: 'role.permissions.update',
+    metadata: { roleName, permissions },
+  }).catch((err) =>
+    console.error(
+      JSON.stringify({
+        severity: 'ERROR',
+        message: 'Failed to write audit_log',
+        error: String(err),
+      }),
+    ),
+  );
 
   return { ok: true };
 });

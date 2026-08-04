@@ -30,29 +30,27 @@ export default defineEventHandler(async (event): Promise<GenerateLineInviteRespo
   const config = useRuntimeConfig();
   const inviteLink = `${config.liffAppUrl}/invite?token=${token}`;
 
-  if (actorRole !== Role.SuperAdmin) {
-    const actorUser = await getUserById(actorId);
-    recordAuditLog({
-      severity: 'INFO',
-      timestamp: new Date().toISOString(),
-      requestId,
-      actor: {
-        userId: actorId,
-        role: actorRole ?? 'unknown',
-        ...(actorUser?.username ? { username: actorUser.username } : {}),
-      },
-      action: 'user.line_invite.generate',
-      metadata: { userId },
-    }).catch((err) =>
-      console.error(
-        JSON.stringify({
-          severity: 'ERROR',
-          message: 'Failed to write audit_log',
-          error: String(err),
-        }),
-      ),
-    );
-  }
+  const actorUser = await getUserById(actorId);
+  recordAuditLog({
+    severity: 'INFO',
+    timestamp: new Date().toISOString(),
+    requestId,
+    actor: {
+      userId: actorId,
+      role: actorRole ?? 'unknown',
+      ...(actorUser?.username ? { username: actorUser.username } : {}),
+    },
+    action: 'user.line_invite.generate',
+    metadata: { userId },
+  }).catch((err) =>
+    console.error(
+      JSON.stringify({
+        severity: 'ERROR',
+        message: 'Failed to write audit_log',
+        error: String(err),
+      }),
+    ),
+  );
 
   return { inviteLink };
 });

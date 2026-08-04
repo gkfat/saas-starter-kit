@@ -1,11 +1,4 @@
-const SENSITIVE_FIELD_NAMES = new Set([
-  'password',
-  'newpassword',
-  'idtoken',
-  'otp',
-  'token',
-  'refreshtoken',
-]);
+const SENSITIVE_FIELD_KEYWORDS = ['password', 'token', 'otp'];
 
 const MAX_BODY_LENGTH = 5000;
 
@@ -22,7 +15,8 @@ export function maskSensitiveFields(value: unknown): unknown {
   if (value !== null && typeof value === 'object') {
     const result: Record<string, unknown> = {};
     for (const [key, fieldValue] of Object.entries(value as Record<string, unknown>)) {
-      result[key] = SENSITIVE_FIELD_NAMES.has(key.toLowerCase())
+      const lowerKey = key.toLowerCase();
+      result[key] = SENSITIVE_FIELD_KEYWORDS.some((keyword) => lowerKey.includes(keyword))
         ? '***'
         : maskSensitiveFields(fieldValue);
     }

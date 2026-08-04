@@ -35,29 +35,27 @@ export default defineEventHandler(async (event): Promise<OkResponse> => {
   await deleteUserAccount(userId);
   await deleteUserRole(userId);
 
-  if (actorRole !== Role.SuperAdmin) {
-    const actorUser = await getUserById(actorId);
-    recordAuditLog({
-      severity: 'INFO',
-      timestamp: new Date().toISOString(),
-      requestId,
-      actor: {
-        userId: actorId,
-        role: actorRole ?? 'unknown',
-        ...(actorUser?.username ? { username: actorUser.username } : {}),
-      },
-      action: 'user.delete',
-      metadata: { userId },
-    }).catch((err) =>
-      console.error(
-        JSON.stringify({
-          severity: 'ERROR',
-          message: 'Failed to write audit_log',
-          error: String(err),
-        }),
-      ),
-    );
-  }
+  const actorUser = await getUserById(actorId);
+  recordAuditLog({
+    severity: 'INFO',
+    timestamp: new Date().toISOString(),
+    requestId,
+    actor: {
+      userId: actorId,
+      role: actorRole ?? 'unknown',
+      ...(actorUser?.username ? { username: actorUser.username } : {}),
+    },
+    action: 'user.delete',
+    metadata: { userId },
+  }).catch((err) =>
+    console.error(
+      JSON.stringify({
+        severity: 'ERROR',
+        message: 'Failed to write audit_log',
+        error: String(err),
+      }),
+    ),
+  );
 
   return { ok: true };
 });
