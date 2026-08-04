@@ -10,7 +10,7 @@
               {{ $t('home.hero.subtitle') }}
             </div>
             <div class="d-flex justify-center ga-3 flex-wrap">
-              <ButtonsAppButton kind="primary" size="large" class="text-none" to="/login">
+              <ButtonsAppButton kind="primary" size="large" class="text-none" :to="ROUTES.login">
                 {{ $t('home.hero.ctaPrimary') }}
               </ButtonsAppButton>
               <ButtonsAppButton kind="secondary" size="large" class="text-none" href="#explore">
@@ -233,8 +233,9 @@ import {
   MANDATORY_FEATURE_MODULES,
 } from '@saas-starter-kit/shared';
 import HomeCard from './components/HomeCard.vue';
+import { ROUTES } from '~/config/app-routes';
 
-definePageMeta({ path: '/home' });
+definePageMeta({ path: ROUTES.home });
 
 const { t } = useI18n();
 const { showSuccess, showError } = useToast();

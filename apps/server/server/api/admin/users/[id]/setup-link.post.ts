@@ -30,7 +30,8 @@ export default defineEventHandler(async (event): Promise<RegenerateSetupLinkResp
   }
 
   const setupToken = await generateSetupToken({ userId, firebaseUid: passwordAuth.firebaseUid });
-  const setupLink = `${getRequestURL(event).origin}/auth/set-password?token=${setupToken}`;
+  const { adminAppUrl } = useRuntimeConfig();
+  const setupLink = `${adminAppUrl}/auth/set-password?token=${setupToken}`;
 
   if (actorRole !== Role.SuperAdmin) {
     const actorUser = await getUserById(actorId);

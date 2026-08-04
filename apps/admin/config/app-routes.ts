@@ -1,5 +1,24 @@
 import { FeatureFlag, Permission } from '@saas-starter-kit/shared';
 
+export const ROUTES = {
+  root: '/',
+  home: '/home',
+  login: '/login',
+  register: '/register',
+  dashboard: '/dashboard',
+  profile: '/profile',
+  features: '/features',
+  pricing: '/pricing',
+  setPassword: '/auth/set-password',
+  lineCallback: '/auth/line-callback',
+  members: '/admin/members',
+  adminAccounts: '/admin/admin-accounts',
+  loginLogs: '/admin/logs/login',
+  auditLogs: '/admin/logs/audit',
+  iamRoles: '/iam/roles',
+  iamPermissions: '/iam/permissions',
+} as const;
+
 export type RouteItem = {
   title: string;
   icon: string;
@@ -20,19 +39,19 @@ export type RouteGroup = {
 export const APP_ROUTES: RouteGroup[] = [
   {
     items: [
-      { title: 'nav.home', icon: 'mdi-home-outline', path: '/home', public: true },
+      { title: 'nav.home', icon: 'mdi-home-outline', path: ROUTES.home, public: true },
       {
         title: 'nav.dashboard',
         icon: 'mdi-view-dashboard',
-        path: '/dashboard',
+        path: ROUTES.dashboard,
         exact: true,
         permission: Permission.Dashboard.Read,
-        redirectTo: '/profile',
+        redirectTo: ROUTES.profile,
       },
       {
         title: 'nav.profile',
         icon: 'mdi-account-circle',
-        path: '/profile',
+        path: ROUTES.profile,
         exact: true,
       },
     ],
@@ -43,19 +62,19 @@ export const APP_ROUTES: RouteGroup[] = [
       {
         title: 'nav.members',
         icon: 'mdi-account-multiple',
-        path: '/admin/members',
+        path: ROUTES.members,
         permission: Permission.Members.Read,
       },
       {
         title: 'nav.adminAccounts',
         icon: 'mdi-account-tie',
-        path: '/admin/admin-accounts',
+        path: ROUTES.adminAccounts,
         permission: Permission.AdminAccounts.Read,
       },
       {
         title: 'nav.loginLogs',
         icon: 'mdi-login',
-        path: '/admin/logs/login',
+        path: ROUTES.loginLogs,
         exact: true,
         permission: Permission.LoginLogs.Read,
         featureFlag: FeatureFlag.LoginLog,
@@ -63,7 +82,7 @@ export const APP_ROUTES: RouteGroup[] = [
       {
         title: 'nav.auditLogs',
         icon: 'mdi-history',
-        path: '/admin/logs/audit',
+        path: ROUTES.auditLogs,
         exact: true,
         permission: Permission.AuditLogs.Read,
         featureFlag: FeatureFlag.AuditLog,
@@ -76,13 +95,13 @@ export const APP_ROUTES: RouteGroup[] = [
       {
         title: 'nav.adminRoles',
         icon: 'mdi-shield-account',
-        path: '/iam/roles',
+        path: ROUTES.iamRoles,
         permission: Permission.Roles.Read,
       },
       {
         title: 'nav.permissions',
         icon: 'mdi-key-variant',
-        path: '/iam/permissions',
+        path: ROUTES.iamPermissions,
         permission: Permission.Permissions.Read,
       },
     ],

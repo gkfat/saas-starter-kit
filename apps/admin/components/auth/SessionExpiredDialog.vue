@@ -14,6 +14,8 @@
 </template>
 
 <script setup lang="ts">
+import { ROUTES } from '~/config/app-routes';
+
 const { isOpen, close } = useSessionExpiredDialog();
 const { logout } = useAuth();
 
@@ -24,6 +26,6 @@ async function confirm() {
   await logout();
   close();
   loggingOut.value = false;
-  await navigateTo('/login');
+  await navigateTo(ROUTES.login);
 }
 </script>

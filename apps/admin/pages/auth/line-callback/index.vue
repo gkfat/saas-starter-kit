@@ -7,8 +7,8 @@
           <AuthRegisterForm
             :id-token="quickRegister.idToken"
             provider="line"
-            @success="router.push('/dashboard')"
-            @cancel="router.push('/login')"
+            @success="router.push(ROUTES.dashboard)"
+            @cancel="router.push(ROUTES.login)"
           />
         </template>
         <template v-else>
@@ -22,7 +22,9 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ path: '/auth/line-callback' });
+import { ROUTES } from '~/config/app-routes';
+
+definePageMeta({ path: ROUTES.lineCallback });
 
 const route = useRoute();
 const router = useRouter();
@@ -41,23 +43,23 @@ onMounted(async () => {
 
   if (route.query.error || !code || !state || state !== expectedState) {
     showError(t('auth.error.lineStateMismatch'));
-    router.push('/login');
+    router.push(ROUTES.login);
     return;
   }
 
   try {
-    const redirectUri = `${window.location.origin}/auth/line-callback`;
+    const redirectUri = `${window.location.origin}${ROUTES.lineCallback}`;
     const result = await completeLineLogin(code, redirectUri);
 
     if (result.status === 'ready') {
-      router.push('/dashboard');
+      router.push(ROUTES.dashboard);
       return;
     }
 
     quickRegister.value = { displayName: result.displayName, idToken: result.idToken };
   } catch {
     showError(t('auth.error.lineLoginFailed'));
-    router.push('/login');
+    router.push(ROUTES.login);
   }
 });
 </script>

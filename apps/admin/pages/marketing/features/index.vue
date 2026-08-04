@@ -32,7 +32,9 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ path: '/features' });
+import { ROUTES } from '~/config/app-routes';
+
+definePageMeta({ path: ROUTES.features });
 
 const items = [
   {

@@ -58,8 +58,9 @@ import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import { z } from 'zod';
 import { isValidPassword } from '@saas-starter-kit/shared';
+import { ROUTES } from '~/config/app-routes';
 
-definePageMeta({ path: '/set-password' });
+definePageMeta({ path: ROUTES.setPassword });
 
 const route = useRoute();
 const router = useRouter();
@@ -99,7 +100,7 @@ const onSubmit = handleSubmit(async (values) => {
       body: { token: token.value, password: values.password },
     });
     showSuccess(t('auth.setPasswordSuccess'));
-    router.push('/login');
+    router.push(ROUTES.login);
   } catch {
     showError(t('auth.error.invalidSetupToken'));
   } finally {

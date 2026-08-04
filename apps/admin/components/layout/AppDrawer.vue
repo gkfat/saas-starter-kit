@@ -10,7 +10,7 @@
     <div
       class="d-flex align-center px-3 py-3"
       style="min-height: 64px; cursor: pointer"
-      @click="router.push('/')"
+      @click="router.push(ROUTES.root)"
     >
       <v-icon icon="mdi-fire" color="primary" size="24" class="flex-shrink-0" />
       <div v-if="!rail || mobile" class="ml-3 overflow-hidden">
@@ -87,7 +87,7 @@
         </ButtonsAppButton>
       </div>
       <div v-else class="pa-3">
-        <ButtonsAppButton kind="secondary" class="text-none" block to="/login">
+        <ButtonsAppButton kind="secondary" class="text-none" block :to="ROUTES.login">
           <v-icon>mdi-login</v-icon>
           <span v-if="!rail || mobile" class="ml-3">{{ $t('auth.login') }}</span>
         </ButtonsAppButton>
@@ -115,7 +115,7 @@
 import { useAuthStore } from '~/stores/auth';
 import { storeToRefs } from 'pinia';
 import { useDisplay } from 'vuetify';
-import { APP_ROUTES } from '~/config/app-routes';
+import { APP_ROUTES, ROUTES } from '~/config/app-routes';
 import type { RouteItem } from '~/config/app-routes';
 
 const open = defineModel<boolean>({ default: false });
@@ -174,7 +174,7 @@ async function handleLogout() {
   loading.value = true;
   try {
     await logout();
-    router.push('/login');
+    router.push(ROUTES.login);
   } finally {
     loading.value = false;
   }

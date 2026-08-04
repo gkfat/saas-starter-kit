@@ -28,7 +28,9 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({ path: '/pricing' });
+import { ROUTES } from '~/config/app-routes';
+
+definePageMeta({ path: ROUTES.pricing });
 
 const plans = [
   { key: 'free', featureCount: 3 },

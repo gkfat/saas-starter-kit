@@ -1,6 +1,7 @@
 import { getAuth, signOut } from 'firebase/auth';
 import { getClientApp } from '~/utils/firebase-client';
 import { useAuthStore } from '~/stores/auth';
+import { ROUTES } from '~/config/app-routes';
 
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig();
@@ -14,7 +15,7 @@ export default defineNuxtPlugin(() => {
       store.clearSession();
       if (import.meta.client) {
         await signOut(getAuth(getClientApp())).catch(() => {});
-        await navigateTo('/login');
+        await navigateTo(ROUTES.login);
       }
     },
   });

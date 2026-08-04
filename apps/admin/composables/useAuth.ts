@@ -12,6 +12,7 @@ import {
 } from 'firebase/auth';
 import { getClientApp } from '~/utils/firebase-client';
 import { useAuthStore } from '~/stores/auth';
+import { ROUTES } from '~/config/app-routes';
 import { toSyntheticEmail } from '@saas-starter-kit/shared';
 
 type GoogleLoginResult =
@@ -117,7 +118,7 @@ export function useAuth() {
   function loginWithLineRedirect(): void {
     const config = useRuntimeConfig();
     const state = crypto.randomUUID();
-    const redirectUri = `${window.location.origin}/auth/line-callback`;
+    const redirectUri = `${window.location.origin}${ROUTES.lineCallback}`;
     sessionStorage.setItem('line_oauth_state', state);
 
     const params = new URLSearchParams({
@@ -215,7 +216,7 @@ export function useAuth() {
 
     await signOut(auth);
     store.clearSession();
-    router.push('/login');
+    router.push(ROUTES.login);
   }
 
   async function unlinkGoogleProvider(): Promise<void> {
@@ -230,7 +231,7 @@ export function useAuth() {
     const auth = getFirebaseAuth();
     await signOut(auth);
     store.clearSession();
-    router.push('/login');
+    router.push(ROUTES.login);
   }
 
   async function generateLineBindCode(): Promise<{
@@ -272,7 +273,7 @@ export function useAuth() {
 
     await signOut(auth);
     store.clearSession();
-    router.push('/login');
+    router.push(ROUTES.login);
   }
 
   async function unlinkLineProvider(): Promise<void> {
@@ -287,7 +288,7 @@ export function useAuth() {
     const auth = getFirebaseAuth();
     await signOut(auth);
     store.clearSession();
-    router.push('/login');
+    router.push(ROUTES.login);
   }
 
   async function logout() {

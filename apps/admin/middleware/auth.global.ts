@@ -1,10 +1,15 @@
 import { useAuthStore } from '~/stores/auth';
 import { useFeatureFlags } from '~/composables/useFeatureFlags';
 import { usePermission } from '~/composables/usePermission';
-import { flattenRouteFeatureFlags, flattenRoutePermissions } from '~/config/app-routes';
+import { ROUTES, flattenRouteFeatureFlags, flattenRoutePermissions } from '~/config/app-routes';
 
-const PUBLIC_ROUTES = new Set(['/login', '/register', '/auth/set-password', '/auth/line-callback']);
-const PUBLIC_CONTENT_ROUTES = new Set(['/', '/home']);
+const PUBLIC_ROUTES = new Set<string>([
+  ROUTES.login,
+  ROUTES.register,
+  ROUTES.setPassword,
+  ROUTES.lineCallback,
+]);
+const PUBLIC_CONTENT_ROUTES = new Set<string>([ROUTES.root, ROUTES.home]);
 
 const PERMISSION_ROUTES = flattenRoutePermissions();
 const FEATURE_FLAG_ROUTES = flattenRouteFeatureFlags();
@@ -17,23 +22,23 @@ export default defineNuxtRouteMiddleware((to) => {
   if (PUBLIC_CONTENT_ROUTES.has(to.path)) return;
 
   if (PUBLIC_ROUTES.has(to.path)) {
-    if (auth.isLoggedIn) return navigateTo('/dashboard');
+    if (auth.isLoggedIn) return navigateTo(ROUTES.dashboard);
     return;
   }
 
   if (!auth.isLoggedIn) {
-    return navigateTo('/login');
+    return navigateTo(ROUTES.login);
   }
 
   const { hasPermission } = usePermission();
   const matched = PERMISSION_ROUTES.find((r) => to.path.startsWith(r.prefix));
   if (matched && !hasPermission(matched.permission)) {
-    return navigateTo(matched.redirectTo ?? '/dashboard');
+    return navigateTo(matched.redirectTo ?? ROUTES.dashboard);
   }
 
   const { isFeatureEnabled } = useFeatureFlags();
   const matchedFlag = FEATURE_FLAG_ROUTES.find((r) => to.path.startsWith(r.prefix));
   if (matchedFlag && !isFeatureEnabled(matchedFlag.featureFlag)) {
-    return navigateTo('/dashboard');
+    return navigateTo(ROUTES.dashboard);
   }
 });

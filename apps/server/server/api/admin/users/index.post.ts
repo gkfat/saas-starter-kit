@@ -58,7 +58,8 @@ export default defineEventHandler(async (event): Promise<CreateUserResponse> => 
   }
 
   const setupToken = await generateSetupToken({ userId: user.userId, firebaseUid });
-  const setupLink = `${getRequestURL(event).origin}/auth/set-password?token=${setupToken}`;
+  const { adminAppUrl } = useRuntimeConfig();
+  const setupLink = `${adminAppUrl}/auth/set-password?token=${setupToken}`;
 
   const actorUser = await getUserById(actorId);
   recordAuditLog({

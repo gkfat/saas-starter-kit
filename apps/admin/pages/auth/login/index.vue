@@ -6,7 +6,7 @@
           <v-card-title class="text-h5 mb-4">{{ $t('auth.createAccount') }}</v-card-title>
           <AuthRegisterForm
             :id-token="quickRegister.idToken"
-            @success="router.push('/dashboard')"
+            @success="router.push(ROUTES.dashboard)"
             @cancel="quickRegister = null"
           />
         </template>
@@ -14,7 +14,7 @@
         <template v-else>
           <v-card-title class="text-h5 mb-4">{{ $t('auth.login') }}</v-card-title>
 
-          <LoginForm @success="router.push('/dashboard')" />
+          <LoginForm @success="router.push(ROUTES.dashboard)" />
 
           <v-divider class="my-6">{{ $t('common.or') }}</v-divider>
 
@@ -43,7 +43,7 @@
 
           <div class="text-center text-body-2 mt-6">
             {{ $t('auth.noAccount') }}
-            <NuxtLink to="/register">{{ $t('auth.registerLink') }}</NuxtLink>
+            <NuxtLink :to="ROUTES.register">{{ $t('auth.registerLink') }}</NuxtLink>
           </div>
         </template>
       </CardsAppCard>
@@ -53,8 +53,9 @@
 
 <script setup lang="ts">
 import LoginForm from './components/LoginForm.vue';
+import { ROUTES } from '~/config/app-routes';
 
-definePageMeta({ path: '/login' });
+definePageMeta({ path: ROUTES.login });
 
 const { loginWithGoogle, loginWithLineRedirect, getLoginErrorMessage } = useAuth();
 const { showError } = useToast();
@@ -71,7 +72,7 @@ async function handleGoogleLogin() {
   try {
     const result = await loginWithGoogle();
     if (result.status === 'ready') {
-      router.push('/dashboard');
+      router.push(ROUTES.dashboard);
     } else {
       quickRegister.value = {
         displayName: result.displayName,
