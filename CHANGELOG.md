@@ -38,6 +38,7 @@
 - 實作驗證過期 dialog 與登出機制
 - 新增 Liff infra
 - 實作 Liff & 後台串接 Line 登入，新增變更密碼功能
+- 實作 API tracing log
 
 ### Changed
 
