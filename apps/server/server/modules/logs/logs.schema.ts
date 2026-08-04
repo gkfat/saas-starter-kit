@@ -15,7 +15,7 @@ export const BaseLogSchema = z.object({
 
 export const LoginLogSchema = BaseLogSchema.extend({
   type: z.literal('login'),
-  provider: z.enum(['password', 'google', 'phone']),
+  provider: z.enum(['password', 'google', 'phone', 'line']),
   ip: z.string(),
   result: z.enum(['success', 'failure']),
   email: z.string().optional(),

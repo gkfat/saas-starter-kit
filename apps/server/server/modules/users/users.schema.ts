@@ -11,12 +11,11 @@ export const CreateUserByAdminDto = z.object({
 export type CreateUserByAdminDto = z.infer<typeof CreateUserByAdminDto>;
 
 export const UserSchema = z.object({
-  uid: z.string(),
+  userId: z.string(),
   username: z.string(),
   displayName: z.string(),
   email: z.string().email().nullable(),
   phone: z.string().nullable(),
-  providers: z.array(z.string()),
   passwordSetupPending: z.boolean(),
   lastLoginAt: z.string().nullable(),
   createdAt: z.string(),

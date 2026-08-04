@@ -8,12 +8,14 @@ function tokenRef(token: string) {
 
 export async function createSetupToken(data: {
   token: string;
-  uid: string;
+  userId: string;
+  firebaseUid: string;
   expiresAt: string;
 }): Promise<void> {
   await tokenRef(data.token).set({
     token: data.token,
-    uid: data.uid,
+    userId: data.userId,
+    firebaseUid: data.firebaseUid,
     expiresAt: data.expiresAt,
     used: false,
     createdAt: new Date().toISOString(),

@@ -5,7 +5,7 @@ loadEnv({ path: resolve(import.meta.dirname, '../../.env') });
 
 export default defineNuxtConfig({
   ssr: false,
-  compatibilityDate: '2024-04-03',
+  compatibilityDate: '2026-07-31',
 
   devServer: {
     port: Number(process.env.ADMIN_PORT) || 3005,
@@ -50,7 +50,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
-      apiBaseUrl: process.env.API_BASE_URL ?? 'http://localhost:3000',
+      apiBaseUrl: process.env.ADMIN_API_BASE_URL ?? 'http://localhost:3000',
       appVersion: process.env.APP_VERSION ?? '0.0.0',
       firebaseApiKey: process.env.VITE_FIREBASE_API_KEY,
       firebaseAuthDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -58,6 +58,7 @@ export default defineNuxtConfig({
       firebaseStorageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
       firebaseMessagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
       firebaseAppId: process.env.VITE_FIREBASE_APP_ID,
+      lineChannelId: process.env.LINE_CHANNEL_ID ?? '',
       featureFlags: {
         auditLog: process.env.FEATURE_AUDIT_LOG_ENABLED !== 'false',
         loginLog: process.env.FEATURE_LOGIN_LOG_ENABLED !== 'false',

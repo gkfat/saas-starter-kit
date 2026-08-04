@@ -1,9 +1,9 @@
 import { adminAuth } from '~/shared/firebase-admin';
-import { hashPassword } from '~/shared/crypto';
-import { RegisterDto } from '~/modules/auth';
-import { registerUser } from '~/modules/users';
+import { RegisterDto, verifyRawIdToken } from '~/modules/auth';
+import { registerUserWithProvider } from '~/modules/users';
+import type { OkResponse } from '@saas-starter-kit/shared';
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async (event): Promise<OkResponse> => {
   const body = await readBody(event);
   const parsed = RegisterDto.safeParse(body);
 
@@ -14,31 +14,28 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const { username, password, email, phone } = parsed.data;
+  const { idToken, username, email, phone } = parsed.data;
 
-  let uid: string;
+  let identity: Awaited<ReturnType<typeof verifyRawIdToken>>;
   try {
-    const created = await adminAuth().createUser({ displayName: username });
-    uid = created.uid;
+    identity = await verifyRawIdToken(idToken);
   } catch {
-    throw createError({ statusCode: 500, message: '建立帳號失敗' });
+    throw createError({ statusCode: 401, message: 'Invalid ID token' });
   }
 
-  const passwordHash = await hashPassword(password);
-
   try {
-    await registerUser({
-      uid,
+    await registerUserWithProvider({
       username,
       displayName: username,
       email: email ?? null,
       phone: phone ?? null,
-      providers: ['password'],
-      passwordHash,
+      providerType: 'password',
+      providerUserId: username,
+      firebaseUid: identity.firebaseUid,
     });
   } catch (err: unknown) {
     await adminAuth()
-      .deleteUser(uid)
+      .deleteUser(identity.firebaseUid)
       .catch(() => {});
     const code = (err as { code?: string }).code;
     if (code === 'username-taken') {
@@ -47,5 +44,5 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, message: '建立帳號失敗' });
   }
 
-  return { uid };
+  return { ok: true };
 });

@@ -1,9 +1,9 @@
 <template>
   <v-dialog :model-value="modelValue" max-width="480" persistent @update:model-value="close">
     <CardsDialogCard>
-      <v-card-title class="pa-4">{{ $t('users.setupLinkTitle') }}</v-card-title>
+      <v-card-title class="pa-4">{{ title ?? $t('users.setupLinkTitle') }}</v-card-title>
       <v-card-text>
-        <p class="text-body-2 mb-3">{{ $t('users.setupLinkHint') }}</p>
+        <p class="text-body-2 mb-3">{{ hint ?? $t('users.setupLinkHint') }}</p>
         <v-text-field :model-value="link" readonly density="compact" />
       </v-card-text>
       <v-card-actions class="pa-4">
@@ -23,6 +23,8 @@
 const props = defineProps<{
   modelValue: boolean;
   link: string | null;
+  title?: string;
+  hint?: string;
 }>();
 
 const emit = defineEmits<{

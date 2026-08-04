@@ -1,6 +1,7 @@
 import { recordAuditLog } from '~/modules/logs';
 import { generateSetupToken } from '~/modules/password-setup';
-import { getUserByUid } from '~/modules/users';
+import { getUserById } from '~/modules/users';
+import { findUserAuthRecord } from '~/modules/identity';
 import { getRoleForUser } from '~/modules/roles';
 import { requirePermission } from '~/shared/rbac';
 import type { AuthenticatedContext } from '~/shared/types/context';
@@ -18,16 +19,21 @@ export default defineEventHandler(async (event): Promise<RegenerateSetupLinkResp
     targetRole === Role.Member ? Permission.Members.Write : Permission.AdminAccounts.Write,
   );
 
-  const targetUser = await getUserByUid(userId);
+  const targetUser = await getUserById(userId);
   if (!targetUser || !targetUser.passwordSetupPending) {
     throw createError({ statusCode: 400, message: '此使用者已設定密碼，無需重新產生連結' });
   }
 
-  const setupToken = await generateSetupToken(userId);
+  const passwordAuth = await findUserAuthRecord('password', targetUser.username);
+  if (!passwordAuth) {
+    throw createError({ statusCode: 500, message: '找不到對應的登入資料' });
+  }
+
+  const setupToken = await generateSetupToken({ userId, firebaseUid: passwordAuth.firebaseUid });
   const setupLink = `${getRequestURL(event).origin}/auth/set-password?token=${setupToken}`;
 
   if (actorRole !== Role.SuperAdmin) {
-    const actorUser = await getUserByUid(actorId);
+    const actorUser = await getUserById(actorId);
     recordAuditLog({
       severity: 'INFO',
       timestamp: new Date().toISOString(),

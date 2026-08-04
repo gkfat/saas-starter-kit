@@ -1,7 +1,7 @@
-import { adminAuth } from '~/shared/firebase-admin';
 import { recordAuditLog } from '~/modules/logs';
 import { deleteUserRole, getRoleForUser } from '~/modules/roles';
-import { deleteUserAccount, getUserByUid } from '~/modules/users';
+import { deleteUserAccount, getUserById } from '~/modules/users';
+import { getAccountStatus } from '~/modules/identity';
 import { requirePermission } from '~/shared/rbac';
 import type { AuthenticatedContext } from '~/shared/types/context';
 import { Permission, Role } from '@saas-starter-kit/shared';
@@ -22,22 +22,21 @@ export default defineEventHandler(async (event): Promise<OkResponse> => {
     throw createError({ statusCode: 400, message: '無法刪除自己的帳號' });
   }
 
-  let disabled: boolean;
-  try {
-    disabled = (await adminAuth().getUser(userId)).disabled;
-  } catch {
+  const target = await getUserById(userId);
+  if (!target) {
     throw createError({ statusCode: 404, message: '使用者不存在' });
   }
+
+  const { disabled } = await getAccountStatus(userId);
   if (!disabled) {
     throw createError({ statusCode: 400, message: '僅能刪除已停用的使用者' });
   }
 
-  await adminAuth().deleteUser(userId);
   await deleteUserAccount(userId);
   await deleteUserRole(userId);
 
   if (actorRole !== Role.SuperAdmin) {
-    const actorUser = await getUserByUid(actorId);
+    const actorUser = await getUserById(actorId);
     recordAuditLog({
       severity: 'INFO',
       timestamp: new Date().toISOString(),

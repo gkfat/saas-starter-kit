@@ -1,30 +1,30 @@
 import {
   GoogleAuthProvider,
   RecaptchaVerifier,
+  createUserWithEmailAndPassword,
   getAuth,
   linkWithPhoneNumber,
-  linkWithPopup,
-  onIdTokenChanged,
   signInWithCustomToken,
+  signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
-  unlink,
   type ConfirmationResult,
 } from 'firebase/auth';
 import { getClientApp } from '~/utils/firebase-client';
 import { useAuthStore } from '~/stores/auth';
+import { toSyntheticEmail } from '@saas-starter-kit/shared';
 
 type GoogleLoginResult =
   | { status: 'ready' }
   | { status: 'quick-register'; googleEmail: string; displayName: string | null; idToken: string };
 
-// linkWithPopup 內部的「popup 是否被手動關閉」偵測與實際 OAuth 回呼是非同步競態關係：
-// 即使 promise 已回報 popup-closed-by-user，Firebase SDK 仍可能稍後才把 auth.currentUser
-// 換成彈窗中選擇的 Google 帳號。這裡等待一段緩衝時間，讓該非同步事件有機會浮現後再檢查身份是否被置換。
-const LINK_SESSION_CHECK_DELAY_MS = 500;
+type LineLoginResult =
+  | { status: 'ready' }
+  | { status: 'quick-register'; displayName: string | null; idToken: string };
 
 export function useAuth() {
   const store = useAuthStore();
+  const router = useRouter();
   const { t } = useI18n();
   const { $api } = useNuxtApp();
   let recaptchaVerifier: RecaptchaVerifier | null = null;
@@ -53,20 +53,28 @@ export function useAuth() {
     email?: string,
     phone?: string,
   ): Promise<void> {
-    await $api('/api/auth/register', {
-      method: 'POST',
-      body: { username, password, email, phone },
-    });
+    const auth = getFirebaseAuth();
+    const credential = await createUserWithEmailAndPassword(
+      auth,
+      toSyntheticEmail(username),
+      password,
+    );
+    const idToken = await credential.user.getIdToken();
+    try {
+      await $api('/api/auth/register', {
+        method: 'POST',
+        body: { idToken, username, email, phone },
+      });
+    } finally {
+      await signOut(auth);
+    }
   }
 
-  async function login(identifier: string, password: string): Promise<void> {
+  async function login(username: string, password: string): Promise<void> {
     const auth = getFirebaseAuth();
-    const { customToken, ...userData } = await $api<
-      { customToken: string } & Parameters<typeof store.rehydrate>[0]
-    >('/api/auth/login', { method: 'POST', body: { provider: 'password', identifier, password } });
-    const credential = await signInWithCustomToken(auth, customToken);
+    const credential = await signInWithEmailAndPassword(auth, toSyntheticEmail(username), password);
     const idToken = await credential.user.getIdToken();
-    store.rehydrate(userData, idToken);
+    await store.setSession(idToken, 'password');
   }
 
   async function loginWithGoogle(): Promise<GoogleLoginResult> {
@@ -100,6 +108,60 @@ export function useAuth() {
       body: { username, idToken },
     });
     await store.setSession(idToken, 'google');
+  }
+
+  /**
+   * Admin 是一般瀏覽器頁面（非 LIFF app-embedded），無法用 liff.getIDToken()，改導向
+   * LINE Login Web OAuth 的 authorize 頁面；state 存 sessionStorage 供 callback 頁比對防 CSRF。
+   */
+  function loginWithLineRedirect(): void {
+    const config = useRuntimeConfig();
+    const state = crypto.randomUUID();
+    const redirectUri = `${window.location.origin}/auth/line-callback`;
+    sessionStorage.setItem('line_oauth_state', state);
+
+    const params = new URLSearchParams({
+      response_type: 'code',
+      client_id: config.public.lineChannelId,
+      redirect_uri: redirectUri,
+      state,
+      scope: 'openid profile email',
+    });
+    window.location.href = `https://access.line.me/oauth2/v2.1/authorize?${params.toString()}`;
+  }
+
+  async function completeLineLogin(code: string, redirectUri: string): Promise<LineLoginResult> {
+    const result = await $api<{
+      status: string;
+      customToken?: string;
+      displayName?: string | null;
+      idToken?: string;
+    }>('/api/auth/line-callback', { method: 'POST', body: { code, redirectUri } });
+
+    if (result.status === 'ready') {
+      const auth = getFirebaseAuth();
+      const credential = await signInWithCustomToken(auth, result.customToken as string);
+      const idToken = await credential.user.getIdToken();
+      await store.setSession(idToken, 'line');
+      return { status: 'ready' };
+    }
+
+    return {
+      status: 'quick-register',
+      displayName: result.displayName ?? null,
+      idToken: result.idToken as string,
+    };
+  }
+
+  async function lineRegister(username: string, idToken: string): Promise<void> {
+    const result = await $api<{ customToken: string }>('/api/auth/line-register', {
+      method: 'POST',
+      body: { username, idToken },
+    });
+    const auth = getFirebaseAuth();
+    const credential = await signInWithCustomToken(auth, result.customToken);
+    const freshIdToken = await credential.user.getIdToken();
+    await store.setSession(freshIdToken, 'line');
   }
 
   async function sendPhoneLinkOtp(
@@ -138,67 +200,94 @@ export function useAuth() {
   }
 
   async function linkGoogleProvider(): Promise<void> {
+    const ownerIdToken = store.idToken;
+    if (!ownerIdToken) throw new Error('Must be logged in to link Google');
+
     const auth = getFirebaseAuth();
-    const currentUser = auth.currentUser;
-    if (!currentUser) throw new Error('Must be logged in to link Google');
-
-    const originalUid = currentUser.uid;
-    let sessionSwapped = false;
-    const unsubscribe = onIdTokenChanged(auth, (user) => {
-      if (user && user.uid !== originalUid) sessionSwapped = true;
-    });
-
-    let linkError: unknown = null;
-    try {
-      await linkWithPopup(currentUser, new GoogleAuthProvider());
-    } catch (e) {
-      linkError = e;
-    }
-
-    await new Promise((resolve) => setTimeout(resolve, LINK_SESSION_CHECK_DELAY_MS));
-    unsubscribe();
-
-    if (sessionSwapped || auth.currentUser?.uid !== originalUid) {
-      await signOut(auth);
-      store.clearSession();
-      throw new Error('auth/session-integrity-check-failed');
-    }
-
-    if (linkError) throw linkError;
-
-    const freshToken = await currentUser.getIdToken(true);
-    store.updateIdToken(freshToken);
+    const googleCredential = await signInWithPopup(auth, new GoogleAuthProvider());
+    const googleIdToken = await googleCredential.user.getIdToken();
 
     await $api('/api/profile/google-provider', {
       method: 'PATCH',
-      headers: { Authorization: `Bearer ${freshToken}` },
+      body: { idToken: googleIdToken },
+      headers: { Authorization: `Bearer ${ownerIdToken}` },
     });
 
-    const user = await $api('/api/auth/me', {
-      headers: { Authorization: `Bearer ${freshToken}` },
-    });
-    store.rehydrate(user as Parameters<typeof store.rehydrate>[0], freshToken);
+    await signOut(auth);
+    store.clearSession();
+    router.push('/login');
   }
 
   async function unlinkGoogleProvider(): Promise<void> {
-    const auth = getFirebaseAuth();
-    const currentUser = auth.currentUser;
-    if (!currentUser) throw new Error('Must be logged in to unlink Google');
-
-    await unlink(currentUser, GoogleAuthProvider.PROVIDER_ID);
-
-    const freshToken = await currentUser.getIdToken(true);
-    store.updateIdToken(freshToken);
+    const ownerIdToken = store.idToken;
+    if (!ownerIdToken) throw new Error('Must be logged in to unlink Google');
 
     await $api('/api/profile/google-provider', {
       method: 'DELETE',
-      headers: { Authorization: `Bearer ${freshToken}` },
+      headers: { Authorization: `Bearer ${ownerIdToken}` },
     });
 
-    const user = await $api('/api/auth/me', {
-      headers: { Authorization: `Bearer ${freshToken}` },
+    const auth = getFirebaseAuth();
+    await signOut(auth);
+    store.clearSession();
+    router.push('/login');
+  }
+
+  async function generateLineBindCode(): Promise<{
+    code: string;
+    expiresInSeconds: number;
+    liffUrl: string | null;
+  }> {
+    const ownerIdToken = store.idToken;
+    if (!ownerIdToken) throw new Error('Must be logged in to bind LINE');
+
+    return $api('/api/profile/line-bind-code', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${ownerIdToken}` },
     });
-    store.rehydrate(user as Parameters<typeof store.rehydrate>[0], freshToken);
+  }
+
+  async function changePassword(newPassword: string, currentPassword?: string): Promise<void> {
+    const ownerIdToken = store.idToken;
+    if (!ownerIdToken) throw new Error('Must be logged in to change password');
+
+    const auth = getFirebaseAuth();
+    const body: { newPassword: string; currentIdToken?: string } = { newPassword };
+
+    if (store.user?.providers.includes('password')) {
+      if (!currentPassword) throw new Error('Current password is required');
+      const credential = await signInWithEmailAndPassword(
+        auth,
+        toSyntheticEmail(store.user.username ?? ''),
+        currentPassword,
+      );
+      body.currentIdToken = await credential.user.getIdToken();
+    }
+
+    await $api('/api/profile/password', {
+      method: 'PATCH',
+      body,
+      headers: { Authorization: `Bearer ${ownerIdToken}` },
+    });
+
+    await signOut(auth);
+    store.clearSession();
+    router.push('/login');
+  }
+
+  async function unlinkLineProvider(): Promise<void> {
+    const ownerIdToken = store.idToken;
+    if (!ownerIdToken) throw new Error('Must be logged in to unlink LINE');
+
+    await $api('/api/profile/line-provider', {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${ownerIdToken}` },
+    });
+
+    const auth = getFirebaseAuth();
+    await signOut(auth);
+    store.clearSession();
+    router.push('/login');
   }
 
   async function logout() {
@@ -223,10 +312,16 @@ export function useAuth() {
     login,
     loginWithGoogle,
     googleRegister,
+    loginWithLineRedirect,
+    completeLineLogin,
+    lineRegister,
     sendPhoneLinkOtp,
     confirmPhoneLinkOtp,
     linkGoogleProvider,
     unlinkGoogleProvider,
+    changePassword,
+    generateLineBindCode,
+    unlinkLineProvider,
     logout,
     getLoginErrorMessage,
   };

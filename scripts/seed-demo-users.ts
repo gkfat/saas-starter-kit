@@ -1,10 +1,10 @@
+import { randomUUID } from 'crypto';
 import { cert, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import 'dotenv/config';
 import { prefixCollection } from '../apps/server/server/shared/firestore-prefix';
-import { hashPassword } from '../apps/server/server/shared/crypto';
-import { Role } from '@saas-starter-kit/shared';
+import { Role, toSyntheticEmail } from '@saas-starter-kit/shared';
 
 const app = initializeApp({
   credential: cert({
@@ -36,47 +36,54 @@ const DEMO_USERS = [
   },
 ];
 
-async function upsertDemoUser(user: (typeof DEMO_USERS)[number]) {
+async function upsertDemoUser(demo: (typeof DEMO_USERS)[number]) {
   const usersCol = prefixCollection('users');
+  const userAuthCol = prefixCollection('user_auth');
+  const authDocId = `password_${demo.username}`;
 
-  // Check if Firestore doc with this username already exists
-  const existing = await db
-    .collection(usersCol)
-    .where('username', '==', user.username)
-    .limit(1)
-    .get();
-
-  let uid: string;
-
-  if (!existing.empty) {
-    uid = existing.docs[0].data().uid as string;
-    console.log(`[SKIP] Firestore user already exists: ${user.username} (uid: ${uid})`);
-  } else {
-    const created = await auth.createUser({ displayName: user.displayName });
-    uid = created.uid;
-    console.log(`[OK] Auth user created: ${user.username} (uid: ${uid})`);
+  const existingAuth = await db.doc(`${userAuthCol}/${authDocId}`).get();
+  if (existingAuth.exists) {
+    console.log(`[SKIP] Demo user already exists: ${demo.username}`);
+    return;
   }
 
-  const passwordHash = await hashPassword(user.password);
+  const firebaseUser = await auth.createUser({
+    email: toSyntheticEmail(demo.username),
+    password: demo.password,
+    emailVerified: true,
+    displayName: demo.displayName,
+  });
+
+  const userId = randomUUID();
   const batch = db.batch();
 
-  batch.set(db.doc(`${usersCol}/${uid}`), {
-    uid,
-    username: user.username,
-    displayName: user.displayName,
-    email: user.email,
-    phone: user.phone,
-    providers: ['password'],
-    passwordHash,
+  batch.set(db.doc(`${usersCol}/${userId}`), {
+    userId,
+    username: demo.username,
+    displayName: demo.displayName,
+    email: demo.email,
+    phone: demo.phone,
+    passwordSetupPending: false,
+    lastLoginAt: null,
     createdAt: new Date().toISOString(),
   });
 
-  batch.set(db.doc(`${prefixCollection('user_roles')}/${uid}`), {
-    role: user.role,
+  batch.set(db.doc(`${userAuthCol}/${authDocId}`), {
+    userId,
+    providerType: 'password',
+    providerUserId: demo.username,
+    firebaseUid: firebaseUser.uid,
+    createdAt: new Date().toISOString(),
+  });
+
+  batch.set(db.doc(`${prefixCollection('user_roles')}/${userId}`), {
+    role: demo.role,
   });
 
   await batch.commit();
-  console.log(`[OK] Firestore upserted: ${user.username} → role: ${user.role}`);
+  await auth.setCustomUserClaims(firebaseUser.uid, { userId });
+
+  console.log(`[OK] Demo user created: ${demo.username} (userId: ${userId}) → role: ${demo.role}`);
 }
 
 (async () => {

@@ -3,7 +3,7 @@ import { recordAuditLog } from '../../modules/logs';
 import { updateRolePermissions } from '../../modules/roles';
 import { requirePermission } from '../../shared/rbac';
 import type { AuthenticatedContext } from '../../shared/types/context';
-import { getUserByUid } from '~/modules/users';
+import { getUserById } from '~/modules/users';
 import { Permission, Role } from '@saas-starter-kit/shared';
 import type { OkResponse } from '@saas-starter-kit/shared';
 
@@ -22,7 +22,7 @@ export default defineEventHandler(async (event): Promise<OkResponse> => {
   await updateRolePermissions(roleName, permissions);
 
   if (role !== Role.SuperAdmin) {
-    const actorUser = await getUserByUid(userId);
+    const actorUser = await getUserById(userId);
 
     recordAuditLog({
       severity: 'INFO',

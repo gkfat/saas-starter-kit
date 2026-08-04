@@ -3,11 +3,11 @@
     <v-row no-gutters class="ga-3 flex-column">
       <v-col>
         <v-text-field
-          v-model="identifier"
-          v-bind="identifierAttrs"
-          :label="$t('auth.identifier')"
+          v-model="username"
+          v-bind="usernameAttrs"
+          :label="$t('auth.username')"
           type="text"
-          :error-messages="errors.identifier"
+          :error-messages="errors.username"
           :disabled="loading"
           hide-details="auto"
         />
@@ -56,23 +56,23 @@ const loading = ref(false);
 
 const validationSchema = toTypedSchema(
   z.object({
-    identifier: z.string().min(1, t('common.required')),
+    username: z.string().min(1, t('common.required')),
     password: z.string().min(1, t('common.required')),
   }),
 );
 
 const { defineField, errors, meta, handleSubmit } = useForm({
   validationSchema,
-  initialValues: { identifier: '', password: '' },
+  initialValues: { username: '', password: '' },
 });
 
-const [identifier, identifierAttrs] = defineField('identifier');
+const [username, usernameAttrs] = defineField('username');
 const [password, passwordAttrs] = defineField('password');
 
 const onSubmit = handleSubmit(async (values) => {
   loading.value = true;
   try {
-    await login(values.identifier, values.password);
+    await login(values.username, values.password);
     emit('success');
   } catch (e: unknown) {
     const statusCode = (e as { data?: { statusCode?: number } }).data?.statusCode;

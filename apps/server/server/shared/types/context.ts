@@ -1,6 +1,7 @@
 export type RequestContext = {
   requestId: string;
   userId?: string;
+  firebaseUid?: string;
   role?: string;
   permissions?: string[];
   phone?: string;

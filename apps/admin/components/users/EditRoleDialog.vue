@@ -93,7 +93,7 @@ function close() {
 async function save() {
   if (!props.user) return;
   saving.value = true;
-  const result = await apiFetch<OkResponse>(`/api/admin/users/${props.user.uid}`, {
+  const result = await apiFetch<OkResponse>(`/api/admin/users/${props.user.userId}`, {
     method: 'PATCH',
     body: { role: selectedRole.value },
   });

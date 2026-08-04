@@ -25,29 +25,13 @@ export default defineEventHandler(async (event) => {
     return;
   }
 
-  // /api/auth/login — only password flow is rate-limited (google/phone bypass)
-  const body = await readBody<{ provider?: string; identifier?: string }>(event);
-  if (body?.provider !== 'password') {
-    return;
-  }
-
-  const identifier = body.identifier ?? '';
-  const loginContext = { ...context, username: identifier };
-
-  const ipResult = await checkAndConsume(`login:ip:${ip}`, RATE_LIMIT_POLICIES.login, loginContext);
-  if (!ipResult.allowed) {
-    throw createError({
-      statusCode: 429,
-      message: 'Too many login attempts, please try again later',
-    });
-  }
-
-  const accountResult = await checkAndConsume(
-    `login:account:${identifier}`,
-    RATE_LIMIT_POLICIES.login,
-    loginContext,
-  );
-  if (!accountResult.allowed) {
+  // /api/auth/login — IP dimension only, for every provider. Credential verification now
+  // happens client-side via Firebase (signInWithEmailAndPassword / Google popup / LINE
+  // Login) before this endpoint is ever called with a valid idToken, so a failed attempt
+  // here no longer carries an identifier we can key an account-level lockout on. This IP
+  // limit guards against generic abuse (e.g. spamming forged/garbage idTokens).
+  const result = await checkAndConsume(`login:ip:${ip}`, RATE_LIMIT_POLICIES.login, context);
+  if (!result.allowed) {
     throw createError({
       statusCode: 429,
       message: 'Too many login attempts, please try again later',

@@ -1,5 +1,5 @@
 export type UserRow = {
-  uid: string;
+  userId: string;
   username: string;
   email: string | null;
   displayName: string;

@@ -20,6 +20,7 @@
       @edit="openEdit"
       @toggle-status="openToggleStatus"
       @regenerate-link="regenerateLink"
+      @generate-line-invite="generateLineInvite"
       @delete="openDelete"
     />
 
@@ -40,6 +41,13 @@
 
     <SetupLinkDialog v-model="linkDialog" :link="linkDialogValue" />
 
+    <SetupLinkDialog
+      v-model="lineInviteDialog"
+      :link="lineInviteDialogValue"
+      :title="t('users.lineInviteLinkTitle')"
+      :hint="t('users.lineInviteLinkHint')"
+    />
+
     <ToggleStatusDialog v-model="statusDialog" :user="statusTarget" @confirmed="refresh" />
 
     <DeleteUserDialog v-model="deleteDialog" :user="deleteTarget" @confirmed="refresh" />
@@ -48,7 +56,11 @@
 
 <script setup lang="ts">
 import { Permission } from '@saas-starter-kit/shared';
-import type { UserRow, RegenerateSetupLinkResponse } from '@saas-starter-kit/shared';
+import type {
+  UserRow,
+  RegenerateSetupLinkResponse,
+  GenerateLineInviteResponse,
+} from '@saas-starter-kit/shared';
 import CreateUserDialog from '~/components/users/CreateUserDialog.vue';
 import DeleteUserDialog from '~/components/users/DeleteUserDialog.vue';
 import EditRoleDialog from '~/components/users/EditRoleDialog.vue';
@@ -75,6 +87,10 @@ const queryParams = computed(() => ({
 
 function applyFilters({ search }: { search: string }) {
   appliedSearch.value = search;
+  // queryParams may be unchanged from its previous value (e.g. re-applying the same
+  // search, or clicking 搜尋 after a no-op edit) — useFetch's reactive watch only
+  // refetches on an actual change, so force it explicitly to keep the button always live.
+  refresh();
 }
 
 const [{ data: users, pending, refresh }, { data: roles }, { data: rolePermissions }] =
@@ -115,12 +131,26 @@ function onUserCreated(setupLink: string) {
 
 async function regenerateLink(item: UserRow) {
   const result = await apiFetch<RegenerateSetupLinkResponse>(
-    `/api/admin/users/${item.uid}/setup-link`,
+    `/api/admin/users/${item.userId}/setup-link`,
     { method: 'POST' },
   );
   if (result) {
     linkDialogValue.value = result.setupLink;
     linkDialog.value = true;
+  }
+}
+
+const lineInviteDialog = ref(false);
+const lineInviteDialogValue = ref<string | null>(null);
+
+async function generateLineInvite(item: UserRow) {
+  const result = await apiFetch<GenerateLineInviteResponse>(
+    `/api/admin/users/${item.userId}/line-invite`,
+    { method: 'POST' },
+  );
+  if (result) {
+    lineInviteDialogValue.value = result.inviteLink;
+    lineInviteDialog.value = true;
   }
 }
 
@@ -147,12 +177,12 @@ function toCsvCell(value: string | null | undefined): string {
 
 function exportCsv() {
   const rows = users.value ?? [];
-  const header = ['uid', 'username', 'email', 'displayName', 'role', 'createdAt'];
+  const header = ['userId', 'username', 'email', 'displayName', 'role', 'createdAt'];
   const lines = [
     header.join(','),
     ...rows.map((u) =>
       [
-        toCsvCell(u.uid),
+        toCsvCell(u.userId),
         toCsvCell(u.username),
         toCsvCell(u.email),
         toCsvCell(u.displayName),

@@ -1,11 +1,10 @@
 import { z } from 'zod';
 import { recordAuditLog } from '~/modules/logs';
 import { assignUserRole, getRoleForUser } from '~/modules/roles';
-import { revokeRefreshTokens } from '~/modules/auth';
+import { setAccountDisabled, revokeSessionsForUser } from '~/modules/identity';
 import { requirePermission } from '~/shared/rbac';
-import { adminAuth } from '~/shared/firebase-admin';
 import type { AuthenticatedContext } from '~/shared/types/context';
-import { getUserByUid } from '~/modules/users';
+import { getUserById } from '~/modules/users';
 import { Permission, Role } from '@saas-starter-kit/shared';
 import type { OkResponse } from '@saas-starter-kit/shared';
 
@@ -35,7 +34,7 @@ export default defineEventHandler(async (event): Promise<OkResponse> => {
     throw createError({ statusCode: 400, message: '無法停用自己的帳號' });
   }
 
-  const actorUser = actorRole !== Role.SuperAdmin ? await getUserByUid(actorId) : null;
+  const actorUser = actorRole !== Role.SuperAdmin ? await getUserById(actorId) : null;
   const auditActor = {
     userId: actorId,
     role: actorRole ?? 'unknown',
@@ -65,9 +64,9 @@ export default defineEventHandler(async (event): Promise<OkResponse> => {
   }
 
   if (body.disabled !== undefined) {
-    await adminAuth().updateUser(userId, { disabled: body.disabled });
+    await setAccountDisabled(userId, body.disabled);
     if (body.disabled) {
-      await revokeRefreshTokens(userId);
+      await revokeSessionsForUser(userId);
     }
     if (actorRole !== Role.SuperAdmin) {
       recordAuditLog({

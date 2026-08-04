@@ -14,7 +14,7 @@
           hide-details="auto"
         />
       </v-col>
-      <v-col v-if="!isGoogleMode">
+      <v-col v-if="!isQuickRegisterMode">
         <v-text-field
           v-model="password"
           v-bind="passwordAttrs"
@@ -29,7 +29,7 @@
           @click:append-inner="showPassword = !showPassword"
         />
       </v-col>
-      <v-col v-if="!isGoogleMode">
+      <v-col v-if="!isQuickRegisterMode">
         <v-text-field
           v-model="confirmPassword"
           v-bind="confirmPasswordAttrs"
@@ -51,10 +51,10 @@
           :loading="loading"
           :disabled="!meta.valid"
         >
-          {{ $t(isGoogleMode ? 'auth.confirmUsername' : 'auth.register') }}
+          {{ $t(isQuickRegisterMode ? 'auth.confirmUsername' : 'auth.register') }}
         </ButtonsAppButton>
       </v-col>
-      <v-col v-if="isGoogleMode">
+      <v-col v-if="isQuickRegisterMode">
         <ButtonsAppButton kind="secondary" block :disabled="loading" @click="emit('cancel')">
           {{ $t('common.cancel') }}
         </ButtonsAppButton>
@@ -69,18 +69,22 @@ import { useForm } from 'vee-validate';
 import { z } from 'zod';
 import { isValidUsername, isValidPassword } from '@saas-starter-kit/shared';
 
-const props = defineProps<{
-  idToken?: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    idToken?: string;
+    provider?: 'google' | 'line';
+  }>(),
+  { provider: 'google' },
+);
 
 const emit = defineEmits<{
   success: [];
   cancel: [];
 }>();
 
-const isGoogleMode = computed(() => !!props.idToken);
+const isQuickRegisterMode = computed(() => !!props.idToken);
 
-const { register, googleRegister } = useAuth();
+const { register, googleRegister, lineRegister } = useAuth();
 const { showError, showSuccess } = useToast();
 const { t } = useI18n();
 
@@ -96,7 +100,7 @@ const validationSchema = toTypedSchema(
       confirmPassword: z.string().optional(),
     })
     .superRefine((data, ctx) => {
-      if (isGoogleMode.value) return;
+      if (isQuickRegisterMode.value) return;
       if (!data.password || !isValidPassword(data.password)) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -126,8 +130,12 @@ const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword');
 const onSubmit = handleSubmit(async (values) => {
   loading.value = true;
   try {
-    if (isGoogleMode.value) {
-      await googleRegister(values.username, props.idToken as string);
+    if (isQuickRegisterMode.value) {
+      if (props.provider === 'line') {
+        await lineRegister(values.username, props.idToken as string);
+      } else {
+        await googleRegister(values.username, props.idToken as string);
+      }
     } else {
       await register(values.username, values.password as string);
       showSuccess(t('auth.registerSuccess'));

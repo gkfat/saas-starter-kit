@@ -1,111 +1,89 @@
-import { assignUserRole } from '../roles';
+import { randomUUID } from 'crypto';
 import { Role } from '@saas-starter-kit/shared';
+import { assignUserRole } from '../roles';
+import { bindProvider, deleteAllProvidersForUser } from '../identity';
+import type { ProviderType } from '../identity';
 import {
   createUser,
-  findUserByUid,
+  findUserById,
   findUserByUsername,
-  findUserByEmail,
-  findUserWithHashByUsername,
-  findUserWithHashByEmail,
-  syncUserOnLogin,
-  addProviderToUser,
-  removeProviderFromUser,
+  touchLogin,
   updateUserPhone,
   updateUserDisplayName,
-  updateUserPassword,
+  markPasswordSetupComplete,
   listUsers,
   deleteUser,
 } from './users.repo';
-import type { User, UserWithHash } from './users.types';
+import type { User } from './users.types';
 
-export async function registerUser(data: {
-  uid: string;
+export async function registerUserWithProvider(data: {
   username: string;
   displayName: string;
   email: string | null;
   phone: string | null;
-  providers: string[];
-  passwordHash: string | null;
+  providerType: ProviderType;
+  providerUserId: string;
+  firebaseUid: string;
   role?: string;
   passwordSetupPending?: boolean;
-}): Promise<void> {
+}): Promise<User> {
   const existing = await findUserByUsername(data.username);
   if (existing) {
     throw Object.assign(new Error('此帳號名稱已被使用'), { code: 'username-taken' });
   }
-  await createUser(data);
-  await assignUserRole(data.uid, data.role ?? Role.Member);
+
+  const userId = randomUUID();
+
+  await bindProvider({
+    userId,
+    providerType: data.providerType,
+    providerUserId: data.providerUserId,
+    firebaseUid: data.firebaseUid,
+  });
+
+  await createUser({
+    userId,
+    username: data.username,
+    displayName: data.displayName,
+    email: data.email,
+    phone: data.phone,
+    passwordSetupPending: data.passwordSetupPending ?? false,
+  });
+
+  await assignUserRole(userId, data.role ?? Role.Member);
+
+  return (await findUserById(userId))!;
 }
 
-export async function createUserByAdmin(data: {
-  uid: string;
-  username: string;
-  displayName: string;
-  email: string | null;
-  phone: string | null;
-  passwordHash: string | null;
-  role: string;
-}): Promise<void> {
-  await registerUser({ ...data, providers: [], passwordSetupPending: true });
-}
-
-export async function getUserWithHashByIdentifier(
-  identifier: string,
-): Promise<UserWithHash | null> {
-  return identifier.includes('@')
-    ? findUserWithHashByEmail(identifier)
-    : findUserWithHashByUsername(identifier);
-}
-
-export async function getUserByUid(uid: string): Promise<User | null> {
-  return findUserByUid(uid);
-}
-
-export async function getUserByUsername(username: string): Promise<User | null> {
-  return findUserByUsername(username);
-}
-
-export async function getUserByEmail(email: string): Promise<User | null> {
-  return findUserByEmail(email);
+export async function getUserById(userId: string): Promise<User | null> {
+  return findUserById(userId);
 }
 
 export async function touchUserOnLogin(data: {
-  uid: string;
+  userId: string;
   displayName: string | null;
   phone: string | null;
 }): Promise<User | null> {
-  return syncUserOnLogin(data);
+  return touchLogin(data);
 }
 
-export async function bindGoogleProvider(uid: string): Promise<void> {
-  return addProviderToUser(uid, 'google');
+export async function syncUserPhone(userId: string, phone: string): Promise<void> {
+  return updateUserPhone(userId, phone);
 }
 
-export async function unbindGoogleProvider(uid: string): Promise<void> {
-  const user = await findUserByUid(uid);
-  if (!user) return;
-  if (user.providers.length <= 1) {
-    throw Object.assign(new Error('無法移除唯一的登入方式'), { code: 'last-provider' });
-  }
-  return removeProviderFromUser(uid, 'google');
+export async function syncUserDisplayName(userId: string, displayName: string): Promise<void> {
+  return updateUserDisplayName(userId, displayName);
 }
 
-export async function syncUserPhone(uid: string, phone: string): Promise<void> {
-  return updateUserPhone(uid, phone);
-}
-
-export async function syncUserDisplayName(uid: string, displayName: string): Promise<void> {
-  return updateUserDisplayName(uid, displayName);
-}
-
-export async function setUserPassword(uid: string, passwordHash: string): Promise<void> {
-  return updateUserPassword(uid, passwordHash);
+export async function completePasswordSetup(userId: string): Promise<void> {
+  return markPasswordSetupComplete(userId);
 }
 
 export async function getAllUsers(): Promise<User[]> {
   return listUsers();
 }
 
-export async function deleteUserAccount(uid: string): Promise<void> {
-  await deleteUser(uid);
+export async function deleteUserAccount(userId: string): Promise<void> {
+  await deleteAllProvidersForUser(userId);
+  await deleteUser(userId);
 }

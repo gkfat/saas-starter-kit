@@ -1,13 +1,9 @@
-import {
-  LoginDto,
-  processLogin,
-  processPasswordLogin,
-  createCustomToken,
-} from '../../modules/auth';
-import { getUserWithHashByIdentifier, touchUserOnLogin } from '../../modules/users';
-import { verifyPassword } from '../../shared/crypto';
-import { resetOnSuccess } from '../../modules/rate-limit';
+import { LoginDto, verifyAuthenticatedIdToken } from '../../modules/auth';
+import { touchUserOnLogin } from '../../modules/users';
+import { listProvidersForUser } from '../../modules/identity';
 import { recordLoginLog } from '../../modules/logs';
+import { resetOnSuccess } from '../../modules/rate-limit';
+import type { LoginProvider } from '@saas-starter-kit/shared';
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
@@ -17,75 +13,62 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: 'Invalid request body' });
   }
 
+  const { idToken, provider } = parsed.data;
   const ip = getRequestIP(event, { xForwardedFor: true }) ?? '';
   const requestId = event.context.requestId ?? '';
 
-  if (parsed.data.provider === 'password') {
-    const { identifier, password } = parsed.data;
-
-    const firestoreUser = await getUserWithHashByIdentifier(identifier);
-
-    const valid =
-      firestoreUser?.passwordHash != null &&
-      (await verifyPassword(firestoreUser.passwordHash, password));
-
-    if (!valid) {
-      await recordLoginLog({
-        severity: 'WARNING',
-        timestamp: new Date().toISOString(),
-        requestId,
-        actor: { userId: 'unknown', role: 'member' },
-        metadata: {},
-        provider: 'password',
-        ip,
-        result: 'failure',
-        username: identifier,
-      });
-      throw createError({ statusCode: 401, message: '帳號或密碼錯誤' });
-    }
-
-    await resetOnSuccess(`login:account:${identifier}`);
-
-    const [user, customToken] = await Promise.all([
-      processPasswordLogin({
-        uid: firestoreUser!.uid,
-        username: firestoreUser!.username,
-        email: firestoreUser!.email,
-        displayName: firestoreUser!.displayName,
-        phone: firestoreUser!.phone,
-        providers: firestoreUser!.providers,
-        ip,
-        requestId,
-      }),
-      createCustomToken(firestoreUser!.uid),
-      touchUserOnLogin({ uid: firestoreUser!.uid, displayName: null, phone: null }),
-    ]);
-
-    return {
-      uid: user.uid,
-      username: user.username,
-      email: user.email,
-      displayName: user.displayName,
-      phone: user.phone,
-      providers: user.providers,
-      role: user.role,
-      permissions: user.permissions,
-      customToken,
-    };
+  let identity: Awaited<ReturnType<typeof verifyAuthenticatedIdToken>>;
+  try {
+    identity = await verifyAuthenticatedIdToken(idToken);
+  } catch {
+    await recordLoginLog({
+      severity: 'WARNING',
+      timestamp: new Date().toISOString(),
+      requestId,
+      actor: { userId: 'unknown', role: 'member' },
+      metadata: {},
+      provider: provider as LoginProvider,
+      ip,
+      result: 'failure',
+    });
+    throw createError({ statusCode: 401, message: 'Invalid ID token' });
   }
 
-  // OAuth flow (google / phone)
-  const { idToken, provider } = parsed.data;
-  const user = await processLogin({ idToken, provider, ip, requestId });
+  const firestoreUser = identity.isSuperAdmin
+    ? null
+    : await touchUserOnLogin({
+        userId: identity.userId,
+        displayName: identity.displayName,
+        phone: identity.phone,
+      });
+
+  await resetOnSuccess(`login:ip:${ip}`);
+
+  const providers = identity.isSuperAdmin ? [] : await listProvidersForUser(identity.userId);
+
+  if (!identity.isSuperAdmin) {
+    await recordLoginLog({
+      severity: 'INFO',
+      timestamp: new Date().toISOString(),
+      requestId,
+      actor: { userId: identity.userId, role: identity.role },
+      metadata: {},
+      provider: provider as LoginProvider,
+      ip,
+      result: 'success',
+      ...(identity.email ? { email: identity.email } : {}),
+      ...(firestoreUser?.username ? { username: firestoreUser.username } : {}),
+    });
+  }
 
   return {
-    uid: user.uid,
-    username: user.username,
-    email: user.email,
-    displayName: user.displayName,
-    phone: user.phone,
-    providers: user.providers,
-    role: user.role,
-    permissions: user.permissions,
+    userId: identity.userId,
+    username: firestoreUser?.username ?? identity.displayName,
+    email: firestoreUser?.email ?? identity.email,
+    displayName: firestoreUser?.displayName ?? identity.displayName,
+    phone: firestoreUser?.phone ?? identity.phone,
+    providers,
+    role: identity.role,
+    permissions: identity.permissions,
   };
 });

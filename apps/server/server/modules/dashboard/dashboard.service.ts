@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { getAuthAccountStatus } from '../auth';
+import { getAccountStatus } from '../identity';
 import { getTodayLoginCounts } from '../logs';
 import { getAllUsers } from '../users';
 import { getRoleForUser } from '../roles';
@@ -11,13 +11,15 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   const details = await Promise.all(
     users.map(async (user) => ({
       user,
-      status: await getAuthAccountStatus(user.uid),
-      role: await getRoleForUser(user.uid),
+      status: await getAccountStatus(user.userId),
+      role: await getRoleForUser(user.userId),
     })),
   );
-  const members = details
-    .filter(({ status }) => !status.isSuperAdmin)
-    .map(({ user, status, role }) => ({ ...user, disabled: status.disabled, role }));
+  const members = details.map(({ user, status, role }) => ({
+    ...user,
+    disabled: status.disabled,
+    role,
+  }));
 
   const total = members.length;
   const disabled = members.filter((m) => m.disabled).length;

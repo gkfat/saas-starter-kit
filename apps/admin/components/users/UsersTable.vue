@@ -4,14 +4,14 @@
       :headers="headers"
       :items="users"
       :loading="pending"
-      item-value="uid"
+      item-value="userId"
       class="users-table table-header-nowrap"
     >
       <template #no-data>
         <span class="text-medium-emphasis">{{ $t('users.noData') }}</span>
       </template>
-      <template #[`item.uid`]="{ item }">
-        <span class="text-caption font-mono text-medium-emphasis">{{ item.uid }}</span>
+      <template #[`item.userId`]="{ item }">
+        <span class="text-caption font-mono text-medium-emphasis">{{ item.userId }}</span>
       </template>
       <template #[`item.email`]="{ item }">
         <span>{{ item.email ?? '-' }}</span>
@@ -52,6 +52,11 @@
             @click="emit('regenerate-link', item)"
           />
           <ButtonsIconActionBtn
+            v-if="canWriteUsers && item.passwordSetupPending"
+            icon="mdi-cellphone-key"
+            @click="emit('generate-line-invite', item)"
+          />
+          <ButtonsIconActionBtn
             v-if="canDeleteUsers && item.disabled"
             icon="mdi-delete-outline"
             class="text-error"
@@ -77,13 +82,14 @@ const emit = defineEmits<{
   edit: [item: UserRow];
   'toggle-status': [item: UserRow];
   'regenerate-link': [item: UserRow];
+  'generate-line-invite': [item: UserRow];
   delete: [item: UserRow];
 }>();
 
 const { t, locale } = useI18n();
 
 const headers = computed(() => [
-  { title: t('users.uid'), key: 'uid' },
+  { title: t('users.uid'), key: 'userId' },
   { title: t('auth.username'), key: 'username' },
   { title: t('users.email'), key: 'email' },
   { title: t('users.displayName'), key: 'displayName' },

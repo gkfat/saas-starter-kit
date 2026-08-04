@@ -1,10 +1,14 @@
 /**
  * 整合測試：驗證 add-auth-rate-limiting 的限流行為（server/modules/rate-limit）。
  * 需先啟動 dev server（pnpm dev），預設打 http://localhost:3000，可用 TEST_BASE_URL 環境變數覆寫；
- * 需要一組可用的 Firebase 專案（.env 的 FIREBASE_* 變數）。
+ * 需要一組可用的 Firebase 專案（.env 的 FIREBASE_* / VITE_FIREBASE_API_KEY 變數）。
  *
  * 注意：環境變數不可命名為 BASE_URL —— Vite 會將 `process.env.BASE_URL` 靜態替換為
  * build base path（預設 '/'），導致此變數永遠無法被 .env 或 shell 覆寫。
+ *
+ * add-line-liff-identity 之後，密碼驗證改由 Firebase 原生 signInWithEmailAndPassword
+ * 於 client 端完成，/api/auth/login 只接收已驗證的 idToken，伺服器端不再能辨識「這次是哪個
+ * 帳號密碼打錯」，因此帳號維度的鎖定機制已移除，只保留 IP 維度限流（見 02.rate-limit.ts）。
  *
  * 未涵蓋：
  * - 登入頁鎖定警示文案（需瀏覽器操作）
@@ -20,9 +24,9 @@ import { prefixCollection } from '../server/shared/firestore-prefix';
 loadEnv({ path: resolve(import.meta.dirname, '../../../.env') });
 
 const BASE_URL = process.env.TEST_BASE_URL ?? 'http://localhost:3000';
+const FIREBASE_API_KEY = process.env.VITE_FIREBASE_API_KEY;
 // username/password 需為 6–8 碼英數字（見 packages/shared/utils/validation.ts），故 RUN_ID 取 5 碼 + 1 碼序號後綴
 const RUN_ID = Date.now().toString(36).slice(-5);
-const TEST_PASSWORD = 'Test1234';
 
 function testUsername(index: number) {
   return `${RUN_ID}${index.toString(36)}`;
@@ -39,33 +43,46 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const createdUsernames = new Set<string>();
+const createdFirebaseUids = new Set<string>();
 const rateLimitKeys = new Set<string>();
+
+async function mintIdToken(uid: string): Promise<string> {
+  const customToken = await auth.createCustomToken(uid);
+  const res = await fetch(
+    `https://identitytoolkit.googleapis.com/v1/accounts:signInWithCustomToken?key=${FIREBASE_API_KEY}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: customToken, returnSecureToken: true }),
+    },
+  );
+  const data = (await res.json()) as { idToken?: string };
+  if (!data.idToken) throw new Error('Failed to mint idToken for test uid');
+  return data.idToken;
+}
 
 async function register(username: string, ip: string) {
   createdUsernames.add(username);
   rateLimitKeys.add(`register:ip:${ip}`);
-  return fetch(`${BASE_URL}/api/auth/register`, {
+
+  const created = await auth.createUser({});
+  createdFirebaseUids.add(created.uid);
+  const idToken = await mintIdToken(created.uid);
+
+  const res = await fetch(`${BASE_URL}/api/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': ip },
-    body: JSON.stringify({ username, password: TEST_PASSWORD }),
+    body: JSON.stringify({ idToken, username }),
   });
+  return { res, uid: created.uid };
 }
 
-async function loginPassword(identifier: string, password: string, ip: string) {
+async function loginWithGarbageToken(ip: string) {
   rateLimitKeys.add(`login:ip:${ip}`);
-  rateLimitKeys.add(`login:account:${identifier}`);
   return fetch(`${BASE_URL}/api/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': ip },
-    body: JSON.stringify({ provider: 'password', identifier, password }),
-  });
-}
-
-async function loginGoogle(ip: string) {
-  return fetch(`${BASE_URL}/api/auth/login`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': ip },
-    body: JSON.stringify({ provider: 'google', idToken: 'invalid-token' }),
+    body: JSON.stringify({ provider: 'password', idToken: 'not-a-real-token' }),
   });
 }
 
@@ -74,9 +91,12 @@ afterAll(async () => {
   for (const username of createdUsernames) {
     const snap = await db.collection(usersCol).where('username', '==', username).limit(1).get();
     if (snap.empty) continue;
-    const uid = snap.docs[0].data().uid as string;
-    await db.doc(`${usersCol}/${uid}`).delete();
-    await db.doc(`${prefixCollection('user_roles')}/${uid}`).delete();
+    const userId = snap.docs[0].data().userId as string;
+    await db.doc(`${usersCol}/${userId}`).delete();
+    await db.doc(`${prefixCollection('user_roles')}/${userId}`).delete();
+    await db.doc(`${prefixCollection('user_auth')}/password_${username}`).delete();
+  }
+  for (const uid of createdFirebaseUids) {
     await auth.deleteUser(uid).catch(() => {});
   }
 
@@ -96,53 +116,40 @@ describe('auth rate limiting', () => {
     const ip = '10.1.0.1';
     const statuses: number[] = [];
     for (let i = 0; i < 11; i++) {
-      statuses.push((await register(testUsername(i), ip)).status);
+      statuses.push((await register(testUsername(i), ip)).res.status);
     }
     expect(statuses.slice(0, 10)).not.toContain(429);
     expect(statuses[10]).toBe(429);
   });
 
-  it('帳號維度連續失敗 5 次 → 鎖定 15 分鐘', async () => {
-    const username = `rl-acct-${RUN_ID}`;
+  it('login 同一 IP 超過 5 次/15 分鐘 → 第 6 次回傳 429', async () => {
+    const ip = '10.2.0.1';
     const statuses: number[] = [];
     for (let i = 0; i < 6; i++) {
-      statuses.push((await loginPassword(username, 'wrong-password', `10.2.${i}.1`)).status);
+      statuses.push((await loginWithGarbageToken(ip)).status);
     }
     expect(statuses.slice(0, 5)).toEqual([401, 401, 401, 401, 401]);
     expect(statuses[5]).toBe(429);
   });
 
-  it('IP 維度連續失敗 5 次 → 鎖定 15 分鐘', async () => {
+  it('login 成功後重置該 IP 的失敗計數', async () => {
     const ip = '10.3.0.1';
-    const statuses: number[] = [];
-    for (let i = 0; i < 6; i++) {
-      statuses.push((await loginPassword(`rl-ip-${RUN_ID}-${i}`, 'wrong-password', ip)).status);
-    }
-    expect(statuses.slice(0, 5)).toEqual([401, 401, 401, 401, 401]);
-    expect(statuses[5]).toBe(429);
-  });
-
-  it('登入成功後重置帳號失敗計數', async () => {
     const username = testUsername(99);
-    const regRes = await register(username, '10.4.0.1');
+
+    const { res: regRes, uid } = await register(username, ip);
     expect(regRes.status).toBe(200);
+    rateLimitKeys.add(`login:ip:${ip}`);
 
-    for (let i = 0; i < 4; i++) {
-      await loginPassword(username, 'wrong-password', `10.4.${i + 1}.1`);
-    }
-    const successRes = await loginPassword(username, TEST_PASSWORD, '10.4.9.1');
-    const afterRes = await loginPassword(username, 'wrong-password', '10.4.10.1');
-
+    // 重新對同一個（已註冊、已有 custom claims）uid 簽發一組 idToken，模擬後續登入。
+    const idToken = await mintIdToken(uid);
+    const successRes = await fetch(`${BASE_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': ip },
+      body: JSON.stringify({ provider: 'password', idToken }),
+    });
     expect(successRes.status).toBe(200);
-    expect(afterRes.status).toBe(401);
-  });
 
-  it('google-login 不受限流影響', async () => {
-    const ip = '10.5.0.1';
-    const statuses: number[] = [];
-    for (let i = 0; i < 20; i++) {
-      statuses.push((await loginGoogle(ip)).status);
-    }
-    expect(statuses).not.toContain(429);
+    const afterRes = await loginWithGarbageToken(ip);
+    expect(afterRes.status).toBe(401);
   });
 });

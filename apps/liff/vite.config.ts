@@ -16,6 +16,10 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: Number(env.LIFF_PORT) || 3006,
+      // Vite blocks unrecognized Host headers by default (DNS rebinding protection).
+      // ngrok forwards requests with its own tunnel hostname, so allow any *.ngrok-free.app
+      // subdomain for local LIFF testing through a tunnel; dev-only, never applies to prod builds.
+      allowedHosts: ['.ngrok-free.app'],
     },
     define: {
       'import.meta.env.VITE_API_BASE_URL': JSON.stringify(

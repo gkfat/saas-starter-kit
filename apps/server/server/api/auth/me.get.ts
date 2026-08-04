@@ -1,4 +1,5 @@
-import { getUserByUid } from '~/modules/users';
+import { getUserById } from '~/modules/users';
+import { listProvidersForUser } from '~/modules/identity';
 
 export default defineEventHandler(async (event) => {
   const ctx = event.context;
@@ -7,15 +8,18 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, message: 'Unauthorized' });
   }
 
-  const firestoreUser = await getUserByUid(ctx.userId);
+  const [firestoreUser, providers] = await Promise.all([
+    getUserById(ctx.userId),
+    listProvidersForUser(ctx.userId),
+  ]);
 
   return {
-    uid: ctx.userId,
-    username: firestoreUser?.username ?? null,
-    email: firestoreUser?.email ?? null,
+    userId: ctx.userId,
+    username: firestoreUser?.username ?? ctx.displayName ?? null,
+    email: firestoreUser?.email ?? ctx.email ?? null,
     displayName: firestoreUser?.displayName ?? ctx.displayName ?? null,
     phone: firestoreUser?.phone ?? ctx.phone ?? null,
-    providers: firestoreUser?.providers ?? [],
+    providers,
     role: ctx.role,
     permissions: ctx.permissions ?? [],
   };

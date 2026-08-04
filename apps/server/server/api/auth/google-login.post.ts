@@ -1,5 +1,5 @@
-import { GoogleLoginDto, verifyIdToken } from '~/modules/auth';
-import { getUserByUid } from '~/modules/users';
+import { GoogleLoginDto, verifyRawIdToken } from '~/modules/auth';
+import { resolveUserIdByProvider } from '~/modules/identity';
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
@@ -11,20 +11,20 @@ export default defineEventHandler(async (event) => {
 
   const { idToken } = parsed.data;
 
-  let googleUser: Awaited<ReturnType<typeof verifyIdToken>>;
+  let identity: Awaited<ReturnType<typeof verifyRawIdToken>>;
   try {
-    googleUser = await verifyIdToken(idToken);
+    identity = await verifyRawIdToken(idToken);
   } catch {
     throw createError({ statusCode: 401, message: 'Invalid ID token' });
   }
 
-  const firestoreUser = await getUserByUid(googleUser.uid);
+  const userId = await resolveUserIdByProvider('google', identity.firebaseUid);
 
-  if (!firestoreUser || !firestoreUser.providers.includes('google')) {
+  if (!userId) {
     return {
       status: 'quick-register' as const,
-      googleEmail: googleUser.email,
-      displayName: googleUser.displayName,
+      googleEmail: identity.email,
+      displayName: identity.displayName,
     };
   }
 

@@ -1,8 +1,8 @@
 import { z } from 'zod';
-import { hashPassword } from '~/shared/crypto';
+import { adminAuth } from '~/shared/firebase-admin';
 import { consumeSetupToken } from '~/modules/password-setup';
-import { setUserPassword } from '~/modules/users';
-import { isValidPassword } from '@saas-starter-kit/shared';
+import { completePasswordSetup, getUserById } from '~/modules/users';
+import { isValidPassword, toSyntheticEmail } from '@saas-starter-kit/shared';
 
 const BodySchema = z.object({
   token: z.string().min(1),
@@ -18,15 +18,25 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  let uid: string;
+  let userId: string;
+  let firebaseUid: string;
   try {
-    ({ uid } = await consumeSetupToken(parsed.data.token));
+    ({ userId, firebaseUid } = await consumeSetupToken(parsed.data.token));
   } catch {
     throw createError({ statusCode: 400, message: '連結無效或已過期' });
   }
 
-  const passwordHash = await hashPassword(parsed.data.password);
-  await setUserPassword(uid, passwordHash);
+  const user = await getUserById(userId);
+  if (!user) {
+    throw createError({ statusCode: 400, message: '連結無效或已過期' });
+  }
+
+  await adminAuth().updateUser(firebaseUid, {
+    email: toSyntheticEmail(user.username),
+    emailVerified: true,
+    password: parsed.data.password,
+  });
+  await completePasswordSetup(userId);
 
   return { ok: true };
 });

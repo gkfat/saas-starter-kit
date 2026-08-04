@@ -1,8 +1,12 @@
 export type CreateUserResponse = {
-  uid: string;
+  userId: string;
   setupLink: string;
 };
 
 export type RegenerateSetupLinkResponse = {
   setupLink: string;
+};
+
+export type GenerateLineInviteResponse = {
+  inviteLink: string;
 };

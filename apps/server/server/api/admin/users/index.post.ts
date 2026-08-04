@@ -1,8 +1,6 @@
-import { randomBytes } from 'crypto';
 import { adminAuth } from '~/shared/firebase-admin';
-import { hashPassword } from '~/shared/crypto';
 import { recordAuditLog } from '~/modules/logs';
-import { createUserByAdmin, getUserByUid, CreateUserByAdminDto } from '~/modules/users';
+import { registerUserWithProvider, getUserById, CreateUserByAdminDto } from '~/modules/users';
 import { generateSetupToken } from '~/modules/password-setup';
 import { requirePermission } from '~/shared/rbac';
 import type { AuthenticatedContext } from '~/shared/types/context';
@@ -28,28 +26,29 @@ export default defineEventHandler(async (event): Promise<CreateUserResponse> => 
     role === Role.Member ? Permission.Members.Create : Permission.AdminAccounts.Create,
   );
 
-  let uid: string;
+  let firebaseUid: string;
   try {
-    uid = (await adminAuth().createUser({ displayName })).uid;
+    firebaseUid = (await adminAuth().createUser({ displayName })).uid;
   } catch {
     throw createError({ statusCode: 500, message: '建立帳號失敗' });
   }
 
-  const passwordHash = await hashPassword(randomBytes(32).toString('hex'));
-
+  let user: Awaited<ReturnType<typeof registerUserWithProvider>>;
   try {
-    await createUserByAdmin({
-      uid,
+    user = await registerUserWithProvider({
       username,
       displayName,
       email: email ?? null,
       phone: phone ?? null,
-      passwordHash,
+      providerType: 'password',
+      providerUserId: username,
+      firebaseUid,
       role,
+      passwordSetupPending: true,
     });
   } catch (err: unknown) {
     await adminAuth()
-      .deleteUser(uid)
+      .deleteUser(firebaseUid)
       .catch(() => {});
     const code = (err as { code?: string }).code;
     if (code === 'username-taken') {
@@ -58,10 +57,10 @@ export default defineEventHandler(async (event): Promise<CreateUserResponse> => 
     throw createError({ statusCode: 500, message: '建立帳號失敗' });
   }
 
-  const setupToken = await generateSetupToken(uid);
+  const setupToken = await generateSetupToken({ userId: user.userId, firebaseUid });
   const setupLink = `${getRequestURL(event).origin}/auth/set-password?token=${setupToken}`;
 
-  const actorUser = await getUserByUid(actorId);
+  const actorUser = await getUserById(actorId);
   recordAuditLog({
     severity: 'INFO',
     timestamp: new Date().toISOString(),
@@ -72,7 +71,7 @@ export default defineEventHandler(async (event): Promise<CreateUserResponse> => 
       ...(actorUser?.username ? { username: actorUser.username } : {}),
     },
     action: 'user.create',
-    metadata: { uid, username, role },
+    metadata: { userId: user.userId, username, role },
   }).catch((err) =>
     console.error(
       JSON.stringify({
@@ -83,5 +82,5 @@ export default defineEventHandler(async (event): Promise<CreateUserResponse> => 
     ),
   );
 
-  return { uid, setupLink };
+  return { userId: user.userId, setupLink };
 });

@@ -1,10 +1,7 @@
 import { cert, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
-import { getFirestore } from 'firebase-admin/firestore';
 import 'dotenv/config';
-import { prefixCollection } from '../apps/server/server/shared/firestore-prefix';
-import { hashPassword } from '../apps/server/server/shared/crypto';
-import { Role } from '@saas-starter-kit/shared';
+import { Role, toSyntheticEmail } from '@saas-starter-kit/shared';
 
 const username = process.env.SUPERADMIN_USERNAME;
 const password = process.env.SUPERADMIN_PASSWORD;
@@ -22,36 +19,25 @@ const app = initializeApp({
 });
 
 const auth = getAuth(app);
-const db = getFirestore(app);
 
 (async () => {
-  const usersCol = prefixCollection('users');
+  const email = toSyntheticEmail(username as string);
 
-  // Check if Firestore doc with this username already exists
-  const existing = await db.collection(usersCol).where('username', '==', username).limit(1).get();
-
-  if (!existing.empty) {
-    const uid = existing.docs[0].data().uid as string;
-    console.warn(`[SKIP] Superadmin already exists: ${username} (uid: ${uid})`);
+  const existing = await auth.getUserByEmail(email).catch(() => null);
+  if (existing) {
+    console.warn(`[SKIP] Superadmin already exists: ${username} (uid: ${existing.uid})`);
     process.exit(0);
   }
 
-  const user = await auth.createUser({ displayName: username });
-  const uid = user.uid;
-  await auth.setCustomUserClaims(uid, { role: Role.SuperAdmin });
-  console.log(`[OK] Superadmin Auth created: ${username} (uid: ${uid})`);
-
-  const passwordHash = await hashPassword(password);
-
-  await db.doc(`${usersCol}/${uid}`).set({
-    uid,
-    username,
+  const user = await auth.createUser({
+    email,
+    password,
+    emailVerified: true,
     displayName: username,
-    email: null,
-    phone: null,
-    providers: ['password'],
-    passwordHash,
-    createdAt: new Date().toISOString(),
   });
-  console.log(`[OK] Superadmin Firestore doc created: ${username}`);
+  await auth.setCustomUserClaims(user.uid, { role: Role.SuperAdmin });
+  console.log(`[OK] Superadmin created: ${username} (uid: ${user.uid})`);
+  console.log(
+    'Superadmin has no Firestore user/user_auth doc — it authenticates purely via Firebase Auth custom claims.',
+  );
 })();

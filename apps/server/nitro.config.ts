@@ -13,6 +13,10 @@ export default defineNitroConfig({
     firebaseProjectId: process.env.FIREBASE_PROJECT_ID,
     firebaseClientEmail: process.env.FIREBASE_CLIENT_EMAIL,
     firebasePrivateKey: process.env.FIREBASE_PRIVATE_KEY,
+    lineChannelId: process.env.LINE_CHANNEL_ID,
+    lineChannelSecret: process.env.LINE_CHANNEL_SECRET,
+    liffAppUrl: process.env.LIFF_APP_URL ?? 'http://localhost:3006',
+    liffId: process.env.VITE_LIFF_ID ?? '',
     corsAllowedOrigins: process.env.CORS_ALLOWED_ORIGINS ?? '',
     public: {
       featureFlags: {

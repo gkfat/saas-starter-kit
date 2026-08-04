@@ -1,5 +1,5 @@
-import { GoogleRegisterDto, verifyIdToken } from '~/modules/auth';
-import { registerUser } from '~/modules/users';
+import { GoogleRegisterDto, verifyRawIdToken } from '~/modules/auth';
+import { registerUserWithProvider } from '~/modules/users';
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
@@ -14,21 +14,22 @@ export default defineEventHandler(async (event) => {
 
   const { username, idToken } = parsed.data;
 
-  let googleUser: Awaited<ReturnType<typeof verifyIdToken>>;
+  let identity: Awaited<ReturnType<typeof verifyRawIdToken>>;
   try {
-    googleUser = await verifyIdToken(idToken);
+    identity = await verifyRawIdToken(idToken);
   } catch {
     throw createError({ statusCode: 401, message: 'Invalid ID token' });
   }
 
   try {
-    await registerUser({
-      uid: googleUser.uid,
+    await registerUserWithProvider({
       username,
-      displayName: googleUser.displayName ?? username,
-      email: googleUser.email,
+      displayName: identity.displayName ?? username,
+      email: identity.email,
       phone: null,
-      providers: ['google'],
+      providerType: 'google',
+      providerUserId: identity.firebaseUid,
+      firebaseUid: identity.firebaseUid,
     });
   } catch (err: unknown) {
     const code = (err as { code?: string }).code;
@@ -38,5 +39,5 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 500, message: '建立帳號失敗' });
   }
 
-  return { uid: googleUser.uid };
+  return { ok: true };
 });

@@ -13,12 +13,12 @@ The system SHALL provide a registration page at `/auth/register` where a new use
 #### Scenario: Successful registration with username and password only
 
 - **WHEN** user submits a valid username, matching password and confirm password (no email, no phone)
-- **THEN** system creates a Firebase Auth account via `createUserWithEmailAndPassword` using synthetic email `{username}@internal.local`, creates Firestore `users` document with `username`, `email: null`, `phone: null`, `providers: ['password']`, signs out, and redirects to `/login`
+- **THEN** system creates a Firebase Auth account via `createUserWithEmailAndPassword` using synthetic email `{username}@internal.local`, creates a new `user` document with `username`, `email: null`, `phone: null`, creates a `user_auth` document with `provider_type: 'password'` and `provider_user_id: username` mapping to that `userId`, signs out, and redirects to `/login`
 
 #### Scenario: Successful registration with username, email, and password
 
 - **WHEN** user submits a valid username, a valid email address, and matching password
-- **THEN** system creates a Firebase Auth account and Firestore `users` document with `email` populated, signs out, and redirects to `/login`
+- **THEN** system creates a Firebase Auth account, a new `user` document with `email` populated, and a `user_auth(provider_type: 'password')` document, signs out, and redirects to `/login`
 
 #### Scenario: Passwords do not match
 

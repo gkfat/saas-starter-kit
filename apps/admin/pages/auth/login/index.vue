@@ -30,6 +30,17 @@
             {{ $t('auth.loginWithGoogle') }}
           </v-btn>
 
+          <v-btn
+            block
+            size="large"
+            variant="outlined"
+            class="text-none mt-3"
+            prepend-icon="mdi-chat"
+            @click="handleLineLogin"
+          >
+            {{ $t('auth.loginWithLine') }}
+          </v-btn>
+
           <div class="text-center text-body-2 mt-6">
             {{ $t('auth.noAccount') }}
             <NuxtLink to="/register">{{ $t('auth.registerLink') }}</NuxtLink>
@@ -45,7 +56,7 @@ import LoginForm from './components/LoginForm.vue';
 
 definePageMeta({ path: '/login' });
 
-const { loginWithGoogle, getLoginErrorMessage } = useAuth();
+const { loginWithGoogle, loginWithLineRedirect, getLoginErrorMessage } = useAuth();
 const { showError } = useToast();
 const router = useRouter();
 const { t } = useI18n();
@@ -79,5 +90,9 @@ async function handleGoogleLogin() {
   } finally {
     googleLoading.value = false;
   }
+}
+
+function handleLineLogin() {
+  loginWithLineRedirect();
 }
 </script>

@@ -52,7 +52,7 @@ function close() {
 async function confirm() {
   if (!props.user) return;
   saving.value = true;
-  const result = await apiFetch<OkResponse>(`/api/admin/users/${props.user.uid}`, {
+  const result = await apiFetch<OkResponse>(`/api/admin/users/${props.user.userId}`, {
     method: 'PATCH',
     body: { disabled: !props.user.disabled },
   });
