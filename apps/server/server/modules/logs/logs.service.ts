@@ -1,5 +1,11 @@
 import dayjs from 'dayjs';
-import { insertAuditLog, insertLoginLog, listLoginLogsSince } from './logs.repo';
+import {
+  insertAuditLog,
+  insertLoginLog,
+  listAuditLogs as listAuditLogsFromRepo,
+  listLoginLogs as listLoginLogsFromRepo,
+  listLoginLogsSince,
+} from './logs.repo';
 import { AuditLogSchema, LoginLogSchema } from './logs.schema';
 import type { AuditLog, LoginLog } from './logs.types';
 import { FeatureFlag } from '@saas-starter-kit/shared';
@@ -16,6 +22,14 @@ export async function recordAuditLog(log: Omit<AuditLog, 'type'>): Promise<void>
 
   const validated = AuditLogSchema.parse({ ...log, type: 'audit' });
   await insertAuditLog(validated);
+}
+
+export async function listLoginLogs(): Promise<LoginLog[]> {
+  return listLoginLogsFromRepo();
+}
+
+export async function listAuditLogs(): Promise<AuditLog[]> {
+  return listAuditLogsFromRepo();
 }
 
 export async function getTodayLoginCounts(): Promise<{ success: number; failure: number }> {

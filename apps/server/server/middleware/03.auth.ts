@@ -10,7 +10,6 @@ const PUBLIC_PATHS = new Set([
   '/api/auth/line-callback',
   '/api/auth/line-invite-activate',
   '/api/auth/line-bind-code-activate',
-  '/api/auth/otp/verify',
   '/api/auth/set-password',
   '/api/marketing/feature-request',
 ]);

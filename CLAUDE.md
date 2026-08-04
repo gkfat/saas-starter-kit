@@ -103,6 +103,6 @@ See `docs/plan.md` for the full roadmap. Current status:
 - ✅ Phase 1: Project infra
 - ✅ Phase 2: Authentication (Email / Google / Phone OTP + login_logs)
 - ✅ Phase 3: RBAC
-- ✅ Phase 4: Users module (audit_logs 寫入待補)
-- ⬜ Phase 5: Logging module (full)
+- ✅ Phase 4: Users module (audit_logs 已寫入)
+- ⬜ Phase 5: Logging module（分頁 / 篩選 / 匯出待補）
 - ⬜ Phase 6: Admin Dashboard

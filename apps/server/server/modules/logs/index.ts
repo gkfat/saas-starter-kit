@@ -1,3 +1,8 @@
-export { recordAuditLog, recordLoginLog, getTodayLoginCounts } from './logs.service';
-export { listLoginLogs, listAuditLogs } from './logs.repo';
+export {
+  recordAuditLog,
+  recordLoginLog,
+  getTodayLoginCounts,
+  listLoginLogs,
+  listAuditLogs,
+} from './logs.service';
 export type { AuditLog, BaseLog, LoginLog, LogSeverity } from './logs.types';
