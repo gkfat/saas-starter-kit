@@ -12,6 +12,11 @@ export function useAuthFetch<T>(url: string, options: Parameters<typeof useFetch
       Authorization: `Bearer ${store.idToken ?? ''}`,
       ...(options.headers as Record<string, string> | undefined),
     })),
+    onRequest() {
+      if (!store.isLoggedIn) {
+        throw new Error('Not logged in');
+      }
+    },
     onResponseError({ response }) {
       if (isSessionExpired(response.status, response._data?.message)) {
         openSessionExpiredDialog();

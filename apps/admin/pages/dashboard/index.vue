@@ -17,19 +17,29 @@
 
 <script setup lang="ts">
 import type { DashboardStats } from '@saas-starter-kit/shared';
+import { storeToRefs } from 'pinia';
+import { useAuthStore } from '~/stores/auth';
 import UserOverviewCard from './components/UserOverviewCard.vue';
 import UserGrowthCard from './components/UserGrowthCard.vue';
 import ActiveUsersCard from './components/ActiveUsersCard.vue';
 
+const { isLoggedIn } = storeToRefs(useAuthStore());
 const { data: stats, refresh } = await useAuthFetch<DashboardStats>('/api/dashboard/stats');
 
 let intervalId: ReturnType<typeof setInterval> | undefined;
+
+function stopPolling() {
+  clearInterval(intervalId);
+  intervalId = undefined;
+}
 
 onMounted(() => {
   intervalId = setInterval(refresh, 60_000);
 });
 
-onUnmounted(() => {
-  clearInterval(intervalId);
+onUnmounted(stopPolling);
+
+watch(isLoggedIn, (loggedIn) => {
+  if (!loggedIn) stopPolling();
 });
 </script>
