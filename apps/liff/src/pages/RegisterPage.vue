@@ -66,7 +66,7 @@ async function submit() {
             <v-text-field
               v-model="username"
               label="帳號名稱"
-              hint="6–8 碼，全英文或英文加數字"
+              hint="6–20 碼，全英文或英文加數字"
               persistent-hint
               :error-messages="username && !usernameValid ? ['格式不符'] : []"
               :disabled="status === 'loading'"

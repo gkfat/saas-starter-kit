@@ -9,14 +9,14 @@ export type LoginDto = z.infer<typeof LoginDto>;
 
 export const RegisterDto = z.object({
   idToken: z.string().min(1),
-  username: z.string().refine(isValidUsername, '帳號須為 6–8 碼，全英文或英文加數字'),
+  username: z.string().refine(isValidUsername, '帳號須為 6–20 碼，全英文或英文加數字'),
   email: z.string().email().optional(),
   phone: z.string().optional(),
 });
 export type RegisterDto = z.infer<typeof RegisterDto>;
 
 export const GoogleRegisterDto = z.object({
-  username: z.string().refine(isValidUsername, '帳號須為 6–8 碼，全英文或英文加數字'),
+  username: z.string().refine(isValidUsername, '帳號須為 6–20 碼，全英文或英文加數字'),
   idToken: z.string().min(1),
 });
 export type GoogleRegisterDto = z.infer<typeof GoogleRegisterDto>;

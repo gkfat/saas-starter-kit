@@ -25,7 +25,7 @@ loadEnv({ path: resolve(import.meta.dirname, '../../../.env') });
 
 const BASE_URL = process.env.TEST_BASE_URL ?? 'http://localhost:3000';
 const FIREBASE_API_KEY = process.env.VITE_FIREBASE_API_KEY;
-// username/password 需為 6–8 碼英數字（見 packages/shared/utils/validation.ts），故 RUN_ID 取 5 碼 + 1 碼序號後綴
+// username 需為 6–20 碼、password 需為 6–8 碼英數字（見 packages/shared/utils/validation.ts），故 RUN_ID 取 5 碼 + 1 碼序號後綴
 const RUN_ID = Date.now().toString(36).slice(-5);
 
 function testUsername(index: number) {

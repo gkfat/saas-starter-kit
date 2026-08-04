@@ -5,7 +5,7 @@ import { registerUserWithProvider } from '~/modules/users';
 import { isValidUsername } from '@saas-starter-kit/shared';
 
 const BodySchema = z.object({
-  username: z.string().refine(isValidUsername, '帳號須為 6–8 碼，全英文或英文加數字'),
+  username: z.string().refine(isValidUsername, '帳號須為 6–20 碼，全英文或英文加數字'),
   idToken: z.string().min(1),
 });
 
