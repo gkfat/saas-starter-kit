@@ -17,6 +17,7 @@
       :pending="pending"
       :can-write-users="canWriteUsers"
       :can-delete-users="canDeleteUsers"
+      :show-member-features="false"
       @edit="openEdit"
       @toggle-status="openToggleStatus"
       @regenerate-link="regenerateLink"

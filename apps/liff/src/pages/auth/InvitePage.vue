@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { getLineIdToken } from '~/utils/liff-client';
 import { apiFetch } from '~/utils/api-client';
 import { completeLineSession } from '~/utils/line-auth-flow';
@@ -11,6 +11,7 @@ type InviteActivateResult = {
 };
 
 const route = useRoute();
+const router = useRouter();
 const status = ref<'loading' | 'error' | 'duplicate' | 'done'>('loading');
 const errorMessage = ref('');
 
@@ -30,6 +31,7 @@ onMounted(async () => {
     });
     await completeLineSession(result.customToken);
     status.value = result.status === 'duplicate' ? 'duplicate' : 'done';
+    router.push('/home');
   } catch (e) {
     errorMessage.value = e instanceof Error ? e.message : String(e);
     status.value = 'error';

@@ -15,6 +15,7 @@ export const ROUTES = {
   adminAccounts: '/admin/admin-accounts',
   loginLogs: '/admin/logs/login',
   auditLogs: '/admin/logs/audit',
+  levelTiers: '/admin/level/tiers',
   iamRoles: '/iam/roles',
   iamPermissions: '/iam/permissions',
 } as const;
@@ -86,6 +87,14 @@ export const APP_ROUTES: RouteGroup[] = [
         exact: true,
         permission: Permission.AuditLogs.Read,
         featureFlag: FeatureFlag.AuditLog,
+      },
+      {
+        title: 'nav.levelTiers',
+        icon: 'mdi-podium-gold',
+        path: ROUTES.levelTiers,
+        exact: true,
+        permission: Permission.LevelTiers.Read,
+        featureFlag: FeatureFlag.Level,
       },
     ],
   },

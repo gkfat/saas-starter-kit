@@ -20,6 +20,6 @@ export async function completeLineSession(customToken: string): Promise<AuthUser
     body: { idToken, provider: 'line' },
   });
 
-  useAuthStore().setSession(user, idToken);
+  useAuthStore().setSession(user);
   return user;
 }

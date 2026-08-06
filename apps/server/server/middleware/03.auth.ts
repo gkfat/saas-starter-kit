@@ -12,6 +12,7 @@ const PUBLIC_PATHS = new Set([
   '/api/auth/line-bind-code-activate',
   '/api/auth/set-password',
   '/api/marketing/feature-request',
+  '/api/internal/level/evaluate-due-periods',
 ]);
 
 export default defineEventHandler(async (event) => {

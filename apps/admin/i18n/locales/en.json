@@ -37,6 +37,7 @@
     "adminAccounts": "Admin Accounts",
     "loginLogs": "Login Logs",
     "auditLogs": "Audit Logs",
+    "levelTiers": "Level Tiers",
     "home": "Home"
   },
   "auth": {
@@ -301,6 +302,7 @@
     "memberPageTitle": "Member Management",
     "adminAccountPageTitle": "Admin Account Management",
     "uid": "UID",
+    "memberNo": "Member No.",
     "name": "Name",
     "email": "Email",
     "displayName": "Display Name",
@@ -337,7 +339,37 @@
     "updateStatusSuccess": "User account status updated",
     "deleteUser": "Delete User",
     "deleteConfirm": "Are you sure you want to permanently delete \"{username}\"? This cannot be undone.",
-    "deleteSuccess": "User deleted"
+    "deleteSuccess": "User deleted",
+    "level": "Level",
+    "detail": "Member Detail",
+    "detailTitle": "Member Detail"
+  },
+  "level": {
+    "cardTitle": "Member Level",
+    "levelNumber": "Level",
+    "currentPeriodTotal": "Current Period Total",
+    "periodStart": "Period Start",
+    "periodEnd": "Period End",
+    "notInitialized": "No level data"
+  },
+  "levelTiers": {
+    "title": "Level Tiers",
+    "levelNumber": "Level",
+    "name": "Name",
+    "metricThreshold": "Threshold",
+    "noData": "No tiers configured",
+    "create": "New Tier",
+    "edit": "Edit Tier",
+    "deleteConfirmTitle": "Delete Tier",
+    "deleteConfirm": "Are you sure you want to delete \"{name}\"?",
+    "createSuccess": "Tier created",
+    "updateSuccess": "Tier updated",
+    "deleteSuccess": "Tier deleted",
+    "floorThresholdFixed": "Level 1's threshold is fixed at 0",
+    "levelNumberRequired": "Level is required",
+    "nameRequired": "Name is required",
+    "thresholdRequired": "Threshold is required",
+    "thresholdMustExceedPrevious": "Threshold must be greater than the previous level's threshold ({threshold})"
   },
   "roles": {
     "title": "Roles",
@@ -413,6 +445,8 @@
     "roles:write": "Edit role permissions",
     "permissions:read": "Read permissions",
     "login_logs:read": "Read login logs",
-    "audit_logs:read": "Read audit logs"
+    "audit_logs:read": "Read audit logs",
+    "level_tiers:read": "Read level tiers",
+    "level_tiers:write": "Edit level tiers"
   }
 }

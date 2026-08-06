@@ -37,6 +37,7 @@
     "adminAccounts": "後台帳號管理",
     "loginLogs": "登入紀錄",
     "auditLogs": "稽核紀錄",
+    "levelTiers": "等級管理",
     "home": "首頁"
   },
   "auth": {
@@ -301,6 +302,7 @@
     "memberPageTitle": "會員管理",
     "adminAccountPageTitle": "後台帳號管理",
     "uid": "UID",
+    "memberNo": "會員編號",
     "name": "名稱",
     "email": "Email",
     "displayName": "顯示名稱",
@@ -337,7 +339,37 @@
     "updateStatusSuccess": "使用者帳號狀態已更新",
     "deleteUser": "刪除使用者",
     "deleteConfirm": "確定要永久刪除「{username}」嗎？此操作無法復原。",
-    "deleteSuccess": "使用者已刪除"
+    "deleteSuccess": "使用者已刪除",
+    "level": "等級",
+    "detail": "會員詳情",
+    "detailTitle": "會員詳情"
+  },
+  "level": {
+    "cardTitle": "會員等級",
+    "levelNumber": "等級",
+    "currentPeriodTotal": "本期累積指標",
+    "periodStart": "本期起始",
+    "periodEnd": "本期到期",
+    "notInitialized": "尚無等級資料"
+  },
+  "levelTiers": {
+    "title": "等級管理",
+    "levelNumber": "等級",
+    "name": "名稱",
+    "metricThreshold": "門檻",
+    "noData": "尚未設定等級",
+    "create": "新增等級",
+    "edit": "編輯等級",
+    "deleteConfirmTitle": "刪除等級",
+    "deleteConfirm": "確定要刪除「{name}」嗎？",
+    "createSuccess": "等級已新增",
+    "updateSuccess": "等級已更新",
+    "deleteSuccess": "等級已刪除",
+    "floorThresholdFixed": "等級 1 的門檻固定為 0",
+    "levelNumberRequired": "請輸入等級",
+    "nameRequired": "請輸入名稱",
+    "thresholdRequired": "請輸入門檻",
+    "thresholdMustExceedPrevious": "門檻必須大於上一等級門檻（{threshold}）"
   },
   "roles": {
     "title": "角色管理",
@@ -413,6 +445,8 @@
     "roles:write": "編輯角色權限",
     "permissions:read": "讀取權限清單",
     "login_logs:read": "讀取登入紀錄",
-    "audit_logs:read": "讀取稽核紀錄"
+    "audit_logs:read": "讀取稽核紀錄",
+    "level_tiers:read": "讀取等級級距表",
+    "level_tiers:write": "編輯等級級距表"
   }
 }

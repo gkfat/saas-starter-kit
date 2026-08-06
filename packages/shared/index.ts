@@ -1,6 +1,7 @@
 export * from './dto/auth';
 export * from './dto/common';
 export * from './dto/dashboard';
+export * from './dto/level';
 export * from './dto/logs';
 export * from './dto/users';
 export * from './feature-flags';

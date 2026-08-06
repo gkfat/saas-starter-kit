@@ -21,7 +21,7 @@ const usernameValid = computed(() => isValidUsername(username.value));
 
 onMounted(() => {
   if (!pending.idToken) {
-    router.replace('/');
+    router.replace('/auth/login');
   }
 });
 
@@ -38,6 +38,7 @@ async function submit() {
     await completeLineSession(result.customToken);
     pending.clear();
     status.value = 'done';
+    router.push('/home');
   } catch (e) {
     const statusCode = (e as ApiError).statusCode;
     errorMessage.value =

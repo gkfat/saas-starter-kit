@@ -22,12 +22,19 @@ export async function findUserByUsername(username: string): Promise<User | null>
   return snapshot.docs[0].data() as User;
 }
 
+export async function findUserByMemberNo(memberNo: string): Promise<User | null> {
+  const snapshot = await usersCollection().where('memberNo', '==', memberNo).limit(1).get();
+  if (snapshot.empty) return null;
+  return snapshot.docs[0].data() as User;
+}
+
 export async function createUser(data: {
   userId: string;
   username: string;
   displayName: string;
   email: string | null;
   phone: string | null;
+  memberNo: string;
   passwordSetupPending?: boolean;
 }): Promise<void> {
   await userRef(data.userId).set({
@@ -36,6 +43,7 @@ export async function createUser(data: {
     displayName: data.displayName,
     email: data.email,
     phone: data.phone,
+    memberNo: data.memberNo,
     passwordSetupPending: data.passwordSetupPending ?? false,
     lastLoginAt: null,
     createdAt: new Date().toISOString(),

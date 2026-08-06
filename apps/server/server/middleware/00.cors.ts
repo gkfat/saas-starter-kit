@@ -12,7 +12,11 @@ export default defineEventHandler((event) => {
   setResponseHeader(event, 'Access-Control-Allow-Origin', origin);
   setResponseHeader(event, 'Access-Control-Allow-Credentials', 'true');
   setResponseHeader(event, 'Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS');
-  setResponseHeader(event, 'Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  setResponseHeader(
+    event,
+    'Access-Control-Allow-Headers',
+    'Content-Type, Authorization, ngrok-skip-browser-warning',
+  );
 
   if (event.method === 'OPTIONS') {
     setResponseStatus(event, 204);

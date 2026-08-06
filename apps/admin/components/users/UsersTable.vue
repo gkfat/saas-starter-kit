@@ -11,7 +11,12 @@
         <span class="text-medium-emphasis">{{ $t('users.noData') }}</span>
       </template>
       <template #[`item.userId`]="{ item }">
-        <span class="text-caption font-mono text-medium-emphasis">{{ item.userId }}</span>
+        <span class="text-caption font-mono text-no-wrap text-medium-emphasis">{{
+          item.userId
+        }}</span>
+      </template>
+      <template #[`item.memberNo`]="{ item }">
+        <span class="text-caption font-mono">{{ item.memberNo }}</span>
       </template>
       <template #[`item.email`]="{ item }">
         <span>{{ item.email ?? '-' }}</span>
@@ -37,10 +42,19 @@
         }}</span>
       </template>
       <template #[`item.createdAt`]="{ item }">
-        <span>{{ formatDateTime(item.createdAt) }}</span>
+        <span class="text-no-wrap">{{ formatDateTime(item.createdAt) }}</span>
+      </template>
+      <template v-if="showLevelColumn" #[`item.level`]="{ item }">
+        <span v-if="item.level" class="text-no-wrap">{{ item.level.levelName }}</span>
+        <span v-else class="text-medium-emphasis">—</span>
       </template>
       <template #[`item.actions`]="{ item }">
         <v-row no-gutters class="ga-1 flex-nowrap">
+          <ButtonsIconActionBtn
+            v-if="showMemberFeatures"
+            icon="mdi-information-outline"
+            @click="emit('detail', item)"
+          />
           <ButtonsIconActionBtn
             v-if="canWriteUsers"
             icon="mdi-pencil"
@@ -69,16 +83,23 @@
 </template>
 
 <script setup lang="ts">
+import { FeatureFlag } from '@saas-starter-kit/shared';
 import type { UserRow } from '@saas-starter-kit/shared';
 
-const props = defineProps<{
-  users: UserRow[];
-  pending: boolean;
-  canWriteUsers: boolean;
-  canDeleteUsers: boolean;
-}>();
+const props = withDefaults(
+  defineProps<{
+    users: UserRow[];
+    pending: boolean;
+    canWriteUsers: boolean;
+    canDeleteUsers: boolean;
+    /** Member-only affordances (level column, detail dialog) — not applicable to admin accounts */
+    showMemberFeatures?: boolean;
+  }>(),
+  { showMemberFeatures: true },
+);
 
 const emit = defineEmits<{
+  detail: [item: UserRow];
   edit: [item: UserRow];
   'toggle-status': [item: UserRow];
   'regenerate-link': [item: UserRow];
@@ -87,19 +108,21 @@ const emit = defineEmits<{
 }>();
 
 const { t, locale } = useI18n();
+const { isFeatureEnabled } = useFeatureFlags();
+const showLevelColumn = props.showMemberFeatures && isFeatureEnabled(FeatureFlag.Level);
 
 const headers = computed(() => [
   { title: t('users.uid'), key: 'userId' },
+  { title: t('users.memberNo'), key: 'memberNo' },
   { title: t('auth.username'), key: 'username' },
   { title: t('users.email'), key: 'email' },
   { title: t('users.displayName'), key: 'displayName' },
   { title: t('users.role'), key: 'role' },
   { title: t('users.status.label'), key: 'status', sortable: false },
+  ...(showLevelColumn ? [{ title: t('users.level'), key: 'level', sortable: false }] : []),
   { title: t('users.lastLoginAt'), key: 'lastLoginAt' },
   { title: t('users.createdAt'), key: 'createdAt' },
-  ...(props.canWriteUsers || props.canDeleteUsers
-    ? [{ title: '', key: 'actions', sortable: false, align: 'end' as const }]
-    : []),
+  { title: '', key: 'actions', sortable: false, align: 'end' as const },
 ]);
 
 function statusLabel(item: UserRow): string {

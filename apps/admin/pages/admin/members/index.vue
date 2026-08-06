@@ -17,12 +17,15 @@
       :pending="pending"
       :can-write-users="canWriteUsers"
       :can-delete-users="canDeleteUsers"
+      @detail="openDetail"
       @edit="openEdit"
       @toggle-status="openToggleStatus"
       @regenerate-link="regenerateLink"
       @generate-line-invite="generateLineInvite"
       @delete="openDelete"
     />
+
+    <MemberDetailDialog v-model="detailDialog" :user="detailTarget" />
 
     <EditRoleDialog
       v-model="dialog"
@@ -64,6 +67,7 @@ import type {
 import CreateUserDialog from '~/components/users/CreateUserDialog.vue';
 import DeleteUserDialog from '~/components/users/DeleteUserDialog.vue';
 import EditRoleDialog from '~/components/users/EditRoleDialog.vue';
+import MemberDetailDialog from '~/components/users/MemberDetailDialog.vue';
 import SetupLinkDialog from '~/components/users/SetupLinkDialog.vue';
 import ToggleStatusDialog from '~/components/users/ToggleStatusDialog.vue';
 import UsersFilterBar from '~/components/users/UsersFilterBar.vue';
@@ -112,6 +116,14 @@ const editing = ref<UserRow | null>(null);
 function openEdit(item: UserRow) {
   editing.value = item;
   dialog.value = true;
+}
+
+const detailDialog = ref(false);
+const detailTarget = ref<UserRow | null>(null);
+
+function openDetail(item: UserRow) {
+  detailTarget.value = item;
+  detailDialog.value = true;
 }
 
 const createDialog = ref(false);

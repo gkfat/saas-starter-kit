@@ -19,10 +19,12 @@ export default defineNitroConfig({
     adminAppUrl: process.env.ADMIN_APP_URL ?? 'http://localhost:3005',
     liffId: process.env.VITE_LIFF_ID ?? '',
     corsAllowedOrigins: process.env.CORS_ALLOWED_ORIGINS ?? '',
+    levelBatchSecret: process.env.LEVEL_BATCH_SECRET ?? '',
     public: {
       featureFlags: {
         auditLog: process.env.FEATURE_AUDIT_LOG_ENABLED !== 'false',
         loginLog: process.env.FEATURE_LOGIN_LOG_ENABLED !== 'false',
+        level: process.env.FEATURE_LEVEL_ENABLED !== 'false',
       },
     },
   },

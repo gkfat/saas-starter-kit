@@ -1,9 +1,10 @@
 import { z } from 'zod';
 import { getAccountStatus } from '~/modules/identity';
+import { getLevelsForUsers } from '~/modules/level';
 import { getAllUsers } from '~/modules/users';
 import { getRoleForUser } from '~/modules/roles';
 import { requirePermission } from '~/shared/rbac';
-import { Permission, Role } from '@saas-starter-kit/shared';
+import { FeatureFlag, Permission, Role } from '@saas-starter-kit/shared';
 
 const QuerySchema = z.object({
   q: z.string().optional(),
@@ -19,6 +20,9 @@ export default defineEventHandler(async (event) => {
   const keyword = q?.trim().toLowerCase();
 
   const users = await getAllUsers();
+  const levelsByUserId = useRuntimeConfig().public.featureFlags[FeatureFlag.Level]
+    ? await getLevelsForUsers(users.map((user) => user.userId))
+    : new Map();
   const withRole = await Promise.all(
     users.map(async (user) => {
       const { disabled } = await getAccountStatus(user.userId);
@@ -26,6 +30,7 @@ export default defineEventHandler(async (event) => {
         ...user,
         disabled,
         role: await getRoleForUser(user.userId),
+        level: levelsByUserId.get(user.userId) ?? null,
       };
     }),
   );

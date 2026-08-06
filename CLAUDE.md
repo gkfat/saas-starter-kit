@@ -106,3 +106,4 @@ See `docs/plan.md` for the full roadmap. Current status:
 - ✅ Phase 4: Users module (audit_logs 已寫入)
 - ⬜ Phase 5: Logging module（分頁 / 篩選 / 匯出待補）
 - ⬜ Phase 6: Admin Dashboard
+- ✅ Phase 7: Level module（週期評等、級距表管理、到期批次評等；指標串接留待後續 phase）

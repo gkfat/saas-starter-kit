@@ -16,12 +16,14 @@
     "@saas-starter-kit/shared": "workspace:*",
     "firebase": "^11.0.0",
     "pinia": "^3.0.4",
+    "qrcode": "^1.5.4",
     "vue": "^3.5.38",
     "vue-router": "^4.5.0",
     "vuetify": "^3.8.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.0.0",
+    "@types/qrcode": "^1.5.6",
     "@typescript-eslint/eslint-plugin": "^8.0.0",
     "@typescript-eslint/parser": "^8.0.0",
     "@vitejs/plugin-vue": "^5.2.4",

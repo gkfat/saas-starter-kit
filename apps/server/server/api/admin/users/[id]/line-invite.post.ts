@@ -28,7 +28,7 @@ export default defineEventHandler(async (event): Promise<GenerateLineInviteRespo
 
   const token = await generateLineInviteToken(userId);
   const config = useRuntimeConfig();
-  const inviteLink = `${config.liffAppUrl}/invite?token=${token}`;
+  const inviteLink = `${config.liffAppUrl}/auth/invite?token=${token}`;
 
   const actorUser = await getUserById(actorId);
   recordAuditLog({

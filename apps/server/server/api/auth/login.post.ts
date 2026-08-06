@@ -67,6 +67,7 @@ export default defineEventHandler(async (event) => {
     email: firestoreUser?.email ?? identity.email,
     displayName: firestoreUser?.displayName ?? identity.displayName,
     phone: firestoreUser?.phone ?? identity.phone,
+    memberNo: firestoreUser?.memberNo ?? null,
     providers,
     role: identity.role,
     permissions: identity.permissions,

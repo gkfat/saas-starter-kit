@@ -4,6 +4,7 @@ export type User = {
   displayName: string;
   email: string | null;
   phone: string | null;
+  memberNo: string;
   passwordSetupPending: boolean;
   lastLoginAt: string | null;
   createdAt: string;

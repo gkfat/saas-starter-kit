@@ -1,7 +1,9 @@
 import { createError } from 'h3';
-import { jwtVerify } from 'jose';
+import { createRemoteJWKSet, decodeProtectedHeader, jwtVerify } from 'jose';
 
 const LINE_ISSUER = 'https://access.line.me';
+const LINE_JWKS_URL = 'https://api.line.me/oauth2/v2.1/certs';
+const lineJwks = createRemoteJWKSet(new URL(LINE_JWKS_URL));
 
 export type LineProviderConfig = {
   channelId: string;
@@ -30,18 +32,25 @@ export type LineIdentity = {
 };
 
 /**
- * LINE ID Token 依 channel 設定可能簽成 HS256（對稱、用 channel secret）或 ES256（非對稱、
- * 可用公開 JWKS 驗證）。實測本專案使用的 channel 簽出的是 HS256，因此在此以 channel secret
- * 做 HMAC 驗證；jose 的 `createRemoteJWKSet`（JWKS-only）驗不了 HS256 token。
+ * LINE ID Token 依 channel 的「Assertion Signing Algorithm」設定，可能簽成 HS256（對稱、用
+ * channel secret 做 HMAC 驗證）或 ES256（非對稱、需用 LINE 公開 JWKS 驗證）——這是 channel
+ * 層級的設定，同一個 repo 對接不同 channel 時可能拿到不同演算法的 token，不能寫死其中一種。
+ * 因此先解出（不驗證）JWT header 的 `alg`，再依演算法選擇對應的驗證金鑰來源。
  */
 export async function verifyLineIdToken(idToken: string): Promise<LineIdentity> {
   const { channelId, channelSecret } = getLineProviderConfig();
-  const secretKey = new TextEncoder().encode(channelSecret);
+  const { alg } = decodeProtectedHeader(idToken);
 
-  const { payload } = await jwtVerify(idToken, secretKey, {
-    issuer: LINE_ISSUER,
-    audience: channelId,
-  });
+  const { payload } =
+    alg === 'HS256'
+      ? await jwtVerify(idToken, new TextEncoder().encode(channelSecret), {
+          issuer: LINE_ISSUER,
+          audience: channelId,
+        })
+      : await jwtVerify(idToken, lineJwks, {
+          issuer: LINE_ISSUER,
+          audience: channelId,
+        });
 
   if (typeof payload.sub !== 'string') {
     throw createError({ statusCode: 401, message: 'Invalid LINE ID token' });

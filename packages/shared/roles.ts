@@ -31,6 +31,8 @@ export const RolePermissions: Record<Role, Permission[]> = {
     Permission.Permissions.Read,
     Permission.LoginLogs.Read,
     Permission.AuditLogs.Read,
+    Permission.LevelTiers.Read,
+    Permission.LevelTiers.Write,
   ],
   member: [],
 };
