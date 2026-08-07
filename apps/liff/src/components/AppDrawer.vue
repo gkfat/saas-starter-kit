@@ -20,6 +20,12 @@
         title="會員中心"
         @click="open = false"
       />
+      <v-list-item
+        :to="{ name: 'myCoupons' }"
+        prepend-icon="mdi-ticket-percent-outline"
+        title="我的優惠券"
+        @click="open = false"
+      />
     </v-list>
   </v-navigation-drawer>
 </template>

@@ -6,7 +6,11 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/auth/login',
+      // A string redirect target drops the current query string. LINE's OAuth
+      // callback lands here at `/` with `code`/`state` (liff.init() needs them to
+      // complete the login) — forward `to.query` so they survive the redirect to
+      // /auth/login instead of vanishing before LoginPage.vue ever mounts.
+      redirect: (to) => ({ path: '/auth/login', query: to.query }),
     },
     {
       path: '/auth',
@@ -40,6 +44,19 @@ const router = createRouter({
           path: 'member-center',
           name: 'memberCenter',
           component: () => import('~/pages/member-center/index.vue'),
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'coupons',
+          name: 'myCoupons',
+          component: () => import('~/pages/coupons/index.vue'),
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'coupons/:id',
+          name: 'couponDetail',
+          component: () => import('~/pages/coupons/[id].vue'),
+          props: true,
           meta: { requiresAuth: true },
         },
       ],

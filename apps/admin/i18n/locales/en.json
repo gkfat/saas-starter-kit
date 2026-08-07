@@ -26,6 +26,8 @@
   },
   "nav": {
     "groupManagement": "Management",
+    "groupCoupons": "Coupon Module",
+    "groupLevel": "Level Module",
     "groupIam": "IAM",
     "groupAbout": "About",
     "dashboard": "Dashboard",
@@ -38,6 +40,8 @@
     "loginLogs": "Login Logs",
     "auditLogs": "Audit Logs",
     "levelTiers": "Level Tiers",
+    "coupons": "Coupon Management",
+    "couponsRedeem": "Redeem Coupon",
     "home": "Home"
   },
   "auth": {
@@ -371,6 +375,70 @@
     "thresholdRequired": "Threshold is required",
     "thresholdMustExceedPrevious": "Threshold must be greater than the previous level's threshold ({threshold})"
   },
+  "coupons": {
+    "title": "Coupon Management",
+    "noData": "No coupon templates yet",
+    "create": "New Template",
+    "edit": "Edit Template",
+    "templateTitle": "Title",
+    "description": "Description",
+    "discountType": "Discount Type",
+    "discountTypeOption": {
+      "fixed": "Fixed Amount",
+      "percentage": "Percentage",
+      "item": "Item Redemption"
+    },
+    "discountValue": "Discount Value",
+    "validDays": "Valid Days",
+    "status": "Status",
+    "statusOption": {
+      "draft": "Draft",
+      "published": "Published",
+      "disabled": "Disabled"
+    },
+    "createSuccess": "Template created",
+    "updateSuccess": "Template updated",
+    "titleRequired": "Title is required",
+    "descriptionRequired": "Description is required",
+    "discountValueRequired": "Discount value is required",
+    "validDaysRequired": "Valid days is required",
+    "issue": "Issue",
+    "issueTitle": "Issue Coupon",
+    "issueSelected": "{count} member(s) selected",
+    "issueSubmit": "Confirm Issue",
+    "issueSuccess": "Issued to {count} member(s)",
+    "issueOnlyPublished": "Only published templates can be issued",
+    "instances": "Issuance Records",
+    "instancesTitle": "Issuance Records",
+    "instancesNoData": "No issuance records yet",
+    "member": "Member",
+    "issuedAt": "Issued At",
+    "state": "Redemption Status",
+    "stateLabel": {
+      "usable": "Usable",
+      "redeemed": "Redeemed",
+      "expired": "Expired"
+    },
+    "searchMember": "Search by name/member no./phone",
+    "myCard": {
+      "cardTitle": "My Coupons",
+      "usable": "Usable",
+      "redeemed": "Redeemed",
+      "expired": "Expired",
+      "empty": "No coupons yet"
+    }
+  },
+  "couponsRedeem": {
+    "title": "Redeem Coupon",
+    "codeLabel": "Coupon Code",
+    "codePlaceholder": "Enter coupon code",
+    "submit": "Redeem",
+    "success": "Redeemed successfully",
+    "resultTitle": "Redemption Result",
+    "errorNotFound": "Code not found",
+    "errorAlreadyRedeemed": "This coupon has already been used",
+    "errorExpired": "This coupon has expired"
+  },
   "roles": {
     "title": "Roles",
     "name": "Role Name",
@@ -447,6 +515,10 @@
     "login_logs:read": "Read login logs",
     "audit_logs:read": "Read audit logs",
     "level_tiers:read": "Read level tiers",
-    "level_tiers:write": "Edit level tiers"
+    "level_tiers:write": "Edit level tiers",
+    "coupons:read": "Read coupon templates and issuance records",
+    "coupons:write": "Edit coupon templates",
+    "coupons:issue": "Issue coupons",
+    "coupons:redeem": "Redeem coupons"
   }
 }

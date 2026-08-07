@@ -16,6 +16,8 @@ export const ROUTES = {
   loginLogs: '/admin/logs/login',
   auditLogs: '/admin/logs/audit',
   levelTiers: '/admin/level/tiers',
+  coupons: '/admin/coupons',
+  couponsRedeem: '/admin/coupons/redeem',
   iamRoles: '/iam/roles',
   iamPermissions: '/iam/permissions',
 } as const;
@@ -88,6 +90,11 @@ export const APP_ROUTES: RouteGroup[] = [
         permission: Permission.AuditLogs.Read,
         featureFlag: FeatureFlag.AuditLog,
       },
+    ],
+  },
+  {
+    label: 'nav.groupLevel',
+    items: [
       {
         title: 'nav.levelTiers',
         icon: 'mdi-podium-gold',
@@ -95,6 +102,27 @@ export const APP_ROUTES: RouteGroup[] = [
         exact: true,
         permission: Permission.LevelTiers.Read,
         featureFlag: FeatureFlag.Level,
+      },
+    ],
+  },
+  {
+    label: 'nav.groupCoupons',
+    items: [
+      {
+        title: 'nav.coupons',
+        icon: 'mdi-ticket-percent',
+        path: ROUTES.coupons,
+        exact: true,
+        permission: Permission.Coupons.Read,
+        featureFlag: FeatureFlag.Coupon,
+      },
+      {
+        title: 'nav.couponsRedeem',
+        icon: 'mdi-qrcode-scan',
+        path: ROUTES.couponsRedeem,
+        exact: true,
+        permission: Permission.Coupons.Redeem,
+        featureFlag: FeatureFlag.Coupon,
       },
     ],
   },

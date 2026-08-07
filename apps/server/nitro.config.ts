@@ -25,6 +25,7 @@ export default defineNitroConfig({
         auditLog: process.env.FEATURE_AUDIT_LOG_ENABLED !== 'false',
         loginLog: process.env.FEATURE_LOGIN_LOG_ENABLED !== 'false',
         level: process.env.FEATURE_LEVEL_ENABLED !== 'false',
+        coupon: process.env.FEATURE_COUPON_ENABLED === 'true',
       },
     },
   },

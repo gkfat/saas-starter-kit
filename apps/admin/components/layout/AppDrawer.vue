@@ -6,20 +6,23 @@
     :temporary="mobile"
     :width="mobile ? Math.min(280, viewportWidth) : 256"
   >
-    <!-- Project header -->
-    <div
-      class="d-flex align-center px-3 py-3"
-      style="min-height: 64px; cursor: pointer"
-      @click="router.push(ROUTES.root)"
-    >
-      <v-icon icon="mdi-fire" color="primary" size="24" class="flex-shrink-0" />
-      <div v-if="!rail || mobile" class="ml-3 overflow-hidden">
-        <div class="text-body-2 font-weight-medium text-truncate">SaaS Starter Kit</div>
-        <div class="text-caption text-medium-emphasis text-truncate">v{{ appVersion }}</div>
+    <template #prepend>
+      <!-- Project header -->
+      <div
+        class="d-flex align-center px-3 py-3"
+        :class="{ 'justify-center': rail || mobile }"
+        style="min-height: 64px; cursor: pointer"
+        @click="router.push(ROUTES.root)"
+      >
+        <v-icon icon="mdi-fire" color="primary" size="24" class="flex-shrink-0" />
+        <div v-if="!rail || mobile" class="ml-3 overflow-hidden">
+          <div class="text-body-2 font-weight-medium text-truncate">SaaS Starter Kit</div>
+          <div class="text-caption text-medium-emphasis text-truncate">v{{ appVersion }}</div>
+        </div>
       </div>
-    </div>
 
-    <v-divider />
+      <v-divider />
+    </template>
 
     <v-list nav density="compact" class="py-2" style="--v-list-item-icon-size: 18px">
       <template v-for="group in visibleGroups" :key="group.label">

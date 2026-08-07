@@ -31,6 +31,12 @@ export const Permission = {
     Read: 'level_tiers:read',
     Write: 'level_tiers:write',
   },
+  Coupons: {
+    Read: 'coupons:read',
+    Write: 'coupons:write',
+    Issue: 'coupons:issue',
+    Redeem: 'coupons:redeem',
+  },
 } as const;
 
 type NestedValues<T> = T extends string ? T : { [K in keyof T]: NestedValues<T[K]> }[keyof T];
@@ -54,4 +60,8 @@ export const PermissionMeta: Record<Permission, string> = {
   'audit_logs:read': '讀取稽核紀錄',
   'level_tiers:read': '讀取等級級距表',
   'level_tiers:write': '編輯等級級距表',
+  'coupons:read': '讀取優惠券範本與發放紀錄',
+  'coupons:write': '編輯優惠券範本',
+  'coupons:issue': '發放優惠券',
+  'coupons:redeem': '核銷優惠券',
 };

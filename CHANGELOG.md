@@ -40,6 +40,7 @@
 - 實作 Liff & 後台串接 Line 登入，新增變更密碼功能
 - 實作 API tracing log
 - 實作會員等級 feature
+- 實作優惠券 feature
 
 ### Changed
 

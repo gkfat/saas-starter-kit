@@ -26,6 +26,8 @@
   },
   "nav": {
     "groupManagement": "管理",
+    "groupCoupons": "優惠券模組",
+    "groupLevel": "等級模組",
     "groupIam": "身份與存取管理",
     "groupAbout": "關於",
     "dashboard": "儀表板",
@@ -38,6 +40,8 @@
     "loginLogs": "登入紀錄",
     "auditLogs": "稽核紀錄",
     "levelTiers": "等級管理",
+    "coupons": "優惠券管理",
+    "couponsRedeem": "優惠券核銷",
     "home": "首頁"
   },
   "auth": {
@@ -371,6 +375,70 @@
     "thresholdRequired": "請輸入門檻",
     "thresholdMustExceedPrevious": "門檻必須大於上一等級門檻（{threshold}）"
   },
+  "coupons": {
+    "title": "優惠券管理",
+    "noData": "尚未建立優惠券範本",
+    "create": "新增範本",
+    "edit": "編輯範本",
+    "templateTitle": "標題",
+    "description": "說明",
+    "discountType": "折扣類型",
+    "discountTypeOption": {
+      "fixed": "固定金額",
+      "percentage": "百分比折扣",
+      "item": "兌換品項"
+    },
+    "discountValue": "折扣值",
+    "validDays": "有效天數",
+    "status": "狀態",
+    "statusOption": {
+      "draft": "草稿",
+      "published": "已發行",
+      "disabled": "已停用"
+    },
+    "createSuccess": "範本已新增",
+    "updateSuccess": "範本已更新",
+    "titleRequired": "請輸入標題",
+    "descriptionRequired": "請輸入說明",
+    "discountValueRequired": "請輸入折扣值",
+    "validDaysRequired": "請輸入有效天數",
+    "issue": "發放",
+    "issueTitle": "發放優惠券",
+    "issueSelected": "已選擇 {count} 位會員",
+    "issueSubmit": "確認發放",
+    "issueSuccess": "已發放給 {count} 位會員",
+    "issueOnlyPublished": "僅已發行的範本可執行發放",
+    "instances": "發放紀錄",
+    "instancesTitle": "發放紀錄",
+    "instancesNoData": "尚無發放紀錄",
+    "member": "會員",
+    "issuedAt": "發放時間",
+    "state": "核銷狀態",
+    "stateLabel": {
+      "usable": "可使用",
+      "redeemed": "已使用",
+      "expired": "已過期"
+    },
+    "searchMember": "搜尋姓名/會員編號/電話",
+    "myCard": {
+      "cardTitle": "我的優惠券",
+      "usable": "可使用",
+      "redeemed": "已使用",
+      "expired": "已失效",
+      "empty": "尚無優惠券"
+    }
+  },
+  "couponsRedeem": {
+    "title": "優惠券核銷",
+    "codeLabel": "優惠券序號",
+    "codePlaceholder": "請輸入優惠券序號",
+    "submit": "核銷",
+    "success": "核銷成功",
+    "resultTitle": "核銷結果",
+    "errorNotFound": "查無此序號",
+    "errorAlreadyRedeemed": "此券已使用",
+    "errorExpired": "此券已過期"
+  },
   "roles": {
     "title": "角色管理",
     "name": "角色名稱",
@@ -447,6 +515,10 @@
     "login_logs:read": "讀取登入紀錄",
     "audit_logs:read": "讀取稽核紀錄",
     "level_tiers:read": "讀取等級級距表",
-    "level_tiers:write": "編輯等級級距表"
+    "level_tiers:write": "編輯等級級距表",
+    "coupons:read": "讀取優惠券範本與發放紀錄",
+    "coupons:write": "編輯優惠券範本",
+    "coupons:issue": "發放優惠券",
+    "coupons:redeem": "核銷優惠券"
   }
 }

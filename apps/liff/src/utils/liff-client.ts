@@ -1,11 +1,18 @@
 import liff from '@line/liff';
 
-let initialized = false;
+let initPromise: Promise<void> | null = null;
 
-async function initLiff(): Promise<void> {
-  if (initialized) return;
-  await liff.init({ liffId: import.meta.env.VITE_LIFF_ID });
-  initialized = true;
+/**
+ * Caches the in-flight init Promise (not just a "did it happen" boolean) so that
+ * concurrent callers on the same page load — e.g. a double tap on BindPage's submit
+ * button before Vue removes it from the DOM — all await the same single
+ * `liff.init()` call instead of racing to start it more than once.
+ */
+function initLiff(): Promise<void> {
+  if (!initPromise) {
+    initPromise = liff.init({ liffId: import.meta.env.VITE_LIFF_ID });
+  }
+  return initPromise;
 }
 
 /**
