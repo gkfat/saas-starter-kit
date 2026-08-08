@@ -348,6 +348,10 @@
     "deleteConfirm": "Are you sure you want to permanently delete \"{username}\"? This cannot be undone.",
     "deleteSuccess": "User deleted",
     "level": "Level",
+    "groupBasic": "Basic Info",
+    "groupActivity": "Activity Status",
+    "groupLevel": "Level",
+    "groupPoints": "Points",
     "detail": "Member Detail",
     "detailTitle": "Member Detail"
   },

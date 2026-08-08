@@ -348,6 +348,10 @@
     "deleteConfirm": "確定要永久刪除「{username}」嗎？此操作無法復原。",
     "deleteSuccess": "使用者已刪除",
     "level": "等級",
+    "groupBasic": "基本資料",
+    "groupActivity": "活動狀態",
+    "groupLevel": "等級資料",
+    "groupPoints": "點數資料",
     "detail": "會員詳情",
     "detailTitle": "會員詳情"
   },

@@ -17,7 +17,7 @@
       <v-list-item
         :to="{ name: 'memberCenter' }"
         prepend-icon="mdi-account-circle-outline"
-        title="會員中心"
+        title="個人資料"
         @click="open = false"
       />
       <v-list-item

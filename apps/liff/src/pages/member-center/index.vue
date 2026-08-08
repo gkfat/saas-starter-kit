@@ -1,28 +1,43 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import AppCard from '~/components/common/AppCard.vue';
+import { useToast } from '~/composables/useToast';
 import { useAuthStore } from '~/stores/auth';
 import { apiFetch } from '~/utils/api-client';
 import { getFreshIdToken } from '~/utils/auth-token';
 
 const store = useAuthStore();
+const { showSuccess } = useToast();
 
-const editingDisplayName = ref(false);
-const displayNameInput = ref('');
-const savingDisplayName = ref(false);
+const editing = ref(false);
+const displayNameInput = ref(store.user?.displayName ?? '');
+const saving = ref(false);
 const errorMessage = ref('');
+
+watch(
+  () => store.user?.displayName,
+  (displayName) => {
+    if (!editing.value) displayNameInput.value = displayName ?? '';
+  },
+);
 
 function startEdit() {
   displayNameInput.value = store.user?.displayName ?? '';
   errorMessage.value = '';
-  editingDisplayName.value = true;
+  editing.value = true;
 }
 
-async function saveDisplayName() {
+function cancelEdit() {
+  editing.value = false;
+  errorMessage.value = '';
+  displayNameInput.value = store.user?.displayName ?? '';
+}
+
+async function save() {
   const trimmed = displayNameInput.value.trim();
   if (!trimmed || !store.user) return;
 
-  savingDisplayName.value = true;
+  saving.value = true;
   errorMessage.value = '';
   try {
     const idToken = await getFreshIdToken();
@@ -32,60 +47,87 @@ async function saveDisplayName() {
       body: { displayName: trimmed },
     });
     store.user.displayName = trimmed;
-    editingDisplayName.value = false;
+    editing.value = false;
+    showSuccess('個人資料已更新');
   } catch (e) {
     errorMessage.value = e instanceof Error ? e.message : String(e);
   } finally {
-    savingDisplayName.value = false;
+    saving.value = false;
   }
 }
 </script>
 
 <template>
-  <AppCard>
-    <div v-if="!editingDisplayName" class="d-flex justify-end mb-2">
-      <v-btn variant="text" size="small" @click="startEdit">編輯</v-btn>
+  <div>
+    <div class="d-flex align-center justify-space-between mb-3">
+      <div class="text-h6 font-weight-bold">個人資料</div>
     </div>
-    <v-row>
-      <v-col cols="12">
-        <div class="text-caption text-medium-emphasis">顯示名稱</div>
-        <div v-if="!editingDisplayName">{{ store.user?.displayName ?? '-' }}</div>
-        <div v-else class="d-flex ga-2 align-center">
+
+    <AppCard>
+      <v-row dense class="py-3 ga-1">
+        <v-col cols="12">
+          <v-text-field
+            :model-value="store.user?.username ?? '-'"
+            variant="outlined"
+            rounded="xl"
+            label="帳號"
+            hide-details
+            readonly
+            :disabled="editing"
+          />
+        </v-col>
+
+        <v-col cols="12">
           <v-text-field
             v-model="displayNameInput"
-            density="compact"
-            hide-details
-            :disabled="savingDisplayName"
+            label="顯示名稱"
+            rounded="xl"
+            :readonly="!editing"
+            variant="outlined"
+            hide-details="auto"
+            :disabled="saving"
           />
-          <v-btn color="primary" size="small" :loading="savingDisplayName" @click="saveDisplayName">
-            儲存
-          </v-btn>
-          <v-btn
-            variant="text"
-            size="small"
-            :disabled="savingDisplayName"
-            @click="editingDisplayName = false"
-          >
-            取消
-          </v-btn>
-        </div>
-        <div v-if="errorMessage" class="text-error text-caption mt-1">{{ errorMessage }}</div>
-      </v-col>
+        </v-col>
 
-      <v-col cols="12" sm="6">
-        <div class="text-caption text-medium-emphasis">帳號</div>
-        <div>{{ store.user?.username ?? '-' }}</div>
-      </v-col>
+        <v-col cols="12">
+          <v-text-field
+            :model-value="store.user?.email ?? '未綁定'"
+            label="Email"
+            readonly
+            rounded="xl"
+            hide-details
+            variant="outlined"
+            :disabled="editing"
+          />
+        </v-col>
 
-      <v-col cols="12" sm="6">
-        <div class="text-caption text-medium-emphasis">Email</div>
-        <div>{{ store.user?.email ?? '未綁定' }}</div>
-      </v-col>
+        <v-col cols="12">
+          <v-text-field
+            :model-value="store.user?.phone ?? '未綁定'"
+            label="手機號碼"
+            hide-details
+            rounded="xl"
+            readonly
+            variant="outlined"
+            :disabled="editing"
+          />
+        </v-col>
+      </v-row>
 
-      <v-col cols="12" sm="6">
-        <div class="text-caption text-medium-emphasis">手機號碼</div>
-        <div>{{ store.user?.phone ?? '未綁定' }}</div>
-      </v-col>
-    </v-row>
-  </AppCard>
+      <div v-if="errorMessage" class="text-error text-caption">{{ errorMessage }}</div>
+
+      <v-card-actions>
+        <v-spacer />
+        <v-btn v-if="editing" variant="outlined" :disabled="saving" @click="cancelEdit">取消</v-btn>
+        <v-btn
+          color="info"
+          variant="flat"
+          :loading="saving"
+          @click="editing ? save() : startEdit()"
+        >
+          {{ editing ? '儲存' : '編輯' }}
+        </v-btn>
+      </v-card-actions>
+    </AppCard>
+  </div>
 </template>
