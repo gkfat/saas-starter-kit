@@ -64,6 +64,7 @@ export default defineNuxtConfig({
         loginLog: process.env.FEATURE_LOGIN_LOG_ENABLED !== 'false',
         level: process.env.FEATURE_LEVEL_ENABLED !== 'false',
         coupon: process.env.FEATURE_COUPON_ENABLED === 'true',
+        points: process.env.FEATURE_POINTS_ENABLED !== 'false',
       },
     },
   },

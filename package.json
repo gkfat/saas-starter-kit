@@ -18,6 +18,7 @@
     "seed:rbac": "tsx scripts/seed-rbac.ts",
     "seed:superadmin": "tsx scripts/seed-superadmin.ts",
     "seed:demo-users": "tsx scripts/seed-demo-users.ts",
+    "deploy:indexes": "firebase deploy --only firestore:indexes",
     "test": "vitest run scripts && pnpm -r --if-present test"
   },
   "lint-staged": {

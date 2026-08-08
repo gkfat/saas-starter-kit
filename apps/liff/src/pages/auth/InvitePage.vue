@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import AppCard from '~/components/common/AppCard.vue';
 import { getLineIdToken } from '~/utils/liff-client';
 import { apiFetch } from '~/utils/api-client';
 import { completeLineSession } from '~/utils/line-auth-flow';
@@ -43,7 +44,7 @@ onMounted(async () => {
   <v-container class="fill-height" fluid>
     <v-row justify="center" align="center">
       <v-col cols="12" sm="8" md="4">
-        <v-card class="pa-6 text-center" elevation="2">
+        <AppCard padding="6" class="text-center">
           <template v-if="status === 'loading'">
             <v-progress-circular indeterminate color="primary" class="mb-4" />
             <div>處理中...</div>
@@ -60,7 +61,7 @@ onMounted(async () => {
             <v-icon icon="mdi-check-circle" color="success" size="40" class="mb-2" />
             <div>帳號啟用成功，已完成登入</div>
           </template>
-        </v-card>
+        </AppCard>
       </v-col>
     </v-row>
   </v-container>

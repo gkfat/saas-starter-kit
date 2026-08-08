@@ -26,6 +26,12 @@
         title="我的優惠券"
         @click="open = false"
       />
+      <v-list-item
+        :to="{ name: 'points' }"
+        prepend-icon="mdi-cash-multiple"
+        title="點數紀錄"
+        @click="open = false"
+      />
     </v-list>
   </v-navigation-drawer>
 </template>

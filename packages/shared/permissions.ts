@@ -37,6 +37,10 @@ export const Permission = {
     Issue: 'coupons:issue',
     Redeem: 'coupons:redeem',
   },
+  Points: {
+    Read: 'points:read',
+    Adjust: 'points:adjust',
+  },
 } as const;
 
 type NestedValues<T> = T extends string ? T : { [K in keyof T]: NestedValues<T[K]> }[keyof T];
@@ -64,4 +68,6 @@ export const PermissionMeta: Record<Permission, string> = {
   'coupons:write': '編輯優惠券範本',
   'coupons:issue': '發放優惠券',
   'coupons:redeem': '核銷優惠券',
+  'points:read': '讀取會員點數',
+  'points:adjust': '增減會員點數',
 };

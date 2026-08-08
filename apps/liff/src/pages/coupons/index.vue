@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import type { CouponInstanceDetail } from '@saas-starter-kit/shared';
+import AppCard from '~/components/common/AppCard.vue';
 import { fetchMyCoupons } from '~/utils/coupons-api';
 
 type TabValue = 'usable' | 'redeemed' | 'expired';
@@ -41,7 +42,7 @@ onMounted(loadCoupons);
 
 <template>
   <div>
-    <div class="d-flex align-center justify-space-between mb-4">
+    <div class="d-flex align-center justify-space-between mb-3">
       <div class="text-h6 font-weight-bold">我的優惠券</div>
       <v-btn
         icon="mdi-refresh"
@@ -71,34 +72,35 @@ onMounted(loadCoupons);
 
       <v-window v-model="activeTab" class="mt-3">
         <v-window-item value="usable">
-          <div v-if="usable.length === 0" class="text-medium-emphasis text-center py-8">
-            目前沒有可使用的優惠券
-          </div>
-          <v-card
+          <AppCard
             v-for="coupon in usable"
             :key="coupon.id"
-            class="pa-4 mb-3"
-            elevation="2"
-            rounded="lg"
+            class="mb-3"
             :to="{ name: 'couponDetail', params: { id: coupon.id } }"
           >
-            <div class="text-body-1 font-weight-bold">{{ coupon.title }}</div>
-            <div class="text-caption text-medium-emphasis">
-              到期日：{{ formatDate(coupon.expiresAt) }}
+            <div class="d-flex justify-space-between align-center">
+              <div>
+                <div class="text-body-1 font-weight-bold">{{ coupon.title }}</div>
+                <div class="text-caption text-medium-emphasis">
+                  到期日：{{ formatDate(coupon.expiresAt) }}
+                </div>
+              </div>
+              <v-btn
+                icon="mdi-qrcode"
+                variant="text"
+                density="comfortable"
+                :to="{ name: 'couponDetail', params: { id: coupon.id } }"
+              />
             </div>
-          </v-card>
+          </AppCard>
+          <div class="text-caption text-medium-emphasis text-center py-4">已經到底囉</div>
         </v-window-item>
 
         <v-window-item value="redeemed">
-          <div v-if="redeemed.length === 0" class="text-medium-emphasis text-center py-8">
-            目前沒有已使用的優惠券
-          </div>
-          <v-card
+          <AppCard
             v-for="coupon in redeemed"
             :key="coupon.id"
-            class="pa-4 mb-3 bg-white"
-            elevation="1"
-            rounded="lg"
+            class="mb-3 bg-white"
             variant="tonal"
             :to="{ name: 'couponDetail', params: { id: coupon.id } }"
           >
@@ -106,19 +108,15 @@ onMounted(loadCoupons);
             <div class="text-caption text-medium-emphasis">
               使用時間：{{ coupon.redeemedAt ? formatDate(coupon.redeemedAt) : '-' }}
             </div>
-          </v-card>
+          </AppCard>
+          <div class="text-caption text-medium-emphasis text-center py-4">已經到底囉</div>
         </v-window-item>
 
         <v-window-item value="expired">
-          <div v-if="expired.length === 0" class="text-medium-emphasis text-center py-8">
-            目前沒有已失效的優惠券
-          </div>
-          <v-card
+          <AppCard
             v-for="coupon in expired"
             :key="coupon.id"
-            class="pa-4 mb-3"
-            elevation="1"
-            rounded="lg"
+            class="mb-3"
             variant="tonal"
             :to="{ name: 'couponDetail', params: { id: coupon.id } }"
           >
@@ -126,7 +124,8 @@ onMounted(loadCoupons);
             <div class="text-caption text-medium-emphasis">
               到期日：{{ formatDate(coupon.expiresAt) }}
             </div>
-          </v-card>
+          </AppCard>
+          <div class="text-caption text-medium-emphasis text-center py-4">已經到底囉</div>
         </v-window-item>
       </v-window>
     </template>

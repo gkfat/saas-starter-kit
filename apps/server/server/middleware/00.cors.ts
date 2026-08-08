@@ -11,7 +11,7 @@ export default defineEventHandler((event) => {
 
   setResponseHeader(event, 'Access-Control-Allow-Origin', origin);
   setResponseHeader(event, 'Access-Control-Allow-Credentials', 'true');
-  setResponseHeader(event, 'Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS');
+  setResponseHeader(event, 'Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
   setResponseHeader(
     event,
     'Access-Control-Allow-Headers',

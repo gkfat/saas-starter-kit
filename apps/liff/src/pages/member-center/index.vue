@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import AppCard from '~/components/common/AppCard.vue';
 import { useAuthStore } from '~/stores/auth';
 import { apiFetch } from '~/utils/api-client';
 import { getFreshIdToken } from '~/utils/auth-token';
@@ -41,7 +42,7 @@ async function saveDisplayName() {
 </script>
 
 <template>
-  <v-card class="pa-4" elevation="1" rounded="lg">
+  <AppCard>
     <div v-if="!editingDisplayName" class="d-flex justify-end mb-2">
       <v-btn variant="text" size="small" @click="startEdit">編輯</v-btn>
     </div>
@@ -86,5 +87,5 @@ async function saveDisplayName() {
         <div>{{ store.user?.phone ?? '未綁定' }}</div>
       </v-col>
     </v-row>
-  </v-card>
+  </AppCard>
 </template>

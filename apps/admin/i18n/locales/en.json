@@ -42,7 +42,10 @@
     "levelTiers": "Level Tiers",
     "coupons": "Coupon Management",
     "couponsRedeem": "Redeem Coupon",
-    "home": "Home"
+    "home": "Home",
+    "groupPoints": "Points Module",
+    "pointsSettings": "Redemption Ratio",
+    "pointsMembers": "Member Points"
   },
   "auth": {
     "login": "Sign In",
@@ -520,5 +523,47 @@
     "coupons:write": "Edit coupon templates",
     "coupons:issue": "Issue coupons",
     "coupons:redeem": "Redeem coupons"
+  },
+  "pointsSettings": {
+    "title": "Points Redemption Ratio",
+    "pointsPerUnit": "Points Required",
+    "currencyValue": "Redeemable Amount (currency)",
+    "ratioPreview": "{points} points = {amount} currency",
+    "pointsPerUnitRequired": "Points required is required",
+    "currencyValueRequired": "Redeemable amount is required",
+    "updateSuccess": "Redemption ratio updated"
+  },
+  "pointsMembers": {
+    "title": "Member Points",
+    "noData": "No members found",
+    "searchPlaceholder": "Search member no. / name / email",
+    "balance": "Balance",
+    "detail": "Points Detail",
+    "detailTitle": "Member Points Detail",
+    "currentBalance": "Current Balance",
+    "adjustTitle": "Adjust Points",
+    "amount": "Amount (positive to add, negative to deduct)",
+    "amountRequired": "Amount is required",
+    "amountNotZero": "Amount must not be zero",
+    "reason": "Reason",
+    "reasonRequired": "Reason is required",
+    "reasonNote": "Note",
+    "reasonNoteRequired": "Note is required",
+    "balanceAfterPreview": "Balance after: {balance}",
+    "insufficientBalance": "Deduction exceeds current balance",
+    "adjustSuccess": "Points updated",
+    "ledgerTitle": "Ledger",
+    "ledgerNoData": "No ledger entries",
+    "ledgerAmount": "Amount",
+    "ledgerBalanceAfter": "Balance After",
+    "ledgerReason": "Reason",
+    "ledgerCreatedAt": "Time",
+    "reasonOption": {
+      "consumption_reward": "Consumption Reward",
+      "complaint_compensation": "Complaint Compensation",
+      "campaign_gift": "Campaign Gift",
+      "birthday_gift": "Birthday Gift",
+      "other": "Other"
+    }
   }
 }

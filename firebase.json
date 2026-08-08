@@ -1,4 +1,7 @@
 {
+  "firestore": {
+    "indexes": "firebase.indexes.json"
+  },
   "hosting": [
     {
       "target": "admin",

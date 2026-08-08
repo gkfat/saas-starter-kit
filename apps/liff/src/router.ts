@@ -59,6 +59,18 @@ const router = createRouter({
           props: true,
           meta: { requiresAuth: true },
         },
+        {
+          path: 'member-card',
+          name: 'memberCard',
+          component: () => import('~/pages/member-card/index.vue'),
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'points',
+          name: 'points',
+          component: () => import('~/pages/points/index.vue'),
+          meta: { requiresAuth: true },
+        },
       ],
     },
   ],

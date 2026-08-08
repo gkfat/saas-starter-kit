@@ -42,7 +42,10 @@
     "levelTiers": "等級管理",
     "coupons": "優惠券管理",
     "couponsRedeem": "優惠券核銷",
-    "home": "首頁"
+    "home": "首頁",
+    "groupPoints": "會員點數模組",
+    "pointsSettings": "折抵比例設定",
+    "pointsMembers": "會員點數管理"
   },
   "auth": {
     "login": "登入",
@@ -520,5 +523,47 @@
     "coupons:write": "編輯優惠券範本",
     "coupons:issue": "發放優惠券",
     "coupons:redeem": "核銷優惠券"
+  },
+  "pointsSettings": {
+    "title": "點數折抵比例設定",
+    "pointsPerUnit": "所需點數",
+    "currencyValue": "可折抵金額（元）",
+    "ratioPreview": "{points} 點 = {amount} 元",
+    "pointsPerUnitRequired": "請輸入所需點數",
+    "currencyValueRequired": "請輸入可折抵金額",
+    "updateSuccess": "折抵比例已更新"
+  },
+  "pointsMembers": {
+    "title": "會員點數管理",
+    "noData": "尚無會員資料",
+    "searchPlaceholder": "搜尋會員編號、姓名、Email",
+    "balance": "目前點數",
+    "detail": "點數明細",
+    "detailTitle": "會員點數明細",
+    "currentBalance": "目前點數餘額",
+    "adjustTitle": "增減點數",
+    "amount": "點數（正數為增加，負數為扣除）",
+    "amountRequired": "請輸入點數",
+    "amountNotZero": "點數不可為 0",
+    "reason": "原因",
+    "reasonRequired": "請選擇原因",
+    "reasonNote": "原因說明",
+    "reasonNoteRequired": "請填寫原因說明",
+    "balanceAfterPreview": "異動後餘額：{balance}",
+    "insufficientBalance": "扣點數量超過目前餘額",
+    "adjustSuccess": "點數已更新",
+    "ledgerTitle": "異動紀錄",
+    "ledgerNoData": "尚無異動紀錄",
+    "ledgerAmount": "異動點數",
+    "ledgerBalanceAfter": "異動後餘額",
+    "ledgerReason": "原因",
+    "ledgerCreatedAt": "時間",
+    "reasonOption": {
+      "consumption_reward": "消費回饋",
+      "complaint_compensation": "客訴補償",
+      "campaign_gift": "活動贈送",
+      "birthday_gift": "生日禮",
+      "other": "其他"
+    }
   }
 }

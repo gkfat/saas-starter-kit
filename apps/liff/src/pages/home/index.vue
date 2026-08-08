@@ -4,7 +4,7 @@ import MemberCard from '~/components/member/MemberCard.vue';
 </script>
 
 <template>
-  <v-row class="mt-4" dense>
+  <v-row dense>
     <v-col cols="12">
       <MemberCard />
     </v-col>

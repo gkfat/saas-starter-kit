@@ -18,6 +18,8 @@ export const ROUTES = {
   levelTiers: '/admin/level/tiers',
   coupons: '/admin/coupons',
   couponsRedeem: '/admin/coupons/redeem',
+  pointsSettings: '/admin/points/settings',
+  pointsMembers: '/admin/points/members',
   iamRoles: '/iam/roles',
   iamPermissions: '/iam/permissions',
 } as const;
@@ -123,6 +125,27 @@ export const APP_ROUTES: RouteGroup[] = [
         exact: true,
         permission: Permission.Coupons.Redeem,
         featureFlag: FeatureFlag.Coupon,
+      },
+    ],
+  },
+  {
+    label: 'nav.groupPoints',
+    items: [
+      {
+        title: 'nav.pointsSettings',
+        icon: 'mdi-cash-multiple',
+        path: ROUTES.pointsSettings,
+        exact: true,
+        permission: Permission.Points.Read,
+        featureFlag: FeatureFlag.Points,
+      },
+      {
+        title: 'nav.pointsMembers',
+        icon: 'mdi-account-cash',
+        path: ROUTES.pointsMembers,
+        exact: true,
+        permission: Permission.Points.Read,
+        featureFlag: FeatureFlag.Points,
       },
     ],
   },

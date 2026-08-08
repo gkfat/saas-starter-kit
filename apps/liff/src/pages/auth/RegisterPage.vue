@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { isValidUsername } from '@saas-starter-kit/shared';
+import AppCard from '~/components/common/AppCard.vue';
 import { apiFetch, type ApiError } from '~/utils/api-client';
 import { completeLineSession } from '~/utils/line-auth-flow';
 import { useLineRegistrationStore } from '~/stores/line-registration';
@@ -52,7 +53,7 @@ async function submit() {
   <v-container class="fill-height" fluid>
     <v-row justify="center" align="center">
       <v-col cols="12" sm="8" md="4">
-        <v-card class="pa-6" elevation="2">
+        <AppCard padding="6">
           <template v-if="status === 'done'">
             <div class="text-center">
               <v-icon icon="mdi-check-circle" color="success" size="40" class="mb-2" />
@@ -85,7 +86,7 @@ async function submit() {
             </v-btn>
             <div v-if="errorMessage" class="text-error text-center mt-3">{{ errorMessage }}</div>
           </template>
-        </v-card>
+        </AppCard>
       </v-col>
     </v-row>
   </v-container>

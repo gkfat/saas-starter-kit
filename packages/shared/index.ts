@@ -4,6 +4,7 @@ export * from './dto/coupons';
 export * from './dto/dashboard';
 export * from './dto/level';
 export * from './dto/logs';
+export * from './dto/points';
 export * from './dto/users';
 export * from './feature-flags';
 export * from './feature-modules';

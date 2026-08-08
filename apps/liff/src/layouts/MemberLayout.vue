@@ -1,6 +1,6 @@
 <template>
   <v-main class="bg-secondary">
-    <v-container>
+    <v-container :max-width="700">
       <AppHeader @toggle-menu="drawerOpen = !drawerOpen" />
       <router-view />
     </v-container>

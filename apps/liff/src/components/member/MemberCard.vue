@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import type { GetLevelResult } from '@saas-starter-kit/shared';
+import type { GetLevelResult, PointsWallet } from '@saas-starter-kit/shared';
+import AppCard from '~/components/common/AppCard.vue';
 import { useAuthStore } from '~/stores/auth';
 import { apiFetch } from '~/utils/api-client';
 import { getFreshIdToken } from '~/utils/auth-token';
 
 const store = useAuthStore();
 const level = ref<GetLevelResult | null>(null);
+const wallet = ref<PointsWallet | null>(null);
 
 const periodProgress = computed(() => {
   if (!level.value) return 0;
@@ -21,20 +23,27 @@ function formatDate(value: string): string {
 }
 
 onMounted(async () => {
+  const idToken = await getFreshIdToken();
+  const headers = { Authorization: `Bearer ${idToken ?? ''}` };
+
   try {
-    const idToken = await getFreshIdToken();
-    level.value = await apiFetch<GetLevelResult | null>('/api/profile/level', {
-      headers: { Authorization: `Bearer ${idToken ?? ''}` },
-    });
+    level.value = await apiFetch<GetLevelResult | null>('/api/profile/level', { headers });
   } catch {
     // 等級功能未開啟或查詢失敗時，安靜略過此區塊
     level.value = null;
+  }
+
+  try {
+    wallet.value = await apiFetch<PointsWallet>('/api/profile/points', { headers });
+  } catch {
+    // 點數功能未開啟或查詢失敗時，安靜略過此區塊
+    wallet.value = null;
   }
 });
 </script>
 
 <template>
-  <v-card class="pa-4" elevation="4" rounded="lg">
+  <AppCard>
     <v-row no-gutters align="start" justify="space-between">
       <v-col cols="auto">
         <div class="text-caption text-medium-emphasis">會員卡</div>
@@ -66,5 +75,18 @@ onMounted(async () => {
         將於 {{ formatDate(level.endDate) }} 重置
       </div>
     </template>
-  </v-card>
+
+    <v-divider v-if="level && wallet" class="my-3" />
+
+    <v-row v-if="wallet" no-gutters align="center" justify="space-between">
+      <v-col cols="auto">
+        <div class="text-caption text-medium-emphasis">目前點數</div>
+        <div class="text-h6 font-weight-bold">{{ wallet.balance }}</div>
+      </v-col>
+      <v-col cols="auto" class="text-right">
+        <div class="text-caption text-medium-emphasis">可折抵金額</div>
+        <div class="text-body-1 font-weight-bold text-info">${{ wallet.redeemableAmount }}</div>
+      </v-col>
+    </v-row>
+  </AppCard>
 </template>

@@ -58,6 +58,11 @@ export async function getLineIdToken(): Promise<string> {
 
   const idToken = liff.getIDToken();
   if (!idToken || isIdTokenExpired(idToken)) {
+    // liff.isLoggedIn() can still report true off a stale cached accessToken, in which
+    // case liff.login() silently reuses that same session instead of re-authenticating —
+    // looping forever with the same expired ID token. logout() first forces a clean
+    // re-authorization against LINE.
+    liff.logout();
     liff.login();
     // liff.login() navigates the page away to LINE's login flow; execution resumes
     // on redirect back to this app, so nothing further runs here.

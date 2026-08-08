@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
+import AppCard from '~/components/common/AppCard.vue';
 import { getLineIdToken } from '~/utils/liff-client';
 import { apiFetch } from '~/utils/api-client';
 
@@ -30,7 +31,7 @@ async function submit() {
   <v-container class="fill-height" fluid>
     <v-row justify="center" align="center">
       <v-col cols="12" sm="8" md="4">
-        <v-card class="pa-6" elevation="2">
+        <AppCard padding="6">
           <template v-if="status === 'idle' || status === 'error'">
             <v-card-title class="text-center px-0">綁定 LINE</v-card-title>
             <v-text-field
@@ -61,7 +62,7 @@ async function submit() {
               <div>綁定成功，請回到原本頁面重新登入</div>
             </div>
           </template>
-        </v-card>
+        </AppCard>
       </v-col>
     </v-row>
   </v-container>
