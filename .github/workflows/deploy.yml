@@ -95,9 +95,29 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+      # apps/admin uses `nuxt generate` (static output), so runtimeConfig.public is baked
+      # into the build at this step — every var it reads (see apps/admin/nuxt.config.ts)
+      # must be supplied here, not just at deploy time.
+      # Requires repo secrets: LINE_CHANNEL_ID, VITE_LIFF_ID, VITE_FIREBASE_API_KEY,
+      # VITE_FIREBASE_AUTH_DOMAIN, VITE_FIREBASE_PROJECT_ID, VITE_FIREBASE_STORAGE_BUCKET,
+      # VITE_FIREBASE_MESSAGING_SENDER_ID, VITE_FIREBASE_APP_ID, SERVER_URL. Feature flag
+      # secrets are optional — fall back to the same defaults as .env.example.
       - run: pnpm --dir apps/admin generate
         env:
-          API_BASE_URL: ${{ secrets.SERVER_URL }}
+          ADMIN_API_BASE_URL: ${{ secrets.SERVER_URL }}
+          LINE_CHANNEL_ID: ${{ secrets.LINE_CHANNEL_ID }}
+          VITE_LIFF_ID: ${{ secrets.VITE_LIFF_ID }}
+          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
+          FEATURE_AUDIT_LOG_ENABLED: ${{ secrets.FEATURE_AUDIT_LOG_ENABLED || 'true' }}
+          FEATURE_LOGIN_LOG_ENABLED: ${{ secrets.FEATURE_LOGIN_LOG_ENABLED || 'true' }}
+          FEATURE_LEVEL_ENABLED: ${{ secrets.FEATURE_LEVEL_ENABLED || 'true' }}
+          FEATURE_COUPON_ENABLED: ${{ secrets.FEATURE_COUPON_ENABLED || 'false' }}
+          FEATURE_POINTS_ENABLED: ${{ secrets.FEATURE_POINTS_ENABLED || 'true' }}
 
       # Requires repo secret: FIREBASE_SERVICE_ACCOUNT (see FirebaseExtended/action-hosting-deploy)
       - uses: FirebaseExtended/action-hosting-deploy@v0
