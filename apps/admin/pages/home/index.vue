@@ -51,6 +51,52 @@
       </v-row>
     </v-container>
 
+    <!-- Architecture -->
+    <v-container class="py-12" :max-width="900">
+      <v-row justify="center" class="text-center mb-6">
+        <v-col cols="12" md="8">
+          <div class="text-h5 font-weight-medium mb-2">{{ $t('home.architecture.title') }}</div>
+          <div class="text-body-2 text-medium-emphasis">
+            {{ $t('home.architecture.subtitle') }}
+          </div>
+        </v-col>
+      </v-row>
+      <v-row justify="center">
+        <v-col cols="12" sm="6">
+          <HomeCard class="pa-6 h-100 text-center">
+            <v-icon icon="mdi-cellphone" color="primary" size="32" class="mb-3" />
+            <div class="text-subtitle-1 font-weight-medium mb-2">
+              {{ $t('home.architecture.liff.label') }}
+            </div>
+            <div class="text-body-2 text-medium-emphasis mb-4">
+              {{ $t('home.architecture.liff.description') }}
+            </div>
+            <img
+              v-if="liffQrDataUrl"
+              :src="liffQrDataUrl"
+              alt="LIFF QR code"
+              width="160"
+              height="160"
+            />
+            <div v-if="liffQrDataUrl" class="text-caption text-medium-emphasis mt-2">
+              {{ $t('home.architecture.liff.qrCaption') }}
+            </div>
+          </HomeCard>
+        </v-col>
+        <v-col cols="12" sm="6">
+          <HomeCard class="pa-6 h-100 text-center">
+            <v-icon icon="mdi-monitor-dashboard" color="primary" size="32" class="mb-3" />
+            <div class="text-subtitle-1 font-weight-medium mb-2">
+              {{ $t('home.architecture.admin.label') }}
+            </div>
+            <div class="text-body-2 text-medium-emphasis">
+              {{ $t('home.architecture.admin.description') }}
+            </div>
+          </HomeCard>
+        </v-col>
+      </v-row>
+    </v-container>
+
     <!-- Explore -->
     <section id="explore" class="explore-section">
       <v-container class="py-12">
@@ -204,6 +250,7 @@
                   :key="module"
                   :color="isModuleSelected(module) ? 'primary' : undefined"
                   :variant="isModuleSelected(module) ? 'flat' : 'outlined'"
+                  :prepend-icon="isModuleSelected(module) ? 'mdi-check' : undefined"
                   @click="toggleModule(module)"
                 >
                   {{ $t(`features.${module}.title`) }}
@@ -227,6 +274,7 @@
   </div>
 </template>
 <script lang="ts" setup>
+import QRCode from 'qrcode';
 import {
   FEATURE_MODULES,
   FeatureModule,
@@ -238,6 +286,14 @@ import { ROUTES } from '~/config/app-routes';
 definePageMeta({ path: ROUTES.home });
 
 const { t } = useI18n();
+const { public: publicConfig } = useRuntimeConfig();
+
+const liffQrDataUrl = ref<string | null>(null);
+
+onMounted(async () => {
+  if (!publicConfig.liffId) return;
+  liffQrDataUrl.value = await QRCode.toDataURL(`https://liff.line.me/${publicConfig.liffId}`);
+});
 const { showSuccess, showError } = useToast();
 const { $api } = useNuxtApp();
 
@@ -337,6 +393,9 @@ const FEATURE_MODULE_ICONS: Record<FeatureModule, string> = {
   [FeatureModule.LoginLogs]: 'mdi-login',
   [FeatureModule.AuditLogs]: 'mdi-history',
   [FeatureModule.Dashboard]: 'mdi-view-dashboard',
+  [FeatureModule.Level]: 'mdi-podium-gold',
+  [FeatureModule.Coupon]: 'mdi-ticket-percent',
+  [FeatureModule.Points]: 'mdi-cash-multiple',
 };
 
 type FeatureCategory = {
@@ -352,6 +411,10 @@ const featureCategories: FeatureCategory[] = [
   {
     labelKey: 'home.explore.categories.admin',
     modules: [FeatureModule.Rbac, FeatureModule.LoginLogs, FeatureModule.AuditLogs],
+  },
+  {
+    labelKey: 'home.explore.categories.engagement',
+    modules: [FeatureModule.Level, FeatureModule.Coupon, FeatureModule.Points],
   },
   {
     labelKey: 'home.explore.categories.analytics',

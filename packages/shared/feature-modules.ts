@@ -5,6 +5,9 @@ export const FeatureModule = {
   AuditLogs: 'auditLogs',
   Dashboard: 'dashboard',
   UserManagement: 'userManagement',
+  Level: 'level',
+  Coupon: 'coupon',
+  Points: 'points',
 } as const;
 
 export type FeatureModule = (typeof FeatureModule)[keyof typeof FeatureModule];
@@ -16,6 +19,9 @@ export const FEATURE_MODULES: FeatureModule[] = [
   FeatureModule.AuditLogs,
   FeatureModule.Dashboard,
   FeatureModule.UserManagement,
+  FeatureModule.Level,
+  FeatureModule.Coupon,
+  FeatureModule.Points,
 ];
 
 // Every membership site needs sign-up/login and member data management, so these

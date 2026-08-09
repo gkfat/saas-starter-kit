@@ -131,6 +131,19 @@
         }
       }
     },
+    "architecture": {
+      "title": "System architecture",
+      "subtitle": "Two platforms, each serving a different audience",
+      "liff": {
+        "label": "LIFF — Member app",
+        "description": "Members open this inside LINE to sign up, log in, check points and level, and claim or redeem coupons.",
+        "qrCaption": "Scan to open the LIFF app"
+      },
+      "admin": {
+        "label": "Admin — Back office",
+        "description": "Staff log in here to manage member data, configure points and level rules, issue coupons, and review login and audit logs."
+      }
+    },
     "industries": {
       "title": "Who is this for?",
       "subtitle": "Whatever you run, including:",
@@ -196,6 +209,7 @@
       "categories": {
         "membership": "Membership",
         "admin": "Admin & governance",
+        "engagement": "Member engagement",
         "analytics": "Analytics"
       }
     }
@@ -224,6 +238,18 @@
     "userManagement": {
       "title": "Member data management",
       "description": "Create, disable, and delete member accounts, and manage member profiles in one place."
+    },
+    "level": {
+      "title": "Member levels",
+      "description": "Auto-rank members by spend or activity, with configurable tiers and periodic re-ranking to drive segmentation."
+    },
+    "coupon": {
+      "title": "Coupons",
+      "description": "Create, distribute, and redeem coupons to run flexible promotions and drive repeat purchases."
+    },
+    "points": {
+      "title": "Member points",
+      "description": "Manage point issuance and transaction history to build an incentive program that boosts member loyalty."
     }
   },
   "dashboard": {

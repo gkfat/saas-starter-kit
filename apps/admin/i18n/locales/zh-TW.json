@@ -131,6 +131,19 @@
         }
       }
     },
+    "architecture": {
+      "title": "本系統架構",
+      "subtitle": "由兩個平台組成，各自服務不同對象",
+      "liff": {
+        "label": "LIFF 會員端",
+        "description": "會員透過 LINE 開啟，完成註冊登入、查看點數與等級、領取與核銷優惠券等自助操作。",
+        "qrCaption": "掃描開啟 LIFF"
+      },
+      "admin": {
+        "label": "Admin 後台",
+        "description": "管理員登入後台，管理會員資料、設定點數與等級規則、發放優惠券，並查看登入與稽核紀錄。"
+      }
+    },
     "industries": {
       "title": "適合哪些商家？",
       "subtitle": "無論您經營的是：",
@@ -196,6 +209,7 @@
       "categories": {
         "membership": "會員系統",
         "admin": "後台治理",
+        "engagement": "會員經營",
         "analytics": "數據分析"
       }
     }
@@ -224,6 +238,18 @@
     "userManagement": {
       "title": "會員資料管理",
       "description": "建立、停用、刪除會員帳號，集中管理會員基本資料。"
+    },
+    "level": {
+      "title": "會員等級",
+      "description": "依消費或活躍度自動評等，設定級距與週期評等規則，經營會員分層。"
+    },
+    "coupon": {
+      "title": "優惠券",
+      "description": "建立、發放與核銷優惠券，靈活規劃促銷活動，帶動會員回購。"
+    },
+    "points": {
+      "title": "會員點數",
+      "description": "管理會員點數發放與異動紀錄，打造誘因機制提升會員黏著度。"
     }
   },
   "dashboard": {
