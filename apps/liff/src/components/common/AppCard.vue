@@ -10,7 +10,7 @@ withDefaults(
     to?: RouteLocationRaw;
   }>(),
   {
-    elevation: 3,
+    elevation: 0,
     rounded: 'lg',
     padding: 4,
     variant: undefined,

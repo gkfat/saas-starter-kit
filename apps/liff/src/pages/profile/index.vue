@@ -64,25 +64,20 @@ async function save() {
     </div>
 
     <AppCard>
-      <v-row dense class="py-3 ga-1">
+      <v-row no-gutters class="pa-3 ga-3">
         <v-col cols="12">
-          <v-text-field
-            :model-value="store.user?.username ?? '-'"
-            variant="outlined"
-            rounded="xl"
-            label="帳號"
-            hide-details
-            readonly
-            :disabled="editing"
-          />
+          <div class="text-caption text-medium-emphasis mb-1">帳號</div>
+          <div class="text-body-1">{{ store.user?.username }}</div>
         </v-col>
 
         <v-col cols="12">
+          <div class="text-caption text-medium-emphasis mb-1">顯示名稱</div>
+          <div v-if="!editing" class="text-body-1">{{ displayNameInput }}</div>
           <v-text-field
+            v-else
             v-model="displayNameInput"
-            label="顯示名稱"
-            rounded="xl"
-            :readonly="!editing"
+            rounded="lg"
+            density="compact"
             variant="outlined"
             hide-details="auto"
             :disabled="saving"
@@ -90,27 +85,13 @@ async function save() {
         </v-col>
 
         <v-col cols="12">
-          <v-text-field
-            :model-value="store.user?.email ?? '未綁定'"
-            label="Email"
-            readonly
-            rounded="xl"
-            hide-details
-            variant="outlined"
-            :disabled="editing"
-          />
+          <div class="text-caption text-medium-emphasis mb-1">Email</div>
+          <div class="text-body-1">{{ store.user?.email ?? '未綁定' }}</div>
         </v-col>
 
         <v-col cols="12">
-          <v-text-field
-            :model-value="store.user?.phone ?? '未綁定'"
-            label="手機號碼"
-            hide-details
-            rounded="xl"
-            readonly
-            variant="outlined"
-            :disabled="editing"
-          />
+          <div class="text-caption text-medium-emphasis mb-1">手機號碼</div>
+          <div class="text-body-1">{{ store.user?.phone ?? '未綁定' }}</div>
         </v-col>
       </v-row>
 
@@ -118,9 +99,9 @@ async function save() {
 
       <v-card-actions>
         <v-spacer />
-        <v-btn v-if="editing" variant="outlined" :disabled="saving" @click="cancelEdit">取消</v-btn>
+        <v-btn v-if="editing" variant="text" :disabled="saving" @click="cancelEdit">取消</v-btn>
         <v-btn
-          color="info"
+          color="primary"
           variant="flat"
           :loading="saving"
           @click="editing ? save() : startEdit()"

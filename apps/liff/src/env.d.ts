@@ -10,6 +10,8 @@ interface ImportMetaEnv {
   readonly VITE_FIREBASE_APP_ID: string;
   readonly VITE_LIFF_ID: string;
   readonly VITE_LIFF_ACCESS_TOKEN?: string;
+  readonly VITE_FEATURE_COUPON_ENABLED: boolean;
+  readonly VITE_FEATURE_POINTS_ENABLED: boolean;
 }
 
 interface ImportMeta {

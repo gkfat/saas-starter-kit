@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref, watch } from 'vue';
 import QRCode from 'qrcode';
 import { useRoute } from 'vue-router';
 import type { CouponInstanceDetail } from '@saas-starter-kit/shared';
@@ -23,9 +23,10 @@ const STATE_LABEL: Record<CouponInstanceDetail['state'], string> = {
   expired: '已過期',
 };
 
-onMounted(async () => {
+async function loadCoupon(id: string): Promise<void> {
+  loading.value = true;
+  errorMessage.value = '';
   try {
-    const id = String(route.params.id);
     coupon.value = await fetchCouponDetail(id);
     qrDataUrl.value = await QRCode.toDataURL(coupon.value.code);
   } catch (e) {
@@ -33,7 +34,13 @@ onMounted(async () => {
   } finally {
     loading.value = false;
   }
-});
+}
+
+watch(
+  () => route.params.id,
+  (id) => loadCoupon(String(id)),
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -62,18 +69,5 @@ onMounted(async () => {
         {{ STATE_LABEL[coupon.state] }}
       </v-chip>
     </AppCard>
-
-    <div class="close-button-bar d-flex justify-center">
-      <v-btn icon="mdi-close" variant="tonal" :to="{ name: 'myCoupons' }" />
-    </div>
   </div>
 </template>
-
-<style scoped>
-.close-button-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 24px;
-}
-</style>

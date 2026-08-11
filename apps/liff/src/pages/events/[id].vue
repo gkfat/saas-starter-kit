@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import type { Event } from '@saas-starter-kit/shared';
 import AppCard from '~/components/common/AppCard.vue';
@@ -15,16 +15,23 @@ function formatDateTime(value: string): string {
   return new Date(value).toLocaleString('zh-TW');
 }
 
-onMounted(async () => {
+async function loadEvent(id: string): Promise<void> {
+  loading.value = true;
+  errorMessage.value = '';
   try {
-    const id = String(route.params.id);
     event.value = await fetchEventDetail(id);
   } catch (e) {
     errorMessage.value = e instanceof Error ? e.message : String(e);
   } finally {
     loading.value = false;
   }
-});
+}
+
+watch(
+  () => route.params.id,
+  (id) => loadEvent(String(id)),
+  { immediate: true },
+);
 </script>
 
 <template>
@@ -47,18 +54,5 @@ onMounted(async () => {
         {{ formatDateTime(event.startAt) }} ~ {{ formatDateTime(event.endAt) }}
       </div>
     </AppCard>
-
-    <div class="close-button-bar d-flex justify-center">
-      <v-btn icon="mdi-close" variant="tonal" :to="{ name: 'home' }" />
-    </div>
   </div>
 </template>
-
-<style scoped>
-.close-button-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 24px;
-}
-</style>

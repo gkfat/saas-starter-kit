@@ -25,6 +25,12 @@ export default defineConfig(({ mode }) => {
       'import.meta.env.VITE_API_BASE_URL': JSON.stringify(
         env.API_BASE_URL ?? 'http://localhost:3000',
       ),
+      'import.meta.env.VITE_FEATURE_COUPON_ENABLED': JSON.stringify(
+        env.FEATURE_COUPON_ENABLED === 'true',
+      ),
+      'import.meta.env.VITE_FEATURE_POINTS_ENABLED': JSON.stringify(
+        env.FEATURE_POINTS_ENABLED !== 'false',
+      ),
     },
   };
 });

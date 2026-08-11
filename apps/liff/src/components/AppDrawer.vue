@@ -1,5 +1,5 @@
 <template>
-  <v-navigation-drawer v-model="open" temporary :style="{ width: open ? '100vw' : undefined }">
+  <v-navigation-drawer v-model="open" temporary location="right">
     <template #prepend>
       <div class="d-flex align-center justify-end pa-2">
         <v-btn icon variant="text" @click="open = false">
@@ -9,27 +9,9 @@
     </template>
     <v-list nav density="compact">
       <v-list-item
-        :to="{ name: 'home' }"
-        prepend-icon="mdi-home-outline"
-        title="首頁"
-        @click="open = false"
-      />
-      <v-list-item
-        :to="{ name: 'memberCenter' }"
+        :to="{ name: 'profile' }"
         prepend-icon="mdi-account-circle-outline"
         title="個人資料"
-        @click="open = false"
-      />
-      <v-list-item
-        :to="{ name: 'myCoupons' }"
-        prepend-icon="mdi-ticket-percent-outline"
-        title="我的優惠券"
-        @click="open = false"
-      />
-      <v-list-item
-        :to="{ name: 'points' }"
-        prepend-icon="mdi-cash-multiple"
-        title="點數紀錄"
         @click="open = false"
       />
     </v-list>

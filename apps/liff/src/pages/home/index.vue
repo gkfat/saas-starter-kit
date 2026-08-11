@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import CouponSummaryCard from '~/components/coupons/CouponSummaryCard.vue';
 import EventBannerCarousel from '~/components/events/EventBannerCarousel.vue';
-import MemberCard from '~/components/member/MemberCard.vue';
+import HomeShortcuts from '~/components/home/HomeShortcuts.vue';
+import MemberCard from '~/components/home/MemberCard.vue';
+import PointsSummaryCard from '~/components/points/PointsSummaryCard.vue';
 </script>
 
 <template>
@@ -10,10 +12,16 @@ import MemberCard from '~/components/member/MemberCard.vue';
       <EventBannerCarousel />
     </v-col>
     <v-col cols="12">
+      <HomeShortcuts />
+    </v-col>
+    <v-col cols="12">
       <MemberCard />
     </v-col>
     <v-col cols="6">
       <CouponSummaryCard />
+    </v-col>
+    <v-col cols="6">
+      <PointsSummaryCard />
     </v-col>
   </v-row>
 </template>

@@ -51,6 +51,21 @@ const iconMap = {
 .toast-item {
   pointer-events: all;
 }
+
+@media (max-width: 599.98px) {
+  .app-toast-container {
+    left: 16px;
+    right: 16px;
+    bottom: 96px;
+  }
+  .toast-list {
+    align-items: stretch;
+  }
+  .toast-item {
+    width: 100%;
+    max-width: none;
+  }
+}
 .toast-enter-active {
   animation: toast-slide-up 0.3s ease-out;
 }

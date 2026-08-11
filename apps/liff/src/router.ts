@@ -41,9 +41,9 @@ const router = createRouter({
           meta: { requiresAuth: true },
         },
         {
-          path: 'member-center',
-          name: 'memberCenter',
-          component: () => import('~/pages/member-center/index.vue'),
+          path: 'profile',
+          name: 'profile',
+          component: () => import('~/pages/profile/index.vue'),
           meta: { requiresAuth: true },
         },
         {
