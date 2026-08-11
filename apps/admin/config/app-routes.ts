@@ -18,6 +18,7 @@ export const ROUTES = {
   levelTiers: '/admin/level/tiers',
   coupons: '/admin/coupons',
   couponsRedeem: '/admin/coupons/redeem',
+  events: '/admin/events',
   pointsSettings: '/admin/points/settings',
   pointsMembers: '/admin/points/members',
   iamRoles: '/iam/roles',
@@ -125,6 +126,19 @@ export const APP_ROUTES: RouteGroup[] = [
         exact: true,
         permission: Permission.Coupons.Redeem,
         featureFlag: FeatureFlag.Coupon,
+      },
+    ],
+  },
+  {
+    label: 'nav.groupEvents',
+    items: [
+      {
+        title: 'nav.events',
+        icon: 'mdi-bullhorn-outline',
+        path: ROUTES.events,
+        exact: true,
+        permission: Permission.Events.Read,
+        featureFlag: FeatureFlag.Event,
       },
     ],
   },

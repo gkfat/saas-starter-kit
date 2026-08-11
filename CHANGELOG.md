@@ -42,6 +42,7 @@
 - 實作會員等級 feature
 - 實作優惠券 feature
 - 實作會員點數 feature
+- 實作活動 feature
 
 ### Changed
 

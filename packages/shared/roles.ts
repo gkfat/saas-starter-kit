@@ -37,6 +37,10 @@ export const RolePermissions: Record<Role, Permission[]> = {
     Permission.Coupons.Write,
     Permission.Coupons.Issue,
     Permission.Coupons.Redeem,
+    Permission.Events.Read,
+    Permission.Events.Write,
+    Permission.Events.Create,
+    Permission.Events.Delete,
   ],
   member: [],
 };

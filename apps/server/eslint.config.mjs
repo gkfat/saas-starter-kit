@@ -23,6 +23,7 @@ export default [
         getRouterParam: 'readonly',
         getQuery: 'readonly',
         readBody: 'readonly',
+        readMultipartFormData: 'readonly',
         createError: 'readonly',
         setResponseHeader: 'readonly',
         setResponseStatus: 'readonly',

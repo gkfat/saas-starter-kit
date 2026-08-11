@@ -45,7 +45,9 @@
     "home": "首頁",
     "groupPoints": "會員點數模組",
     "pointsSettings": "折抵比例設定",
-    "pointsMembers": "會員點數管理"
+    "pointsMembers": "會員點數管理",
+    "groupEvents": "活動模組",
+    "events": "活動管理"
   },
   "auth": {
     "login": "登入",
@@ -141,7 +143,8 @@
       },
       "admin": {
         "label": "Admin 後台",
-        "description": "管理員登入後台，管理會員資料、設定點數與等級規則、發放優惠券，並查看登入與稽核紀錄。"
+        "description": "管理員登入後台，管理會員資料、設定點數與等級規則、發放優惠券，並查看登入與稽核紀錄。",
+        "cta": "立即註冊以體驗功能"
       }
     },
     "industries": {
@@ -250,6 +253,10 @@
     "points": {
       "title": "會員點數",
       "description": "管理會員點數發放與異動紀錄，打造誘因機制提升會員黏著度。"
+    },
+    "event": {
+      "title": "活動公告",
+      "description": "設定活動起訖時間與 Banner 圖片，於會員端依排程自動上下架，快速發布行銷活動。"
     }
   },
   "dashboard": {
@@ -595,5 +602,41 @@
       "birthday_gift": "生日禮",
       "other": "其他"
     }
+  },
+  "events": {
+    "title": "活動管理",
+    "noData": "尚未建立活動",
+    "create": "新增活動",
+    "edit": "編輯活動",
+    "eventTitle": "標題",
+    "copyText": "文宣內容",
+    "startAt": "開始時間",
+    "endAt": "結束時間",
+    "enabled": "啟用",
+    "banner": "Banner 圖片",
+    "bannerChange": "更換圖片",
+    "bannerRemove": "移除圖片",
+    "bannerUpload": "上傳圖片",
+    "status": "狀態",
+    "searchByTitle": "以標題搜尋",
+    "statusOption": {
+      "upcoming": "即將開始",
+      "active": "上檔中",
+      "ended": "已結束",
+      "disabled": "已停用"
+    },
+    "createSuccess": "活動已新增",
+    "updateSuccess": "活動已更新",
+    "deleteSuccess": "活動已刪除",
+    "titleRequired": "請輸入標題",
+    "copyTextRequired": "請輸入文宣內容",
+    "startAtRequired": "請選擇開始時間",
+    "endAtRequired": "請選擇結束時間",
+    "scheduleInvalid": "結束時間需晚於開始時間",
+    "bannerTypeInvalid": "僅支援 PNG/JPEG/WebP 圖片格式",
+    "bannerTooLarge": "圖片大小不可超過 5MB",
+    "bannerUploadFailed": "Banner 圖片上傳失敗，請重新編輯活動再次上傳",
+    "deleteConfirmTitle": "刪除活動",
+    "deleteConfirm": "確定要刪除活動「{title}」嗎？"
   }
 }

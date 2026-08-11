@@ -1,14 +1,5 @@
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import timezone from 'dayjs/plugin/timezone';
-import utc from 'dayjs/plugin/utc';
-import 'dayjs/locale/zh-tw';
-import 'dayjs/locale/en';
+import dayjs from './dayjs';
 import { useTimezoneStore } from '~/stores/timezone';
-
-dayjs.extend(relativeTime);
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 export function formatDateTime(value: string | null | undefined): string {
   if (!value) return '-';

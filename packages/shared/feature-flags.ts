@@ -4,6 +4,7 @@ export const FeatureFlag = {
   Level: 'level',
   Coupon: 'coupon',
   Points: 'points',
+  Event: 'event',
 } as const;
 
 export type FeatureFlag = (typeof FeatureFlag)[keyof typeof FeatureFlag];

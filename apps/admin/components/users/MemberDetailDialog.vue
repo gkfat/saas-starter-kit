@@ -2,7 +2,7 @@
   <v-dialog :model-value="modelValue" max-width="480" @update:model-value="close">
     <CardsDialogCard>
       <v-card-title class="pa-4">{{ $t('users.detailTitle') }}</v-card-title>
-      <v-card-text class="dialog-scroll-body">
+      <v-card-text>
         <template v-if="detail">
           <div class="text-subtitle-2 mb-2">{{ $t('users.groupBasic') }}</div>
           <v-row>
@@ -165,10 +165,3 @@ function close() {
   emit('update:modelValue', false);
 }
 </script>
-
-<style scoped>
-.dialog-scroll-body {
-  max-height: 60vh;
-  overflow-y: auto;
-}
-</style>

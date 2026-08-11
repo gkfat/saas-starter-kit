@@ -20,6 +20,11 @@ export default defineNitroConfig({
     liffId: process.env.VITE_LIFF_ID ?? '',
     corsAllowedOrigins: process.env.CORS_ALLOWED_ORIGINS ?? '',
     levelBatchSecret: process.env.LEVEL_BATCH_SECRET ?? '',
+    r2AccountId: process.env.R2_ACCOUNT_ID ?? '',
+    r2AccessKeyId: process.env.R2_ACCESS_KEY_ID ?? '',
+    r2SecretAccessKey: process.env.R2_SECRET_ACCESS_KEY ?? '',
+    r2BucketName: process.env.R2_BUCKET_NAME ?? '',
+    r2PublicBaseUrl: process.env.R2_PUBLIC_BASE_URL ?? '',
     public: {
       featureFlags: {
         auditLog: process.env.FEATURE_AUDIT_LOG_ENABLED !== 'false',
@@ -27,6 +32,7 @@ export default defineNitroConfig({
         level: process.env.FEATURE_LEVEL_ENABLED !== 'false',
         coupon: process.env.FEATURE_COUPON_ENABLED === 'true',
         points: process.env.FEATURE_POINTS_ENABLED !== 'false',
+        event: process.env.FEATURE_EVENT_ENABLED !== 'false',
       },
     },
   },

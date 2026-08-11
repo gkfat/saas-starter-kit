@@ -36,7 +36,12 @@ export default defineNuxtConfig({
     transpile: ['vuetify'],
   },
 
-  css: ['vuetify/styles', '@mdi/font/css/materialdesignicons.css', '~/assets/css/data-table.css'],
+  css: [
+    'vuetify/styles',
+    '@mdi/font/css/materialdesignicons.css',
+    '~/assets/css/data-table.css',
+    '@vuepic/vue-datepicker/dist/main.css',
+  ],
 
   vite: {
     define: {
@@ -66,6 +71,7 @@ export default defineNuxtConfig({
         level: process.env.FEATURE_LEVEL_ENABLED !== 'false',
         coupon: process.env.FEATURE_COUPON_ENABLED === 'true',
         points: process.env.FEATURE_POINTS_ENABLED !== 'false',
+        event: process.env.FEATURE_EVENT_ENABLED !== 'false',
       },
     },
   },

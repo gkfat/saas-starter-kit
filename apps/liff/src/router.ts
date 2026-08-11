@@ -71,6 +71,13 @@ const router = createRouter({
           component: () => import('~/pages/points/index.vue'),
           meta: { requiresAuth: true },
         },
+        {
+          path: 'events/:id',
+          name: 'eventDetail',
+          component: () => import('~/pages/events/[id].vue'),
+          props: true,
+          meta: { requiresAuth: true },
+        },
       ],
     },
   ],

@@ -45,7 +45,9 @@
     "home": "Home",
     "groupPoints": "Points Module",
     "pointsSettings": "Redemption Ratio",
-    "pointsMembers": "Member Points"
+    "pointsMembers": "Member Points",
+    "groupEvents": "Event Module",
+    "events": "Event Management"
   },
   "auth": {
     "login": "Sign In",
@@ -141,7 +143,8 @@
       },
       "admin": {
         "label": "Admin — Back office",
-        "description": "Staff log in here to manage member data, configure points and level rules, issue coupons, and review login and audit logs."
+        "description": "Staff log in here to manage member data, configure points and level rules, issue coupons, and review login and audit logs.",
+        "cta": "Sign up now to try it out"
       }
     },
     "industries": {
@@ -250,6 +253,10 @@
     "points": {
       "title": "Member points",
       "description": "Manage point issuance and transaction history to build an incentive program that boosts member loyalty."
+    },
+    "event": {
+      "title": "Event announcements",
+      "description": "Schedule event start/end times and banner images, shown to members automatically within the active window."
     }
   },
   "dashboard": {
@@ -595,5 +602,41 @@
       "birthday_gift": "Birthday Gift",
       "other": "Other"
     }
+  },
+  "events": {
+    "title": "Event Management",
+    "noData": "No events yet",
+    "create": "New Event",
+    "edit": "Edit Event",
+    "eventTitle": "Title",
+    "copyText": "Copy Text",
+    "startAt": "Start At",
+    "endAt": "End At",
+    "enabled": "Enabled",
+    "banner": "Banner Image",
+    "bannerChange": "Change Image",
+    "bannerRemove": "Remove Image",
+    "bannerUpload": "Upload Image",
+    "status": "Status",
+    "searchByTitle": "Search by title",
+    "statusOption": {
+      "upcoming": "Upcoming",
+      "active": "Active",
+      "ended": "Ended",
+      "disabled": "Disabled"
+    },
+    "createSuccess": "Event created",
+    "updateSuccess": "Event updated",
+    "deleteSuccess": "Event deleted",
+    "titleRequired": "Title is required",
+    "copyTextRequired": "Copy text is required",
+    "startAtRequired": "Start time is required",
+    "endAtRequired": "End time is required",
+    "scheduleInvalid": "End time must be later than start time",
+    "bannerTypeInvalid": "Only PNG/JPEG/WebP images are supported",
+    "bannerTooLarge": "Image size must not exceed 5MB",
+    "bannerUploadFailed": "Banner upload failed, please edit the event to upload again",
+    "deleteConfirmTitle": "Delete Event",
+    "deleteConfirm": "Are you sure you want to delete event \"{title}\"?"
   }
 }

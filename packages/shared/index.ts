@@ -2,6 +2,7 @@ export * from './dto/auth';
 export * from './dto/common';
 export * from './dto/coupons';
 export * from './dto/dashboard';
+export * from './dto/events';
 export * from './dto/level';
 export * from './dto/logs';
 export * from './dto/points';

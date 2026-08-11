@@ -71,6 +71,10 @@ api/   → server/middleware/ (tracing → logging → auth) → modules/*/servi
 
 Superadmin uses Firebase Auth custom claims `{ role: 'superadmin' }` — never stored in Firestore.
 
+### Dialog layout
+
+All modal dialogs use `CardsDialogCard` (`apps/admin/components/cards/DialogCard.vue`). It fixes `v-card-title` and `v-card-actions` in place and caps overall height at `90vh`; only the direct `v-card-text` child scrolls. Do not add per-dialog `max-height`/`overflow-y` hacks on `v-card-text` — this is handled centrally by `CardsDialogCard`.
+
 ### Client route guard
 
 `middleware/auth.global.ts` — runs on every navigation:
