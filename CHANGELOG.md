@@ -54,4 +54,4 @@
 - 移除多租戶（tenant）資料結構，改為單一租戶架構
 - 角色管理頁面與角色指派下拉選單不再顯示 superadmin
 - 將專案拆分為 monorepo 結構
-- 優化 Liff App UI
+- 優化後台、Liff App UI

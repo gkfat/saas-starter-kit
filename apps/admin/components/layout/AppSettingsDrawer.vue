@@ -19,13 +19,13 @@
             <div class="text-caption text-medium-emphasis text-uppercase font-weight-medium mb-2">
               {{ $t('settings.language') }}
             </div>
-            <v-list density="compact" rounded="lg" bg-color="transparent">
+            <v-list density="compact" rounded="sm" bg-color="transparent">
               <v-list-item
                 v-for="loc in locales"
                 :key="loc.code"
                 :active="loc.code === currentLocale"
                 active-color="primary"
-                rounded="lg"
+                rounded="sm"
                 @click="switchLocale(loc.code)"
               >
                 <template #prepend>

@@ -1,5 +1,5 @@
 <template>
-  <v-card rounded="lg" class="dialog-card">
+  <v-card rounded="sm" class="dialog-card">
     <slot />
   </v-card>
 </template>

@@ -11,9 +11,10 @@ export default defineNuxtPlugin((app) => {
       themes: {
         light: {
           colors: {
-            primary: '#1967D2',
+            primary: '#33495D',
             surface: '#ffffff',
-            background: '#ffffff',
+            background: '#F3F4F6',
+            'surface-variant': '#E1E4E8',
           },
         },
       },

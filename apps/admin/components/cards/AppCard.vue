@@ -1,5 +1,5 @@
 <template>
-  <v-card variant="elevated" :elevation="2" :rounded="rounded" class="border">
+  <v-card variant="flat" :elevation="elevation" :rounded="rounded" class="border">
     <slot />
   </v-card>
 </template>
@@ -8,7 +8,8 @@
 withDefaults(
   defineProps<{
     rounded?: string;
+    elevation?: number | string;
   }>(),
-  { rounded: 'lg' },
+  { rounded: 'sm', elevation: 0 },
 );
 </script>

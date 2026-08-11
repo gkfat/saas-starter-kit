@@ -1,5 +1,5 @@
 <template>
-  <v-app-bar v-if="mobile" elevation="1" density="compact">
+  <v-app-bar v-if="mobile" flat elevation="0" density="compact" class="border-b">
     <v-app-bar-nav-icon @click="$emit('toggle-drawer')" />
     <v-app-bar-title class="text-body-1 font-weight-medium">saas-starter-kit</v-app-bar-title>
     <template #append>

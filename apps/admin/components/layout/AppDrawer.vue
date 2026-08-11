@@ -14,7 +14,7 @@
         style="min-height: 64px; cursor: pointer"
         @click="router.push(ROUTES.root)"
       >
-        <v-icon icon="mdi-fire" color="primary" size="24" class="flex-shrink-0" />
+        <img :src="'/logo.svg'" alt="" width="24" height="24" class="flex-shrink-0" />
         <div v-if="!rail || mobile" class="ml-3 overflow-hidden">
           <div class="text-body-2 font-weight-medium text-truncate">SaaS Starter Kit</div>
           <div class="text-caption text-medium-emphasis text-truncate">v{{ appVersion }}</div>

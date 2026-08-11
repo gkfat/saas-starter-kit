@@ -36,9 +36,28 @@ export default defineNuxtConfig({
     transpile: ['vuetify'],
   },
 
+  app: {
+    head: {
+      link: [
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
+        { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
+        { rel: 'icon', href: '/favicon.ico' },
+        { rel: 'manifest', href: '/site.webmanifest' },
+      ],
+    },
+  },
+
   css: [
     'vuetify/styles',
     '@mdi/font/css/materialdesignicons.css',
+    '@fontsource/roboto/400.css',
+    '@fontsource/roboto/500.css',
+    '@fontsource/roboto/700.css',
+    '@fontsource/noto-sans-tc/400.css',
+    '@fontsource/noto-sans-tc/500.css',
+    '@fontsource/noto-sans-tc/700.css',
+    '~/assets/css/typography.css',
     '~/assets/css/data-table.css',
     '@vuepic/vue-datepicker/dist/main.css',
   ],
