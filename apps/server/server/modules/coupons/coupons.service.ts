@@ -1,4 +1,6 @@
 import { randomUUID, randomInt } from 'node:crypto';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import { FeatureFlag } from '@saas-starter-kit/shared';
 import {
   createInstances,
@@ -23,6 +25,8 @@ import type {
   CouponInstanceWithState,
   CouponTemplate,
 } from './coupons.types';
+
+dayjs.extend(utc);
 
 const CODE_CHARSET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no O/0/I/1 to reduce misreads
 const CODE_LENGTH = 8;
@@ -132,7 +136,7 @@ export async function issueCoupons(
   }
 
   const issuedAt = new Date().toISOString();
-  const expiresAt = new Date(Date.now() + template.validDays * 24 * 60 * 60 * 1000).toISOString();
+  const expiresAt = dayjs.utc(issuedAt).startOf('day').add(template.validDays, 'day').toISOString();
 
   const instances: CouponInstance[] = memberIds.map((memberId) => ({
     id: randomUUID(),

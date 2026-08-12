@@ -243,7 +243,7 @@ describe('優惠券範本管理（admin/coupons）', () => {
 });
 
 describe('發放邏輯（admin/coupons/[id]/issue）', () => {
-  it('批次發放給多位會員產生正確數量的獨立 instances，expiresAt 依 validDays 計算', async () => {
+  it('批次發放給多位會員產生正確數量的獨立 instances，expiresAt 依 validDays 計算（對齊 UTC 當日 00:00）', async () => {
     const { idToken } = await seedUser(testUsername('a', 4), Role.Admin);
     const memberA = await seedUser(testUsername('m', 2), Role.Member);
     const memberB = await seedUser(testUsername('m', 3), Role.Member);
@@ -251,7 +251,12 @@ describe('發放邏輯（admin/coupons/[id]/issue）', () => {
 
     const template = await createTemplate(idToken, { status: 'published', validDays: 3 });
 
-    const beforeIssue = Date.now();
+    const beforeIssue = new Date();
+    const startOfIssueDayUtc = Date.UTC(
+      beforeIssue.getUTCFullYear(),
+      beforeIssue.getUTCMonth(),
+      beforeIssue.getUTCDate(),
+    );
     const res = await fetch(`${BASE_URL}/api/admin/coupons/${template.id}/issue`, {
       method: 'POST',
       headers: authHeaders(idToken),
@@ -265,8 +270,8 @@ describe('發放邏輯（admin/coupons/[id]/issue）', () => {
     expect(new Set(instances.map((i) => i.code)).size).toBe(3);
     for (const instance of instances) {
       const expiresAt = new Date(instance.expiresAt).getTime();
-      const expected = beforeIssue + 3 * 24 * 60 * 60 * 1000;
-      expect(Math.abs(expiresAt - expected)).toBeLessThan(60_000);
+      const expected = startOfIssueDayUtc + 3 * 24 * 60 * 60 * 1000;
+      expect(expiresAt).toBe(expected);
     }
   });
 
