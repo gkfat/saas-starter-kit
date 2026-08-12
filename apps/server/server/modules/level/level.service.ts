@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
 import type { QueryDocumentSnapshot } from 'firebase-admin/firestore';
 import { FeatureFlag } from '@saas-starter-kit/shared';
 import { DUE_PERIOD_PAGE_SIZE, LEVEL_PERIOD_LENGTH } from './level.constants';
@@ -25,6 +26,8 @@ import type {
   MemberLevelState,
 } from './level.types';
 
+dayjs.extend(utc);
+
 function isLevelEnabled(): boolean {
   return useRuntimeConfig().public.featureFlags[FeatureFlag.Level];
 }
@@ -36,7 +39,7 @@ function requireLevelEnabled(): void {
 }
 
 function nextPeriodBoundary(from: string): { startDate: string; endDate: string } {
-  const startDate = dayjs(from);
+  const startDate = dayjs.utc(from).startOf('day');
   const endDate = startDate.add(LEVEL_PERIOD_LENGTH.amount, LEVEL_PERIOD_LENGTH.unit);
   return { startDate: startDate.toISOString(), endDate: endDate.toISOString() };
 }
