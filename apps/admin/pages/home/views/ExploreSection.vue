@@ -3,14 +3,14 @@
     <v-container class="py-12">
       <v-row justify="center" class="text-center mb-6">
         <v-col cols="12" md="8">
-          <div class="text-h5 font-weight-medium">{{ $t('home.explore.title') }}</div>
+          <div class="text-h5 font-weight-medium text-white">{{ $t('home.explore.title') }}</div>
         </v-col>
       </v-row>
 
       <div v-for="category in featureCategories" :key="category.labelKey" class="mb-8">
         <v-row justify="center" class="mb-3">
           <v-col cols="12" md="8" class="text-center">
-            <div class="text-subtitle-1 font-weight-medium text-primary">
+            <div class="text-subtitle-1 font-weight-medium explore-category-label">
               {{ $t(category.labelKey) }}
             </div>
           </v-col>
@@ -75,11 +75,15 @@ const featureCategories: FeatureCategory[] = [
 
 <style scoped>
 .explore-section {
-  background: #f1f4f9;
+  background: #33495d;
   /* Cancel the ancestor PageContent v-container's fixed 16px left/right padding so the
      background reaches the true left/right edges, like the hero. */
   margin-left: -16px;
   margin-right: -16px;
   width: calc(100% + 32px);
+}
+
+.explore-category-label {
+  color: #9db8d6;
 }
 </style>
