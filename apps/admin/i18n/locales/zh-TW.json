@@ -32,6 +32,8 @@
     "groupAbout": "關於",
     "dashboard": "儀表板",
     "profile": "個人資料",
+    "memberInfo": "會員資訊",
+    "myCoupons": "我的優惠券",
     "users": "使用者管理",
     "permissions": "權限",
     "adminRoles": "角色管理",
@@ -388,6 +390,11 @@
     "detail": "會員詳情",
     "detailTitle": "會員詳情"
   },
+  "memberInfo": {
+    "title": "會員資訊",
+    "memberNo": "會員編號",
+    "expiresAt": "將於 {date} 到期"
+  },
   "level": {
     "cardTitle": "會員等級",
     "levelNumber": "等級",
@@ -462,10 +469,27 @@
     "searchMember": "搜尋姓名/會員編號/電話",
     "myCard": {
       "cardTitle": "我的優惠券",
+      "filterState": "狀態",
+      "filterAll": "全部",
       "usable": "可使用",
       "redeemed": "已使用",
       "expired": "已失效",
+      "expiresAt": "到期日：{date}",
+      "redeemedAt": "使用時間：{date}",
       "empty": "尚無優惠券"
+    }
+  },
+  "points": {
+    "myCard": {
+      "cardTitle": "我的點數",
+      "balance": "目前點數",
+      "redeemableAmount": "可折抵金額",
+      "ledgerTitle": "點數紀錄",
+      "ledgerEmpty": "尚無點數紀錄",
+      "ledgerAmount": "點數",
+      "ledgerBalanceAfter": "異動後餘額",
+      "ledgerReason": "原因",
+      "ledgerCreatedAt": "時間"
     }
   },
   "couponsRedeem": {

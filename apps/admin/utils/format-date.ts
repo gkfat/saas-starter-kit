@@ -7,6 +7,12 @@ export function formatDateTime(value: string | null | undefined): string {
   return dayjs(value).tz(store.selected).format('YYYY-MM-DD HH:mm');
 }
 
+export function formatDate(value: string | null | undefined): string {
+  if (!value) return '-';
+  const store = useTimezoneStore();
+  return dayjs(value).tz(store.selected).format('YYYY/MM/DD');
+}
+
 export function formatRelativeTime(value: string | null | undefined, locale: string): string {
   if (!value) return '-';
   return dayjs(value)

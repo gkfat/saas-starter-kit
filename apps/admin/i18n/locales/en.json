@@ -32,6 +32,8 @@
     "groupAbout": "About",
     "dashboard": "Dashboard",
     "profile": "Profile",
+    "memberInfo": "Member Info",
+    "myCoupons": "My Coupons",
     "users": "User Management",
     "permissions": "Permissions",
     "adminRoles": "Roles",
@@ -388,6 +390,11 @@
     "detail": "Member Detail",
     "detailTitle": "Member Detail"
   },
+  "memberInfo": {
+    "title": "Member Info",
+    "memberNo": "Member No.",
+    "expiresAt": "Expires at {date}"
+  },
   "level": {
     "cardTitle": "Member Level",
     "levelNumber": "Level",
@@ -462,10 +469,27 @@
     "searchMember": "Search by name/member no./phone",
     "myCard": {
       "cardTitle": "My Coupons",
+      "filterState": "Status",
+      "filterAll": "All",
       "usable": "Usable",
       "redeemed": "Redeemed",
       "expired": "Expired",
+      "expiresAt": "Expires at: {date}",
+      "redeemedAt": "Redeemed at: {date}",
       "empty": "No coupons yet"
+    }
+  },
+  "points": {
+    "myCard": {
+      "cardTitle": "My Points",
+      "balance": "Current balance",
+      "redeemableAmount": "Redeemable amount",
+      "ledgerTitle": "Points history",
+      "ledgerEmpty": "No points history yet",
+      "ledgerAmount": "Points",
+      "ledgerBalanceAfter": "Balance after",
+      "ledgerReason": "Reason",
+      "ledgerCreatedAt": "Time"
     }
   },
   "couponsRedeem": {
