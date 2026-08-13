@@ -27,6 +27,6 @@ export type LoginLog = BaseLog & {
 export type AuditLog = BaseLog & {
   type: 'audit';
   action: string;
-  resourceId?: string;
-  diff?: Record<string, { before?: unknown; after?: unknown }>;
+  result: 'success' | 'failure';
+  error?: string;
 };

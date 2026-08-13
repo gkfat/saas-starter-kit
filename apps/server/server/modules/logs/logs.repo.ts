@@ -1,6 +1,7 @@
 import { adminDb } from '../../shared/firebase-admin';
 import { prefixCollection } from '../../shared/firestore-prefix';
 import type { AuditLog, LoginLog } from './logs.types';
+import type { Query } from 'firebase-admin/firestore';
 
 function loginLogsCollection() {
   return adminDb().collection(prefixCollection('login_logs'));
@@ -28,7 +29,14 @@ export async function listLoginLogsSince(since: string): Promise<LoginLog[]> {
   return snapshot.docs.map((doc) => doc.data() as LoginLog);
 }
 
-export async function listAuditLogs(): Promise<AuditLog[]> {
-  const snapshot = await auditLogsCollection().orderBy('timestamp', 'desc').limit(100).get();
+export async function listAuditLogs(range: {
+  startDate?: string;
+  endDate?: string;
+}): Promise<AuditLog[]> {
+  let query: Query = auditLogsCollection();
+  if (range.startDate) query = query.where('timestamp', '>=', range.startDate);
+  if (range.endDate) query = query.where('timestamp', '<=', range.endDate);
+
+  const snapshot = await query.orderBy('timestamp', 'desc').limit(500).get();
   return snapshot.docs.map((doc) => doc.data() as AuditLog);
 }

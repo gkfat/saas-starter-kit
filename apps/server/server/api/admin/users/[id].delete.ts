@@ -1,4 +1,4 @@
-import { recordAuditLog } from '~/modules/logs';
+import { withAuditLog } from '~/modules/logs';
 import { deleteUserRole, getRoleForUser } from '~/modules/roles';
 import { deleteUserAccount, getUserById } from '~/modules/users';
 import { getAccountStatus } from '~/modules/identity';
@@ -32,29 +32,25 @@ export default defineEventHandler(async (event): Promise<OkResponse> => {
     throw createError({ statusCode: 400, message: '僅能刪除已停用的使用者' });
   }
 
-  await deleteUserAccount(userId);
-  await deleteUserRole(userId);
-
   const actorUser = await getUserById(actorId);
-  recordAuditLog({
-    severity: 'INFO',
-    timestamp: new Date().toISOString(),
-    requestId,
-    actor: {
-      userId: actorId,
-      role: actorRole ?? 'unknown',
-      ...(actorUser?.username ? { username: actorUser.username } : {}),
+  const actor = {
+    userId: actorId,
+    role: actorRole ?? 'unknown',
+    ...(actorUser?.username ? { username: actorUser.username } : {}),
+  };
+
+  await withAuditLog(
+    {
+      action: 'user.delete',
+      actor,
+      requestId,
+      metadata: () => ({ userId }),
+      metadataOnError: { userId },
     },
-    action: 'user.delete',
-    metadata: { userId },
-  }).catch((err) =>
-    console.error(
-      JSON.stringify({
-        severity: 'ERROR',
-        message: 'Failed to write audit_log',
-        error: String(err),
-      }),
-    ),
+    async () => {
+      await deleteUserAccount(userId);
+      await deleteUserRole(userId);
+    },
   );
 
   return { ok: true };

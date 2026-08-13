@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { createCouponTemplate } from '~/modules/coupons';
-import { recordAuditLog } from '~/modules/logs';
+import { withAuditLog } from '~/modules/logs';
 import { getUserById } from '~/modules/users';
 import { requirePermission } from '~/shared/rbac';
 import type { AuthenticatedContext } from '~/shared/types/context';
@@ -26,24 +26,18 @@ export default defineEventHandler(async (event): Promise<CouponTemplate> => {
   const { userId, role, requestId } = event.context as AuthenticatedContext;
   const body = BodySchema.parse(await readBody(event));
 
-  const template = await createCouponTemplate(body);
-
   const actorUser = await getUserById(userId);
-  recordAuditLog({
-    severity: 'INFO',
-    timestamp: new Date().toISOString(),
-    requestId,
-    actor: { userId, role, ...(actorUser?.username ? { username: actorUser.username } : {}) },
-    action: 'coupon.template.create',
-    metadata: { templateId: template.id, ...body },
-  }).catch((err) =>
-    console.error(
-      JSON.stringify({
-        severity: 'ERROR',
-        message: 'Failed to write audit_log',
-        error: String(err),
-      }),
-    ),
+  const actor = { userId, role, ...(actorUser?.username ? { username: actorUser.username } : {}) };
+
+  const template = await withAuditLog(
+    {
+      action: 'coupon.template.create',
+      actor,
+      requestId,
+      metadata: (result) => ({ templateId: result.id, ...body }),
+      metadataOnError: body,
+    },
+    () => createCouponTemplate(body),
   );
 
   return template;

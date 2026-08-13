@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { recordAuditLog } from '~/modules/logs';
+import { withAuditLog } from '~/modules/logs';
 import { assignUserRole, getRoleForUser } from '~/modules/roles';
 import { setAccountDisabled, revokeSessionsForUser } from '~/modules/identity';
 import { requirePermission } from '~/shared/rbac';
@@ -42,45 +42,35 @@ export default defineEventHandler(async (event): Promise<OkResponse> => {
   };
 
   if (body.role !== undefined) {
-    await assignUserRole(userId, body.role);
-    recordAuditLog({
-      severity: 'INFO',
-      timestamp: new Date().toISOString(),
-      requestId,
-      actor: auditActor,
-      action: 'user.role.assign',
-      metadata: { userId, role: body.role },
-    }).catch((err) =>
-      console.error(
-        JSON.stringify({
-          severity: 'ERROR',
-          message: 'Failed to write audit_log',
-          error: String(err),
-        }),
-      ),
+    const newRole = body.role;
+    await withAuditLog(
+      {
+        action: 'user.role.assign',
+        actor: auditActor,
+        requestId,
+        metadata: () => ({ userId, role: newRole }),
+        metadataOnError: { userId, role: newRole },
+      },
+      () => assignUserRole(userId, newRole),
     );
   }
 
   if (body.disabled !== undefined) {
-    await setAccountDisabled(userId, body.disabled);
-    if (body.disabled) {
-      await revokeSessionsForUser(userId);
-    }
-    recordAuditLog({
-      severity: 'INFO',
-      timestamp: new Date().toISOString(),
-      requestId,
-      actor: auditActor,
-      action: 'user.status.update',
-      metadata: { userId, disabled: body.disabled },
-    }).catch((err) =>
-      console.error(
-        JSON.stringify({
-          severity: 'ERROR',
-          message: 'Failed to write audit_log',
-          error: String(err),
-        }),
-      ),
+    const disabled = body.disabled;
+    await withAuditLog(
+      {
+        action: 'user.status.update',
+        actor: auditActor,
+        requestId,
+        metadata: () => ({ userId, disabled }),
+        metadataOnError: { userId, disabled },
+      },
+      async () => {
+        await setAccountDisabled(userId, disabled);
+        if (disabled) {
+          await revokeSessionsForUser(userId);
+        }
+      },
     );
   }
 

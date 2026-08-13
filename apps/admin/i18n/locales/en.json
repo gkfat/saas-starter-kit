@@ -531,16 +531,46 @@
     "user": "User",
     "username": "Username",
     "actor": "Actor",
-    "action": "Action",
-    "resource": "Resource",
-    "changedFields": "Changed Fields",
+    "role": "Role",
+    "action": "Operation",
     "ip": "IP Address",
     "provider": "Provider",
     "result": "Result",
     "success": "Success",
     "failed": "Failed",
     "noData": "No login logs found",
-    "auditNoData": "No audit logs yet"
+    "auditNoData": "No audit logs yet",
+    "dateRange": "Date/Time Range",
+    "detailTitle": "Audit Log Detail",
+    "metadata": "Details",
+    "actions": {
+      "role": { "permissions": { "update": "Update Role Permissions" } },
+      "coupon": {
+        "template": { "create": "Create Coupon Template", "update": "Update Coupon Template" },
+        "instance": { "issue": "Issue Coupon", "redeem": "Redeem Coupon" }
+      },
+      "user": {
+        "create": "Create User",
+        "delete": "Delete User",
+        "role": { "assign": "Assign User Role" },
+        "status": { "update": "Update User Status" },
+        "setup_link": { "regenerate": "Regenerate Setup Link" },
+        "line_invite": { "generate": "Generate LINE Invite Link" }
+      },
+      "level": {
+        "tier": {
+          "create": "Create Level Tier",
+          "update": "Update Level Tier",
+          "delete": "Delete Level Tier"
+        }
+      },
+      "event": {
+        "create": "Create Event",
+        "update": "Update Event",
+        "delete": "Delete Event",
+        "banner": { "upload": "Upload Event Banner" }
+      }
+    }
   },
   "settings": {
     "title": "Settings",

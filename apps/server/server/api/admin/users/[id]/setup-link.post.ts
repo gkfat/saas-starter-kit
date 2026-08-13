@@ -1,4 +1,4 @@
-import { recordAuditLog } from '~/modules/logs';
+import { withAuditLog } from '~/modules/logs';
 import { generateSetupToken } from '~/modules/password-setup';
 import { getUserById } from '~/modules/users';
 import { findUserAuthRecord } from '~/modules/identity';
@@ -29,31 +29,25 @@ export default defineEventHandler(async (event): Promise<RegenerateSetupLinkResp
     throw createError({ statusCode: 500, message: '找不到對應的登入資料' });
   }
 
-  const setupToken = await generateSetupToken({ userId, firebaseUid: passwordAuth.firebaseUid });
+  const actorUser = await getUserById(actorId);
+  const actor = {
+    userId: actorId,
+    role: actorRole ?? 'unknown',
+    ...(actorUser?.username ? { username: actorUser.username } : {}),
+  };
+
+  const setupToken = await withAuditLog(
+    {
+      action: 'user.setup_link.regenerate',
+      actor,
+      requestId,
+      metadata: () => ({ userId }),
+      metadataOnError: { userId },
+    },
+    () => generateSetupToken({ userId, firebaseUid: passwordAuth.firebaseUid }),
+  );
   const { adminAppUrl } = useRuntimeConfig();
   const setupLink = `${adminAppUrl}/auth/set-password?token=${setupToken}`;
-
-  const actorUser = await getUserById(actorId);
-  recordAuditLog({
-    severity: 'INFO',
-    timestamp: new Date().toISOString(),
-    requestId,
-    actor: {
-      userId: actorId,
-      role: actorRole ?? 'unknown',
-      ...(actorUser?.username ? { username: actorUser.username } : {}),
-    },
-    action: 'user.setup_link.regenerate',
-    metadata: { userId },
-  }).catch((err) =>
-    console.error(
-      JSON.stringify({
-        severity: 'ERROR',
-        message: 'Failed to write audit_log',
-        error: String(err),
-      }),
-    ),
-  );
 
   return { setupLink };
 });

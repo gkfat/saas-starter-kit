@@ -1,5 +1,5 @@
 import { uploadEventBanner } from '~/modules/events';
-import { recordAuditLog } from '~/modules/logs';
+import { withAuditLog } from '~/modules/logs';
 import { getUserById } from '~/modules/users';
 import { requirePermission } from '~/shared/rbac';
 import type { AuthenticatedContext } from '~/shared/types/context';
@@ -27,6 +27,7 @@ export default defineEventHandler(async (event): Promise<Event> => {
     throw createError({ statusCode: 400, message: 'Missing file' });
   }
 
+  const filename = filePart.filename;
   const mimeType = filePart.type ?? '';
   if (!ALLOWED_MIME_TYPES.has(mimeType)) {
     throw createError({ statusCode: 400, message: 'Unsupported file type' });
@@ -37,37 +38,32 @@ export default defineEventHandler(async (event): Promise<Event> => {
 
   const { userId, role, requestId } = event.context as AuthenticatedContext;
 
-  let updated: Event;
-  try {
-    updated = await uploadEventBanner(
-      id,
-      { filename: filePart.filename, mimeType, size: filePart.data.length },
-      filePart.data,
-    );
-  } catch (err: unknown) {
-    const code = (err as { code?: string }).code;
-    if (code === 'event-not-found') {
-      throw createError({ statusCode: 404, message: (err as Error).message });
-    }
-    throw err;
-  }
-
   const actorUser = await getUserById(userId);
-  recordAuditLog({
-    severity: 'INFO',
-    timestamp: new Date().toISOString(),
-    requestId,
-    actor: { userId, role, ...(actorUser?.username ? { username: actorUser.username } : {}) },
-    action: 'event.banner.upload',
-    metadata: { eventId: id, filename: filePart.filename, mimeType },
-  }).catch((err) =>
-    console.error(
-      JSON.stringify({
-        severity: 'ERROR',
-        message: 'Failed to write audit_log',
-        error: String(err),
-      }),
-    ),
+  const actor = { userId, role, ...(actorUser?.username ? { username: actorUser.username } : {}) };
+
+  const updated = await withAuditLog(
+    {
+      action: 'event.banner.upload',
+      actor,
+      requestId,
+      metadata: () => ({ eventId: id, filename: filename, mimeType }),
+      metadataOnError: { eventId: id, filename: filename, mimeType },
+    },
+    async () => {
+      try {
+        return await uploadEventBanner(
+          id,
+          { filename: filename, mimeType, size: filePart.data.length },
+          filePart.data,
+        );
+      } catch (err: unknown) {
+        const code = (err as { code?: string }).code;
+        if (code === 'event-not-found') {
+          throw createError({ statusCode: 404, message: (err as Error).message });
+        }
+        throw err;
+      }
+    },
   );
 
   return updated;

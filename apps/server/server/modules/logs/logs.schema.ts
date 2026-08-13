@@ -25,6 +25,6 @@ export const LoginLogSchema = BaseLogSchema.extend({
 export const AuditLogSchema = BaseLogSchema.extend({
   type: z.literal('audit'),
   action: z.string(),
-  resourceId: z.string().optional(),
-  diff: z.record(z.object({ before: z.unknown(), after: z.unknown() })).optional(),
+  result: z.enum(['success', 'failure']),
+  error: z.string().optional(),
 });

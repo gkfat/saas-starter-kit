@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { recordAuditLog } from '../../modules/logs';
+import { withAuditLog } from '../../modules/logs';
 import { updateRolePermissions } from '../../modules/roles';
 import { requirePermission } from '../../shared/rbac';
 import type { AuthenticatedContext } from '../../shared/types/context';
@@ -19,29 +19,22 @@ export default defineEventHandler(async (event): Promise<OkResponse> => {
   const body = await readBody(event);
   const { roleName, permissions } = BodySchema.parse(body);
 
-  await updateRolePermissions(roleName, permissions);
-
   const actorUser = await getUserById(userId);
+  const actor = {
+    userId,
+    role: role ?? 'unknown',
+    ...(actorUser?.username ? { username: actorUser.username } : {}),
+  };
 
-  recordAuditLog({
-    severity: 'INFO',
-    timestamp: new Date().toISOString(),
-    requestId,
-    actor: {
-      userId,
-      role: role ?? 'unknown',
-      ...(actorUser?.username ? { username: actorUser.username } : {}),
+  await withAuditLog(
+    {
+      action: 'role.permissions.update',
+      actor,
+      requestId,
+      metadata: () => ({ roleName, permissions }),
+      metadataOnError: { roleName, permissions },
     },
-    action: 'role.permissions.update',
-    metadata: { roleName, permissions },
-  }).catch((err) =>
-    console.error(
-      JSON.stringify({
-        severity: 'ERROR',
-        message: 'Failed to write audit_log',
-        error: String(err),
-      }),
-    ),
+    () => updateRolePermissions(roleName, permissions),
   );
 
   return { ok: true };

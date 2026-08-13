@@ -531,16 +531,42 @@
     "user": "使用者",
     "username": "帳號",
     "actor": "操作者",
-    "action": "動作",
-    "resource": "資源",
-    "changedFields": "變更欄位",
+    "role": "角色",
+    "action": "操作",
     "ip": "IP 位址",
     "provider": "登入方式",
     "result": "結果",
     "success": "成功",
     "failed": "失敗",
     "noData": "無登入紀錄",
-    "auditNoData": "無稽核紀錄"
+    "auditNoData": "無稽核紀錄",
+    "dateRange": "日期時間區間",
+    "detailTitle": "稽核紀錄詳情",
+    "metadata": "詳細資料",
+    "actions": {
+      "role": { "permissions": { "update": "更新角色權限" } },
+      "coupon": {
+        "template": { "create": "新增優惠券範本", "update": "更新優惠券範本" },
+        "instance": { "issue": "派發優惠券", "redeem": "核銷優惠券" }
+      },
+      "user": {
+        "create": "新增使用者",
+        "delete": "刪除使用者",
+        "role": { "assign": "指派使用者角色" },
+        "status": { "update": "更新使用者狀態" },
+        "setup_link": { "regenerate": "重新產生設定連結" },
+        "line_invite": { "generate": "產生 LINE 邀請連結" }
+      },
+      "level": {
+        "tier": { "create": "新增等級分級", "update": "更新等級分級", "delete": "刪除等級分級" }
+      },
+      "event": {
+        "create": "新增活動",
+        "update": "更新活動",
+        "delete": "刪除活動",
+        "banner": { "upload": "上傳活動橫幅" }
+      }
+    }
   },
   "settings": {
     "title": "設定",

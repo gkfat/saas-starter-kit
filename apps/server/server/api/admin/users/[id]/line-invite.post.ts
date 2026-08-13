@@ -1,4 +1,4 @@
-import { recordAuditLog } from '~/modules/logs';
+import { withAuditLog } from '~/modules/logs';
 import { generateLineInviteToken } from '~/modules/identity';
 import { getUserById } from '~/modules/users';
 import { getRoleForUser } from '~/modules/roles';
@@ -26,31 +26,25 @@ export default defineEventHandler(async (event): Promise<GenerateLineInviteRespo
     throw createError({ statusCode: 400, message: '此使用者已啟用，無需產生邀請連結' });
   }
 
-  const token = await generateLineInviteToken(userId);
+  const actorUser = await getUserById(actorId);
+  const actor = {
+    userId: actorId,
+    role: actorRole ?? 'unknown',
+    ...(actorUser?.username ? { username: actorUser.username } : {}),
+  };
+
+  const token = await withAuditLog(
+    {
+      action: 'user.line_invite.generate',
+      actor,
+      requestId,
+      metadata: () => ({ userId }),
+      metadataOnError: { userId },
+    },
+    () => generateLineInviteToken(userId),
+  );
   const config = useRuntimeConfig();
   const inviteLink = `${config.liffAppUrl}/auth/invite?token=${token}`;
-
-  const actorUser = await getUserById(actorId);
-  recordAuditLog({
-    severity: 'INFO',
-    timestamp: new Date().toISOString(),
-    requestId,
-    actor: {
-      userId: actorId,
-      role: actorRole ?? 'unknown',
-      ...(actorUser?.username ? { username: actorUser.username } : {}),
-    },
-    action: 'user.line_invite.generate',
-    metadata: { userId },
-  }).catch((err) =>
-    console.error(
-      JSON.stringify({
-        severity: 'ERROR',
-        message: 'Failed to write audit_log',
-        error: String(err),
-      }),
-    ),
-  );
 
   return { inviteLink };
 });

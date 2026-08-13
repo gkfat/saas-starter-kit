@@ -1,5 +1,5 @@
 import { adminAuth } from '~/shared/firebase-admin';
-import { recordAuditLog } from '~/modules/logs';
+import { withAuditLog } from '~/modules/logs';
 import { registerUserWithProvider, getUserById, CreateUserByAdminDto } from '~/modules/users';
 import { generateSetupToken } from '~/modules/password-setup';
 import { requirePermission } from '~/shared/rbac';
@@ -26,62 +26,58 @@ export default defineEventHandler(async (event): Promise<CreateUserResponse> => 
     role === Role.Member ? Permission.Members.Create : Permission.AdminAccounts.Create,
   );
 
-  let firebaseUid: string;
-  try {
-    firebaseUid = (await adminAuth().createUser({ displayName })).uid;
-  } catch {
-    throw createError({ statusCode: 500, message: '建立帳號失敗' });
-  }
+  const actorUser = await getUserById(actorId);
+  const actor = {
+    userId: actorId,
+    role: actorRole,
+    ...(actorUser?.username ? { username: actorUser.username } : {}),
+  };
 
-  let user: Awaited<ReturnType<typeof registerUserWithProvider>>;
-  try {
-    user = await registerUserWithProvider({
-      username,
-      displayName,
-      email: email ?? null,
-      phone: phone ?? null,
-      providerType: 'password',
-      providerUserId: username,
-      firebaseUid,
-      role,
-      passwordSetupPending: true,
-    });
-  } catch (err: unknown) {
-    await adminAuth()
-      .deleteUser(firebaseUid)
-      .catch(() => {});
-    const code = (err as { code?: string }).code;
-    if (code === 'username-taken') {
-      throw createError({ statusCode: 409, message: '此帳號名稱已被使用' });
-    }
-    throw createError({ statusCode: 500, message: '建立帳號失敗' });
-  }
+  const { user, firebaseUid } = await withAuditLog(
+    {
+      action: 'user.create',
+      actor,
+      requestId,
+      metadata: ({ user: result }) => ({ userId: result.userId, username, role }),
+      metadataOnError: { username, role },
+    },
+    async () => {
+      let firebaseUid: string;
+      try {
+        firebaseUid = (await adminAuth().createUser({ displayName })).uid;
+      } catch {
+        throw createError({ statusCode: 500, message: '建立帳號失敗' });
+      }
+
+      try {
+        const user = await registerUserWithProvider({
+          username,
+          displayName,
+          email: email ?? null,
+          phone: phone ?? null,
+          providerType: 'password',
+          providerUserId: username,
+          firebaseUid,
+          role,
+          passwordSetupPending: true,
+        });
+        return { user, firebaseUid };
+      } catch (err: unknown) {
+        await adminAuth()
+          .deleteUser(firebaseUid)
+          .catch(() => {});
+        const code = (err as { code?: string }).code;
+        if (code === 'username-taken') {
+          throw createError({ statusCode: 409, message: '此帳號名稱已被使用' });
+        }
+        throw createError({ statusCode: 500, message: '建立帳號失敗' });
+      }
+    },
+  );
 
   const setupToken = await generateSetupToken({ userId: user.userId, firebaseUid });
   const { adminAppUrl } = useRuntimeConfig();
   const setupLink = `${adminAppUrl}/auth/set-password?token=${setupToken}`;
-
-  const actorUser = await getUserById(actorId);
-  recordAuditLog({
-    severity: 'INFO',
-    timestamp: new Date().toISOString(),
-    requestId,
-    actor: {
-      userId: actorId,
-      role: actorRole,
-      ...(actorUser?.username ? { username: actorUser.username } : {}),
-    },
-    action: 'user.create',
-    metadata: { userId: user.userId, username, role },
-  }).catch((err) =>
-    console.error(
-      JSON.stringify({
-        severity: 'ERROR',
-        message: 'Failed to write audit_log',
-        error: String(err),
-      }),
-    ),
-  );
 
   return { userId: user.userId, setupLink };
 });
