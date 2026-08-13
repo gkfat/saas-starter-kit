@@ -621,6 +621,20 @@
     "events:create": "建立活動",
     "events:delete": "刪除活動"
   },
+  "permissionModule": {
+    "all": "全部",
+    "dashboard": "儀表板",
+    "members": "會員管理",
+    "admin_accounts": "後台帳號管理",
+    "roles": "角色管理",
+    "permissions": "權限",
+    "login_logs": "登入紀錄",
+    "audit_logs": "稽核紀錄",
+    "level_tiers": "等級管理",
+    "coupons": "優惠券管理",
+    "points": "會員點數",
+    "events": "活動管理"
+  },
   "pointsSettings": {
     "title": "點數折抵比例設定",
     "pointsPerUnit": "所需點數",

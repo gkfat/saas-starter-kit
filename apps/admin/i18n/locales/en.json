@@ -625,6 +625,20 @@
     "events:create": "Create events",
     "events:delete": "Delete events"
   },
+  "permissionModule": {
+    "all": "All",
+    "dashboard": "Dashboard",
+    "members": "Members",
+    "admin_accounts": "Admin Accounts",
+    "roles": "Roles",
+    "permissions": "Permissions",
+    "login_logs": "Login Logs",
+    "audit_logs": "Audit Logs",
+    "level_tiers": "Level Tiers",
+    "coupons": "Coupons",
+    "points": "Member Points",
+    "events": "Events"
+  },
   "pointsSettings": {
     "title": "Points Redemption Ratio",
     "pointsPerUnit": "Points Required",

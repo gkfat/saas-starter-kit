@@ -32,22 +32,47 @@
       </v-data-table>
     </CardsAppCard>
 
-    <v-dialog v-model="dialog" max-width="480" persistent>
+    <v-dialog v-model="dialog" max-width="680" persistent>
       <CardsDialogCard>
         <v-card-title class="pa-4"
           >{{ $t('roles.editPermissions') }} —
           {{ editing ? $t(`role.${editing.name}`) : '' }}</v-card-title
         >
-        <v-card-text>
-          <v-checkbox
-            v-for="perm in allPermissions"
-            :key="perm.name"
-            v-model="selectedPermissions"
-            :label="$t(`permission.${perm.name}`)"
-            :value="perm.name"
-            density="compact"
-            hide-details
-          />
+        <v-card-text class="pa-0">
+          <v-row no-gutters class="permission-editor">
+            <v-col cols="4" class="permission-editor__modules">
+              <v-list density="compact" nav>
+                <v-list-item
+                  :active="selectedModule === 'all'"
+                  color="primary"
+                  @click="selectedModule = 'all'"
+                >
+                  <v-list-item-title>{{ $t('permissionModule.all') }}</v-list-item-title>
+                </v-list-item>
+                <v-list-item
+                  v-for="mod in modules"
+                  :key="mod"
+                  :active="selectedModule === mod"
+                  color="primary"
+                  @click="selectedModule = mod"
+                >
+                  <v-list-item-title>{{ $t(`permissionModule.${mod}`) }}</v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-col>
+            <v-divider vertical />
+            <v-col cols="8" class="permission-editor__permissions pa-4">
+              <v-checkbox
+                v-for="perm in filteredPermissions"
+                :key="perm.name"
+                v-model="selectedPermissions"
+                :label="$t(`permission.${perm.name}`)"
+                :value="perm.name"
+                density="compact"
+                hide-details
+              />
+            </v-col>
+          </v-row>
         </v-card-text>
         <v-card-actions class="pa-4">
           <v-spacer />
@@ -106,10 +131,35 @@ const dialog = ref(false);
 const saving = ref(false);
 const editing = ref<RoleRow | null>(null);
 const selectedPermissions = ref<string[]>([]);
+const selectedModule = ref('all');
+
+function moduleOf(permissionName: string) {
+  return permissionName.split(':')[0];
+}
+
+const modules = computed(() => {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const perm of allPermissions.value ?? []) {
+    const mod = moduleOf(perm.name);
+    if (!seen.has(mod)) {
+      seen.add(mod);
+      result.push(mod);
+    }
+  }
+  return result;
+});
+
+const filteredPermissions = computed(() =>
+  selectedModule.value === 'all'
+    ? (allPermissions.value ?? [])
+    : (allPermissions.value ?? []).filter((perm) => moduleOf(perm.name) === selectedModule.value),
+);
 
 function openEdit(item: RoleRow) {
   editing.value = item;
   selectedPermissions.value = rolePermissions.value?.[item.name] ?? [];
+  selectedModule.value = 'all';
   dialog.value = true;
 }
 
@@ -128,3 +178,15 @@ async function save() {
   saving.value = false;
 }
 </script>
+
+<style scoped>
+.permission-editor__modules {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.permission-editor__permissions {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+</style>
