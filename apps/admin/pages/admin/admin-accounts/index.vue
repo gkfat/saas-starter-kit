@@ -18,6 +18,7 @@
       :can-write-users="canWriteUsers"
       :can-delete-users="canDeleteUsers"
       :show-member-features="false"
+      :current-user-id="auth.user?.userId"
       @edit="openEdit"
       @toggle-status="openToggleStatus"
       @regenerate-link="regenerateLink"
@@ -30,6 +31,7 @@
       :user="editing"
       :role-options="roleOptions"
       :role-permissions="rolePermissions ?? {}"
+      :current-user-id="auth.user?.userId"
       @saved="refresh"
     />
 
@@ -70,11 +72,13 @@ import ToggleStatusDialog from '~/components/users/ToggleStatusDialog.vue';
 import UsersFilterBar from '~/components/users/UsersFilterBar.vue';
 import UsersTable from '~/components/users/UsersTable.vue';
 import UsersToolbar from '~/components/users/UsersToolbar.vue';
+import { useAuthStore } from '~/stores/auth';
 
 const { t } = useI18n();
 
 const { apiFetch } = useApi();
 const { hasPermission } = usePermission();
+const auth = useAuthStore();
 
 const canWriteUsers = computed(() => hasPermission(Permission.AdminAccounts.Write));
 const canCreateUsers = computed(() => hasPermission(Permission.AdminAccounts.Create));

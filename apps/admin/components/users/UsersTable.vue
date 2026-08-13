@@ -31,7 +31,8 @@
           :color="statusColor(item)"
           class="border text-caption"
           prepend-icon="mdi-cog"
-          @click="canWriteUsers && emit('toggle-status', item)"
+          :disabled="isSelf(item)"
+          @click="canWriteUsers && !isSelf(item) && emit('toggle-status', item)"
         >
           {{ statusLabel(item) }}
         </ButtonsAppButton>
@@ -94,8 +95,10 @@ const props = withDefaults(
     canDeleteUsers: boolean;
     /** Member-only affordances (level column, detail dialog) — not applicable to admin accounts */
     showMemberFeatures?: boolean;
+    /** Logged-in user's own userId, used to block self-service status changes */
+    currentUserId?: string | null;
   }>(),
-  { showMemberFeatures: true },
+  { showMemberFeatures: true, currentUserId: null },
 );
 
 const emit = defineEmits<{
@@ -124,6 +127,10 @@ const headers = computed(() => [
   { title: t('users.createdAt'), key: 'createdAt' },
   { title: '', key: 'actions', sortable: false, align: 'end' as const },
 ]);
+
+function isSelf(item: UserRow): boolean {
+  return !!props.currentUserId && item.userId === props.currentUserId;
+}
 
 function statusLabel(item: UserRow): string {
   if (item.disabled) return t('users.status.disabled');

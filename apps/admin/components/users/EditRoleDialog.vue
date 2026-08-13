@@ -30,9 +30,13 @@
         <ButtonsAppButton kind="secondary" @click="close">{{
           $t('common.cancel')
         }}</ButtonsAppButton>
-        <ButtonsAppButton kind="primary" :loading="saving" :disabled="!meta.valid" @click="save">{{
-          $t('common.save')
-        }}</ButtonsAppButton>
+        <ButtonsAppButton
+          kind="primary"
+          :loading="saving"
+          :disabled="!meta.valid || isSelf"
+          @click="save"
+          >{{ $t('common.save') }}</ButtonsAppButton
+        >
       </v-card-actions>
     </CardsDialogCard>
   </v-dialog>
@@ -49,6 +53,8 @@ const props = defineProps<{
   user: UserRow | null;
   roleOptions: Array<{ title: string; value: string }>;
   rolePermissions: Record<string, string[]>;
+  /** Logged-in user's own userId, used to block self-service role changes */
+  currentUserId?: string | null;
 }>();
 
 const emit = defineEmits<{
@@ -78,6 +84,8 @@ const [selectedRole, selectedRoleAttrs] = defineField('selectedRole');
 const selectedRolePermissions = computed(
   () => props.rolePermissions[selectedRole.value ?? ''] ?? [],
 );
+
+const isSelf = computed(() => !!props.currentUserId && props.user?.userId === props.currentUserId);
 
 watch(
   () => props.modelValue,
