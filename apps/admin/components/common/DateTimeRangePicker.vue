@@ -11,10 +11,6 @@
     :formats="{
       input: 'yyyy/MM/dd HH:mm',
     }"
-    :start-time="[
-      { hours: 0, minutes: 0 },
-      { hours: 23, minutes: 59 },
-    ]"
     :disabled="disabled"
     @update:model-value="handleUpdate"
   />

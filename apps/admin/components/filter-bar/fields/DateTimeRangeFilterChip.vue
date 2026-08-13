@@ -53,7 +53,10 @@ watch(menuOpen, (isOpen) => {
   if (!isOpen) return;
   tempValue.value = modelValue.value
     ? [new Date(modelValue.value[0]), new Date(modelValue.value[1])]
-    : null;
+    : [
+        dayjs().startOf('day').toDate(),
+        dayjs().hour(23).minute(59).second(0).millisecond(0).toDate(),
+      ];
 });
 
 function applyValue() {
