@@ -269,23 +269,22 @@
     "title": "Dashboard",
     "welcome": "Welcome back",
     "userOverview": {
-      "title": "User Overview",
       "total": "Total Members"
     },
     "userGrowth": {
       "title": "User Growth",
-      "today": "New Today",
-      "thisWeek": "New This Week",
-      "thisMonth": "New This Month"
+      "seriesName": "New Members",
+      "range": {
+        "all": "All Time",
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "week": "1 Week",
+        "month": "1 Month",
+        "halfYear": "6 Months",
+        "year": "1 Year"
+      }
     },
     "activeUsers": {
-      "title": "Active Users",
-      "dau": "Daily Active (DAU)",
-      "wau": "Weekly Active (WAU)",
-      "mau": "Monthly Active (MAU)",
-      "todayLogins": "Today's Logins",
-      "loginSuccess": "Success",
-      "loginFailure": "Failure",
       "activeRate": "Active Rate"
     }
   },

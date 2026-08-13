@@ -1,2 +1,2 @@
-export { getDashboardStats } from './dashboard.service';
-export type { DashboardStats } from './dashboard.types';
+export { getDashboardStats, getUserGrowthSeries } from './dashboard.service';
+export type { DashboardStats, GrowthRange, UserGrowthSeries } from './dashboard.types';

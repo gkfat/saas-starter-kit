@@ -2,14 +2,23 @@
   <div>
     <LayoutPageHeader :title="$t('dashboard.title')" />
     <v-row v-if="stats" dense align="stretch">
-      <v-col cols="12" md="6" lg="4">
-        <UserOverviewCard :overview="stats.userOverview" />
+      <v-col cols="6" md="3">
+        <StatCard :title="$t('dashboard.userOverview.total')" :value="stats.userOverview.total" />
       </v-col>
-      <v-col cols="12" md="6" lg="4">
-        <UserGrowthCard :growth="stats.userGrowth" />
+      <v-col cols="6" md="3">
+        <StatCard :title="$t('role.admin')" :value="stats.userOverview.byRole.admin" />
       </v-col>
-      <v-col cols="12" md="6" lg="4">
-        <ActiveUsersCard :active-users="stats.activeUsers" />
+      <v-col cols="6" md="3">
+        <StatCard :title="$t('role.member')" :value="stats.userOverview.byRole.member" />
+      </v-col>
+      <v-col cols="6" md="3">
+        <StatCard
+          :title="$t('dashboard.activeUsers.activeRate')"
+          :value="`${activeRatePercent}%`"
+        />
+      </v-col>
+      <v-col cols="12">
+        <UserGrowthCard />
       </v-col>
     </v-row>
   </div>
@@ -19,12 +28,15 @@
 import type { DashboardStats } from '@saas-starter-kit/shared';
 import { storeToRefs } from 'pinia';
 import { useAuthStore } from '~/stores/auth';
-import UserOverviewCard from './components/UserOverviewCard.vue';
+import StatCard from './components/StatCard.vue';
 import UserGrowthCard from './components/UserGrowthCard.vue';
-import ActiveUsersCard from './components/ActiveUsersCard.vue';
 
 const { isLoggedIn } = storeToRefs(useAuthStore());
 const { data: stats, refresh } = await useAuthFetch<DashboardStats>('/api/dashboard/stats');
+
+const activeRatePercent = computed(() =>
+  stats.value ? Math.round(stats.value.activeUsers.activeRate * 100) : 0,
+);
 
 let intervalId: ReturnType<typeof setInterval> | undefined;
 

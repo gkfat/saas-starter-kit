@@ -9,12 +9,6 @@ export type UserOverviewStats = {
   };
 };
 
-export type UserGrowthStats = {
-  today: number;
-  thisWeek: number;
-  thisMonth: number;
-};
-
 export type ActiveUsersStats = {
   dau: number;
   wau: number;
@@ -28,6 +22,27 @@ export type ActiveUsersStats = {
 
 export type DashboardStats = {
   userOverview: UserOverviewStats;
-  userGrowth: UserGrowthStats;
   activeUsers: ActiveUsersStats;
+};
+
+export const GrowthRange = {
+  All: 'all',
+  Today: 'today',
+  Yesterday: 'yesterday',
+  Week: 'week',
+  Month: 'month',
+  HalfYear: 'halfYear',
+  Year: 'year',
+} as const;
+
+export type GrowthRange = (typeof GrowthRange)[keyof typeof GrowthRange];
+
+export type UserGrowthPoint = {
+  label: string;
+  count: number;
+};
+
+export type UserGrowthSeries = {
+  range: GrowthRange;
+  points: UserGrowthPoint[];
 };
