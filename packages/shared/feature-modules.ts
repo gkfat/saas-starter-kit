@@ -25,7 +25,6 @@ export const FEATURE_MODULES: FeatureModule[] = [
   FeatureModule.Coupon,
   FeatureModule.Points,
   FeatureModule.Event,
-  FeatureModule.MemberLiff,
 ];
 
 // Every membership site needs sign-up/login and member data management, so these
@@ -33,4 +32,5 @@ export const FEATURE_MODULES: FeatureModule[] = [
 export const MANDATORY_FEATURE_MODULES: FeatureModule[] = [
   FeatureModule.Auth,
   FeatureModule.UserManagement,
+  FeatureModule.MemberLiff,
 ];
