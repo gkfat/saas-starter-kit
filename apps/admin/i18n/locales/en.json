@@ -587,7 +587,13 @@
     "coupons:read": "Read coupon templates and issuance records",
     "coupons:write": "Edit coupon templates",
     "coupons:issue": "Issue coupons",
-    "coupons:redeem": "Redeem coupons"
+    "coupons:redeem": "Redeem coupons",
+    "points:read": "Read member points",
+    "points:adjust": "Adjust member points",
+    "events:read": "Read events",
+    "events:write": "Edit events",
+    "events:create": "Create events",
+    "events:delete": "Delete events"
   },
   "pointsSettings": {
     "title": "Points Redemption Ratio",

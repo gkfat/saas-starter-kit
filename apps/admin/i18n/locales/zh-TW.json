@@ -587,7 +587,13 @@
     "coupons:read": "讀取優惠券範本與發放紀錄",
     "coupons:write": "編輯優惠券範本",
     "coupons:issue": "發放優惠券",
-    "coupons:redeem": "核銷優惠券"
+    "coupons:redeem": "核銷優惠券",
+    "points:read": "讀取會員點數",
+    "points:adjust": "增減會員點數",
+    "events:read": "讀取活動",
+    "events:write": "編輯活動",
+    "events:create": "建立活動",
+    "events:delete": "刪除活動"
   },
   "pointsSettings": {
     "title": "點數折抵比例設定",
