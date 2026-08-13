@@ -37,10 +37,17 @@ export type MultiSelectFilterField<T = string | number> = BaseFilterField & {
   transform?: (value: T[]) => FieldValue;
 };
 
+export type DateTimeRangeFilterField = BaseFilterField & {
+  type: 'dateTimeRange';
+  defaultValue?: [string, string] | null;
+  transform?: (value: [string, string] | null) => FieldValue;
+};
+
 export type FilterField =
   | TextInputFilterField
   | SelectFilterField<string | number>
-  | MultiSelectFilterField<string | number>;
+  | MultiSelectFilterField<string | number>
+  | DateTimeRangeFilterField;
 
 export const isTextInputField = (field: FilterField): field is TextInputFilterField =>
   field.type === 'text';
@@ -51,6 +58,9 @@ export const isSelectField = (field: FilterField): field is SelectFilterField<st
 export const isMultiSelectField = (
   field: FilterField,
 ): field is MultiSelectFilterField<string | number> => field.type === 'multiSelect';
+
+export const isDateTimeRangeField = (field: FilterField): field is DateTimeRangeFilterField =>
+  field.type === 'dateTimeRange';
 
 export type SelectOption<T = string | number> = {
   text: string;
@@ -100,6 +110,17 @@ export type CreateMultiSelectFieldOptions<T = string | number> = {
   defaultValue?: T[];
   apiKey?: string;
   transform?: (value: T[]) => FieldValue;
+};
+
+export type CreateDateTimeRangeFieldOptions = {
+  key: string;
+  label: string;
+  icon?: string;
+  required?: boolean;
+  removable?: boolean;
+  defaultValue?: [string, string] | null;
+  apiKey?: string;
+  transform?: (value: [string, string] | null) => FieldValue;
 };
 
 export const createTextInputField = (
@@ -154,6 +175,33 @@ export const createSelectField = <T = string | number>(
     label,
     icon,
     options: selectOptions,
+    defaultValue,
+    required,
+    removable,
+    apiKey,
+    transform,
+  };
+};
+
+export const createDateTimeRangeField = (
+  options: CreateDateTimeRangeFieldOptions,
+): DateTimeRangeFilterField => {
+  const {
+    key,
+    label,
+    icon = 'mdi-calendar-range',
+    required = false,
+    removable = true,
+    defaultValue = null,
+    apiKey,
+    transform,
+  } = options;
+
+  return {
+    key,
+    type: 'dateTimeRange',
+    label,
+    icon,
     defaultValue,
     required,
     removable,

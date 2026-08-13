@@ -22,6 +22,12 @@
               :field="field"
               @update="handleFieldUpdate(field.key, $event)"
             />
+            <DateTimeRangeFilterChip
+              v-else-if="field.type === 'dateTimeRange'"
+              v-model="formData[field.key] as [string, string] | null | undefined"
+              :field="field"
+              @update="handleFieldUpdate(field.key, $event)"
+            />
           </v-col>
         </template>
       </v-row>
@@ -53,14 +59,17 @@
 </template>
 
 <script setup lang="ts">
+import dayjs from 'dayjs';
 import MultiSelectFilterChip from './fields/MultiSelectFilterChip.vue';
 import SelectFilterChip from './fields/SelectFilterChip.vue';
 import TextInputFilterChip from './fields/TextInputFilterChip.vue';
+import DateTimeRangeFilterChip from './fields/DateTimeRangeFilterChip.vue';
 import AppliedFiltersBar from './AppliedFiltersBar.vue';
 import {
   isTextInputField,
   isMultiSelectField,
   isSelectField,
+  isDateTimeRangeField,
   type FilterBarConfig,
   type FilterField,
   type AppliedFilter,
@@ -143,6 +152,12 @@ function getFilterDisplayInfo(field: FilterField, value: FieldValue): string | n
     case 'text':
       if (typeof value === 'string' && value.trim()) return value;
       break;
+    case 'dateTimeRange':
+      if (Array.isArray(value) && value.length === 2) {
+        const format = (v: FieldValue) => dayjs(v as string).format('YYYY/MM/DD HH:mm');
+        return `${format(value[0])} ~ ${format(value[1])}`;
+      }
+      break;
   }
 
   return null;
@@ -158,6 +173,8 @@ function removeFilter(key: string) {
     handleFieldUpdate(key, (field.defaultValue ?? []) as FieldValue);
   } else if (isSelectField(field)) {
     handleFieldUpdate(key, field.defaultValue ?? null);
+  } else if (isDateTimeRangeField(field)) {
+    handleFieldUpdate(key, (field.defaultValue ?? null) as FieldValue);
   }
 }
 
