@@ -13,6 +13,12 @@
           <span class="text-medium-emphasis">{{ $t('events.noData') }}</span>
         </template>
 
+        <template #[`item.id`]="{ item }">
+          <span class="text-caption font-mono text-no-wrap text-medium-emphasis">{{
+            item.id
+          }}</span>
+        </template>
+
         <template #[`item.status`]="{ item }">
           <v-chip :color="statusColor(item.status)" size="small" variant="flat">
             {{ $t(`events.statusOption.${item.status}`) }}
@@ -103,6 +109,7 @@ const filteredEvents = computed(() => {
 });
 
 const headers = computed(() => [
+  { title: t('users.uid'), key: 'id' },
   { title: t('events.eventTitle'), key: 'title' },
   { title: t('events.startAt'), key: 'startAt' },
   { title: t('events.endAt'), key: 'endAt' },

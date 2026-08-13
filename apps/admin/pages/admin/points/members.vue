@@ -20,6 +20,11 @@
         <template #no-data>
           <span class="text-medium-emphasis">{{ $t('pointsMembers.noData') }}</span>
         </template>
+        <template #[`item.userId`]="{ item }">
+          <span class="text-caption font-mono text-no-wrap text-medium-emphasis">{{
+            item.userId
+          }}</span>
+        </template>
         <template #[`item.memberNo`]="{ item }">
           <span class="text-caption font-mono">{{ item.memberNo }}</span>
         </template>
@@ -93,6 +98,7 @@ function resetSearch() {
 }
 
 const headers = computed(() => [
+  { title: t('users.uid'), key: 'userId' },
   { title: t('users.memberNo'), key: 'memberNo' },
   { title: t('users.displayName'), key: 'displayName' },
   { title: t('users.email'), key: 'email' },

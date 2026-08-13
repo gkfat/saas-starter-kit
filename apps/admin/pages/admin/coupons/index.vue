@@ -11,6 +11,12 @@
           <span class="text-medium-emphasis">{{ $t('coupons.noData') }}</span>
         </template>
 
+        <template #[`item.id`]="{ item }">
+          <span class="text-caption font-mono text-no-wrap text-medium-emphasis">{{
+            item.id
+          }}</span>
+        </template>
+
         <template #[`item.discountType`]="{ item }">
           {{ $t(`coupons.discountTypeOption.${item.discountType}`) }}
         </template>
@@ -67,6 +73,7 @@ const {
 } = await useAuthFetch<CouponTemplate[]>('/api/admin/coupons', { default: () => [] });
 
 const headers = computed(() => [
+  { title: t('users.uid'), key: 'id' },
   { title: t('coupons.templateTitle'), key: 'title' },
   { title: t('coupons.discountType'), key: 'discountType' },
   { title: t('coupons.validDays'), key: 'validDays' },
