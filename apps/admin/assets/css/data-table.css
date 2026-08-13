@@ -2,6 +2,11 @@
   white-space: nowrap;
 }
 
+.v-data-table {
+  border: thin solid rgba(var(--v-border-color), var(--v-border-opacity));
+  border-radius: 4px;
+}
+
 .v-data-table > .v-table__wrapper > table > thead > tr > th {
   background: rgb(var(--v-theme-surface-variant));
 }
