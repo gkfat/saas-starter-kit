@@ -259,6 +259,10 @@
     "event": {
       "title": "Event announcements",
       "description": "Schedule event start/end times and banner images, shown to members automatically within the active window."
+    },
+    "memberLiff": {
+      "title": "Member LINE LIFF",
+      "description": "Deliver a member-only mobile web experience via LINE LIFF, so members can sign up and engage without installing an app."
     }
   },
   "dashboard": {

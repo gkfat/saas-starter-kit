@@ -9,6 +9,7 @@ export const FeatureModule = {
   Coupon: 'coupon',
   Points: 'points',
   Event: 'event',
+  MemberLiff: 'memberLiff',
 } as const;
 
 export type FeatureModule = (typeof FeatureModule)[keyof typeof FeatureModule];
@@ -24,6 +25,7 @@ export const FEATURE_MODULES: FeatureModule[] = [
   FeatureModule.Coupon,
   FeatureModule.Points,
   FeatureModule.Event,
+  FeatureModule.MemberLiff,
 ];
 
 // Every membership site needs sign-up/login and member data management, so these

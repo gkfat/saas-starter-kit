@@ -46,6 +46,7 @@ const FEATURE_MODULE_ICONS: Record<FeatureModule, string> = {
   [FeatureModule.Coupon]: 'mdi-ticket-percent',
   [FeatureModule.Points]: 'mdi-cash-multiple',
   [FeatureModule.Event]: 'mdi-bullhorn-outline',
+  [FeatureModule.MemberLiff]: 'mdi-cellphone-message',
 };
 
 type FeatureCategory = {
@@ -56,7 +57,7 @@ type FeatureCategory = {
 const featureCategories: FeatureCategory[] = [
   {
     labelKey: 'home.explore.categories.membership',
-    modules: [FeatureModule.Auth, FeatureModule.UserManagement],
+    modules: [FeatureModule.Auth, FeatureModule.UserManagement, FeatureModule.MemberLiff],
   },
   {
     labelKey: 'home.explore.categories.admin',

@@ -259,6 +259,10 @@
     "event": {
       "title": "活動公告",
       "description": "設定活動起訖時間與 Banner 圖片，於會員端依排程自動上下架，快速發布行銷活動。"
+    },
+    "memberLiff": {
+      "title": "會員 LINE LIFF",
+      "description": "透過 LINE LIFF 提供會員專屬的行動網頁體驗，免下載 App 即可完成註冊與互動。"
     }
   },
   "dashboard": {
