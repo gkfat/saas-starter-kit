@@ -194,11 +194,7 @@ defineExpose({
 
 <style scoped lang="scss">
 :deep(.v-menu__content) {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-radius: 8px;
-}
-
-:deep(.v-card) {
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
   border-radius: 8px;
 }
 </style>

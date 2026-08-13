@@ -1,3 +1,11 @@
 .table-header-nowrap th {
   white-space: nowrap;
 }
+
+.v-data-table > .v-table__wrapper > table > thead > tr > th {
+  background: rgb(var(--v-theme-surface-variant));
+}
+
+.v-data-table > .v-table__wrapper > table > tbody > tr:hover > td {
+  background: rgb(var(--v-theme-surface-variant));
+}

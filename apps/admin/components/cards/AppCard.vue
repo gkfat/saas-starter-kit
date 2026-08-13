@@ -10,6 +10,6 @@ withDefaults(
     rounded?: string;
     elevation?: number | string;
   }>(),
-  { rounded: 'sm', elevation: 0 },
+  { rounded: 'lg', elevation: 0 },
 );
 </script>

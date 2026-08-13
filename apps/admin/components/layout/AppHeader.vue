@@ -10,7 +10,7 @@
   </v-app-bar>
 
   <v-app-bar v-else flat elevation="0" class="border-b" height="36">
-    <div class="d-flex align-center px-4 w-100" style="font-size: 11px; color: #5f6368">
+    <div class="d-flex align-center px-4 w-100 text-muted" style="font-size: 11px">
       <nav class="d-flex align-center ga-1 flex-grow-1">
         <template v-for="(crumb, i) in crumbs" :key="crumb.path">
           <span v-if="i > 0" class="text-disabled">/</span>
