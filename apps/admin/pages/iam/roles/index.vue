@@ -108,15 +108,17 @@ const headers = computed(() => [
     : []),
 ]);
 
-const [
-  { data: roles, pending, refresh: refreshRoles },
-  { data: rolePermissions, refresh: refreshRolePermissions },
-  { data: allPermissions },
-] = await Promise.all([
-  useAuthFetch<Array<{ name: string }>>('/api/admin/roles', { default: () => [] }),
-  useAuthFetch<Record<string, string[]>>('/api/admin/role-permissions', { default: () => ({}) }),
-  useAuthFetch<Array<{ name: string }>>('/api/admin/permissions', { default: () => [] }),
-]);
+const {
+  data: roles,
+  pending,
+  refresh: refreshRoles,
+} = useAuthFetch<Array<{ name: string }>>('/api/admin/roles', { default: () => [] });
+const { data: rolePermissions, refresh: refreshRolePermissions } = useAuthFetch<
+  Record<string, string[]>
+>('/api/admin/role-permissions', { default: () => ({}) });
+const { data: allPermissions } = useAuthFetch<Array<{ name: string }>>('/api/admin/permissions', {
+  default: () => [],
+});
 
 const rolesWithPermissions = computed(() =>
   (roles.value ?? []).map((role) => ({

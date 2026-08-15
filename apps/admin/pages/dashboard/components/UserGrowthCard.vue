@@ -10,7 +10,8 @@
     </v-card-title>
     <v-card-text>
       <div class="chart-wrapper">
-        <Line v-if="chartData" :data="chartData" :options="chartOptions" />
+        <v-skeleton-loader v-if="!chartData" type="image" height="320" />
+        <Line v-else :data="chartData" :options="chartOptions" />
       </div>
     </v-card-text>
   </CardsAppCard>
@@ -38,7 +39,7 @@ const { t } = useI18n();
 const rangeOptions = Object.values(GrowthRange);
 const range = ref<GrowthRange>(GrowthRange.Week);
 
-const { data: series } = await useAuthFetch<UserGrowthSeries>('/api/dashboard/user-growth', {
+const { data: series } = useAuthFetch<UserGrowthSeries>('/api/dashboard/user-growth', {
   query: computed(() => ({ range: range.value })),
 });
 

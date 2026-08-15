@@ -120,7 +120,7 @@ const {
   data: tiers,
   pending,
   refresh,
-} = await useAuthFetch<LevelTier[]>('/api/admin/level/tiers', {
+} = useAuthFetch<LevelTier[]>('/api/admin/level/tiers', {
   default: () => [],
 });
 

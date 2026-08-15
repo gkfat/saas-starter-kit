@@ -10,7 +10,7 @@
             v-bind="pointsPerUnitAttrs"
             :label="$t('pointsSettings.pointsPerUnit')"
             type="number"
-            :disabled="!canWrite"
+            :disabled="!canWrite || pending"
             :error-messages="formErrors.pointsPerUnit"
             hide-details="auto"
           />
@@ -21,7 +21,7 @@
             v-bind="currencyValueAttrs"
             :label="$t('pointsSettings.currencyValue')"
             type="number"
-            :disabled="!canWrite"
+            :disabled="!canWrite || pending"
             :error-messages="formErrors.currencyValue"
             hide-details="auto"
           />
@@ -58,10 +58,11 @@ const { hasPermission } = usePermission();
 
 const canWrite = computed(() => hasPermission(Permission.Points.Adjust));
 
-const { data: settings, refresh } = await useAuthFetch<PointsSettings | null>(
-  '/api/admin/points/settings',
-  { default: () => null },
-);
+const {
+  data: settings,
+  pending,
+  refresh,
+} = useAuthFetch<PointsSettings | null>('/api/admin/points/settings', { default: () => null });
 
 const validationSchema = computed(() =>
   toTypedSchema(

@@ -97,14 +97,18 @@ function applyFilters({ search }: { search: string }) {
   refresh();
 }
 
-const [{ data: users, pending, refresh }, { data: roles }, { data: rolePermissions }] =
-  await Promise.all([
-    useAuthFetch<UserRow[]>('/api/admin/users', { query: queryParams, default: () => [] }),
-    useAuthFetch<Array<{ name: string }>>('/api/admin/roles', { default: () => [] }),
-    useAuthFetch<Record<string, string[]>>('/api/admin/role-permissions', {
-      default: () => ({}),
-    }),
-  ]);
+const {
+  data: users,
+  pending,
+  refresh,
+} = useAuthFetch<UserRow[]>('/api/admin/users', { query: queryParams, default: () => [] });
+const { data: roles } = useAuthFetch<Array<{ name: string }>>('/api/admin/roles', {
+  default: () => [],
+});
+const { data: rolePermissions } = useAuthFetch<Record<string, string[]>>(
+  '/api/admin/role-permissions',
+  { default: () => ({}) },
+);
 
 const roleOptions = computed(() =>
   (roles.value ?? []).map((r) => ({ title: t(`role.${r.name}`), value: r.name })),

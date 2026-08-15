@@ -11,7 +11,8 @@
             <template v-if="isLevelEnabled">
               <v-divider class="mb-4" />
 
-              <template v-if="level">
+              <v-skeleton-loader v-if="levelPending" type="text, text" />
+              <template v-else-if="level">
                 <v-chip
                   prepend-icon="mdi-star"
                   color="warning"
@@ -49,7 +50,8 @@
             <template v-if="isPointsEnabled">
               <v-divider class="mb-4" :class="{ 'mt-4': isLevelEnabled }" />
 
-              <v-row no-gutters>
+              <v-skeleton-loader v-if="walletPending" type="text, text" />
+              <v-row v-else no-gutters>
                 <v-col cols="6">
                   <div class="text-caption text-medium-emphasis">
                     {{ $t('points.myCard.balance') }}
@@ -75,6 +77,7 @@
             <v-data-table
               :headers="ledgerHeaders"
               :items="ledger"
+              :loading="ledgerPending"
               item-value="id"
               density="compact"
             >
@@ -118,19 +121,19 @@ const { isFeatureEnabled } = useFeatureFlags();
 const isLevelEnabled = isFeatureEnabled(FeatureFlag.Level);
 const isPointsEnabled = isFeatureEnabled(FeatureFlag.Points);
 
-const { data: level } = isLevelEnabled
-  ? await useAuthFetch<GetLevelResult | null>('/api/profile/level', { default: () => null })
-  : { data: ref(null) };
+const { data: level, pending: levelPending } = isLevelEnabled
+  ? useAuthFetch<GetLevelResult | null>('/api/profile/level', { default: () => null })
+  : { data: ref(null), pending: ref(false) };
 
-const { data: wallet } = isPointsEnabled
-  ? await useAuthFetch<PointsWallet>('/api/profile/points', {
+const { data: wallet, pending: walletPending } = isPointsEnabled
+  ? useAuthFetch<PointsWallet>('/api/profile/points', {
       default: () => ({ balance: 0, redeemableAmount: 0 }),
     })
-  : { data: ref({ balance: 0, redeemableAmount: 0 }) };
+  : { data: ref({ balance: 0, redeemableAmount: 0 }), pending: ref(false) };
 
-const { data: ledger } = isPointsEnabled
-  ? await useAuthFetch<PointsLedgerEntry[]>('/api/profile/points/ledger', { default: () => [] })
-  : { data: ref([]) };
+const { data: ledger, pending: ledgerPending } = isPointsEnabled
+  ? useAuthFetch<PointsLedgerEntry[]>('/api/profile/points/ledger', { default: () => [] })
+  : { data: ref([]), pending: ref(false) };
 
 const periodProgress = computed(() => {
   if (!level.value || !level.value.nextTierThreshold) return 0;

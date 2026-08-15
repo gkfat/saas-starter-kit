@@ -13,7 +13,13 @@
       style="max-width: 180px"
     />
 
-    <CardsAppCard v-if="filteredCoupons.length === 0">
+    <v-row v-if="pending">
+      <v-col v-for="n in 3" :key="n" cols="12" md="6" lg="4">
+        <v-skeleton-loader type="card" />
+      </v-col>
+    </v-row>
+
+    <CardsAppCard v-else-if="filteredCoupons.length === 0">
       <v-card-text class="text-medium-emphasis text-center py-8">
         {{ $t('coupons.myCard.empty') }}
       </v-card-text>
@@ -60,7 +66,7 @@ if (!isFeatureEnabled(FeatureFlag.Coupon)) {
 
 const { t } = useI18n();
 
-const { data: coupons } = await useAuthFetch<CouponInstanceDetail[]>('/api/profile/coupons', {
+const { data: coupons, pending } = useAuthFetch<CouponInstanceDetail[]>('/api/profile/coupons', {
   default: () => [],
 });
 

@@ -71,7 +71,7 @@ const {
   data: members,
   pending,
   refresh,
-} = await useAuthFetch<PointsMemberRow[]>('/api/admin/points/members', {
+} = useAuthFetch<PointsMemberRow[]>('/api/admin/points/members', {
   query: queryParams,
   default: () => [],
 });

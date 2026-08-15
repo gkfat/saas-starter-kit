@@ -77,7 +77,7 @@ const {
   data: logs,
   pending,
   refresh,
-} = await useAuthFetch<AuditLog[]>('/api/admin/logs/audit', {
+} = useAuthFetch<AuditLog[]>('/api/admin/logs/audit', {
   query: queryParams,
   default: (): AuditLog[] => [],
 });

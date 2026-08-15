@@ -49,7 +49,7 @@ const headers = computed(() => [
   { title: t('logs.result'), key: 'result' },
 ]);
 
-const { data: logs, pending } = await useAuthFetch<LoginLog[]>('/api/admin/logs/login', {
+const { data: logs, pending } = useAuthFetch<LoginLog[]>('/api/admin/logs/login', {
   default: (): LoginLog[] => [],
 });
 </script>

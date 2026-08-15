@@ -70,7 +70,7 @@ const {
   data: templates,
   pending,
   refresh,
-} = await useAuthFetch<CouponTemplate[]>('/api/admin/coupons', { default: () => [] });
+} = useAuthFetch<CouponTemplate[]>('/api/admin/coupons', { default: () => [] });
 
 const headers = computed(() => [
   { title: t('users.uid'), key: 'id' },

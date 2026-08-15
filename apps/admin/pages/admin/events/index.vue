@@ -89,7 +89,7 @@ const {
   data: events,
   pending,
   refresh,
-} = await useAuthFetch<EventWithStatus[]>('/api/admin/events', { default: () => [] });
+} = useAuthFetch<EventWithStatus[]>('/api/admin/events', { default: () => [] });
 
 const appliedSearch = ref('');
 const appliedStatus = ref<EventStatus | ''>('');

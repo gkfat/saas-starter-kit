@@ -1,22 +1,29 @@
 <template>
   <div>
     <LayoutPageHeader :title="$t('dashboard.title')" />
-    <v-row v-if="stats" dense align="stretch">
-      <v-col cols="6" md="3">
-        <StatCard :title="$t('dashboard.userOverview.total')" :value="stats.userOverview.total" />
-      </v-col>
-      <v-col cols="6" md="3">
-        <StatCard :title="$t('role.admin')" :value="stats.userOverview.byRole.admin" />
-      </v-col>
-      <v-col cols="6" md="3">
-        <StatCard :title="$t('role.member')" :value="stats.userOverview.byRole.member" />
-      </v-col>
-      <v-col cols="6" md="3">
-        <StatCard
-          :title="$t('dashboard.activeUsers.activeRate')"
-          :value="`${activeRatePercent}%`"
-        />
-      </v-col>
+    <v-row dense align="stretch">
+      <template v-if="stats">
+        <v-col cols="6" md="3">
+          <StatCard :title="$t('dashboard.userOverview.total')" :value="stats.userOverview.total" />
+        </v-col>
+        <v-col cols="6" md="3">
+          <StatCard :title="$t('role.admin')" :value="stats.userOverview.byRole.admin" />
+        </v-col>
+        <v-col cols="6" md="3">
+          <StatCard :title="$t('role.member')" :value="stats.userOverview.byRole.member" />
+        </v-col>
+        <v-col cols="6" md="3">
+          <StatCard
+            :title="$t('dashboard.activeUsers.activeRate')"
+            :value="`${activeRatePercent}%`"
+          />
+        </v-col>
+      </template>
+      <template v-else>
+        <v-col v-for="n in 4" :key="n" cols="6" md="3">
+          <v-skeleton-loader type="card" class="h-100" />
+        </v-col>
+      </template>
       <v-col cols="12">
         <UserGrowthCard />
       </v-col>
@@ -32,7 +39,7 @@ import StatCard from './components/StatCard.vue';
 import UserGrowthCard from './components/UserGrowthCard.vue';
 
 const { isLoggedIn } = storeToRefs(useAuthStore());
-const { data: stats, refresh } = await useAuthFetch<DashboardStats>('/api/dashboard/stats');
+const { data: stats, refresh } = useAuthFetch<DashboardStats>('/api/dashboard/stats');
 
 const activeRatePercent = computed(() =>
   stats.value ? Math.round(stats.value.activeUsers.activeRate * 100) : 0,

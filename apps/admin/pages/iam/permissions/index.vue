@@ -25,7 +25,7 @@ const headers = computed(() => [
   { title: t('permissions.description'), key: 'description' },
 ]);
 
-const { data: permissions, pending } = await useAuthFetch('/api/admin/permissions', {
+const { data: permissions, pending } = useAuthFetch('/api/admin/permissions', {
   default: () => [],
 });
 </script>
