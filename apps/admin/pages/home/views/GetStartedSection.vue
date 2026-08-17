@@ -1,98 +1,100 @@
 <template>
-  <v-container class="py-12" :max-width="CONTAINER_WIDTH - 100">
-    <v-row justify="center" class="text-center mb-6">
-      <v-col cols="12" md="8">
-        <div class="text-h5 font-weight-medium">{{ $t('home.getStarted.title') }}</div>
-      </v-col>
-    </v-row>
-    <v-row justify="center">
-      <v-col cols="12">
-        <HomeCard class="pa-8">
-          <div class="text-subtitle-1 font-weight-medium mb-2">
-            {{ $t('home.getStarted.nameLabel') }}
-          </div>
-          <v-text-field
-            v-model="contactName"
-            :placeholder="$t('home.getStarted.namePlaceholder')"
-            class="mb-4"
-            hide-details="auto"
-          />
-
-          <div class="text-subtitle-1 font-weight-medium mb-2">
-            {{ $t('home.getStarted.businessLabel') }}
-          </div>
-          <v-text-field
-            v-model="businessDescription"
-            :placeholder="$t('home.getStarted.businessPlaceholder')"
-            class="mb-4"
-            hide-details="auto"
-          />
-
-          <div class="text-subtitle-1 font-weight-medium mb-2">
-            {{ $t('home.getStarted.emailLabel') }}
-          </div>
-          <v-text-field
-            v-model="contactEmail"
-            type="email"
-            placeholder="example@email.com"
-            class="mb-4"
-            hide-details="auto"
-          />
-
-          <div class="text-subtitle-1 font-weight-medium mb-4">
-            {{ $t('home.getStarted.formTitle') }}
-          </div>
-          <div class="mb-4">
-            <div class="text-caption text-medium-emphasis mb-2">
-              {{ $t('home.getStarted.includedLabel') }}
+  <section class="get-started-section">
+    <v-container class="py-12" :max-width="CONTAINER_WIDTH - 100">
+      <v-row justify="center" class="text-center mb-6">
+        <v-col cols="12" md="8">
+          <div class="text-h5 font-weight-medium">{{ $t('home.getStarted.title') }}</div>
+        </v-col>
+      </v-row>
+      <v-row justify="center">
+        <v-col cols="12">
+          <HomeCard class="pa-8">
+            <div class="text-subtitle-1 font-weight-medium mb-2">
+              {{ $t('home.getStarted.nameLabel') }}
             </div>
-            <div class="d-flex flex-wrap ga-2">
-              <v-chip
-                v-for="module in mandatoryModules"
-                :key="module"
-                color="primary"
-                variant="flat"
-                prepend-icon="mdi-lock"
-                class="locked-chip"
+            <v-text-field
+              v-model="contactName"
+              :placeholder="$t('home.getStarted.namePlaceholder')"
+              class="mb-4"
+              hide-details="auto"
+            />
+
+            <div class="text-subtitle-1 font-weight-medium mb-2">
+              {{ $t('home.getStarted.businessLabel') }}
+            </div>
+            <v-text-field
+              v-model="businessDescription"
+              :placeholder="$t('home.getStarted.businessPlaceholder')"
+              class="mb-4"
+              hide-details="auto"
+            />
+
+            <div class="text-subtitle-1 font-weight-medium mb-2">
+              {{ $t('home.getStarted.emailLabel') }}
+            </div>
+            <v-text-field
+              v-model="contactEmail"
+              type="email"
+              placeholder="example@email.com"
+              class="mb-4"
+              hide-details="auto"
+            />
+
+            <div class="text-subtitle-1 font-weight-medium mb-4">
+              {{ $t('home.getStarted.formTitle') }}
+            </div>
+            <div class="mb-4">
+              <div class="text-caption text-medium-emphasis mb-2">
+                {{ $t('home.getStarted.includedLabel') }}
+              </div>
+              <div class="d-flex flex-wrap ga-2">
+                <v-chip
+                  v-for="module in mandatoryModules"
+                  :key="module"
+                  color="accent"
+                  variant="flat"
+                  prepend-icon="mdi-lock"
+                  class="locked-chip"
+                >
+                  {{ $t(`features.${module}.title`) }}
+                </v-chip>
+              </div>
+            </div>
+            <div class="mb-6">
+              <div class="text-caption text-medium-emphasis mb-2">
+                {{ $t('home.getStarted.optionalLabel') }}
+              </div>
+              <div class="d-flex flex-wrap ga-2">
+                <v-chip
+                  v-for="module in optionalModules"
+                  :key="module"
+                  :color="isModuleSelected(module) ? 'accent' : undefined"
+                  :variant="isModuleSelected(module) ? 'flat' : 'outlined'"
+                  :prepend-icon="isModuleSelected(module) ? 'mdi-check' : undefined"
+                  @click="toggleModule(module)"
+                >
+                  {{ $t(`features.${module}.title`) }}
+                </v-chip>
+              </div>
+            </div>
+            <v-divider class="my-6"></v-divider>
+            <div class="d-flex justify-end">
+              <ButtonsAppButton
+                kind="primary"
+                block
+                size="x-large"
+                class="text-none"
+                :loading="submitting"
+                @click="submitFeatureRequest"
               >
-                {{ $t(`features.${module}.title`) }}
-              </v-chip>
+                {{ $t('home.getStarted.submit') }}
+              </ButtonsAppButton>
             </div>
-          </div>
-          <div class="mb-6">
-            <div class="text-caption text-medium-emphasis mb-2">
-              {{ $t('home.getStarted.optionalLabel') }}
-            </div>
-            <div class="d-flex flex-wrap ga-2">
-              <v-chip
-                v-for="module in optionalModules"
-                :key="module"
-                :color="isModuleSelected(module) ? 'primary' : undefined"
-                :variant="isModuleSelected(module) ? 'flat' : 'outlined'"
-                :prepend-icon="isModuleSelected(module) ? 'mdi-check' : undefined"
-                @click="toggleModule(module)"
-              >
-                {{ $t(`features.${module}.title`) }}
-              </v-chip>
-            </div>
-          </div>
-          <v-divider class="my-6"></v-divider>
-          <div class="d-flex justify-end">
-            <ButtonsAppButton
-              kind="primary"
-              block
-              size="x-large"
-              class="text-none"
-              :loading="submitting"
-              @click="submitFeatureRequest"
-            >
-              {{ $t('home.getStarted.submit') }}
-            </ButtonsAppButton>
-          </div>
-        </HomeCard>
-      </v-col>
-    </v-row>
-  </v-container>
+          </HomeCard>
+        </v-col>
+      </v-row>
+    </v-container>
+  </section>
 </template>
 
 <script setup lang="ts">
@@ -161,6 +163,13 @@ async function submitFeatureRequest() {
 </script>
 
 <style scoped>
+.get-started-section {
+  background: #ffffff;
+  margin-left: -16px;
+  margin-right: -16px;
+  width: calc(100% + 32px);
+}
+
 .locked-chip {
   cursor: default;
   pointer-events: none;

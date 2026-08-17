@@ -1,3 +1,7 @@
 .v-application {
   font-family: 'Roboto', 'Noto Sans TC', sans-serif !important;
 }
+
+.font-display {
+  font-family: 'Fraunces', 'Noto Sans TC', serif;
+}

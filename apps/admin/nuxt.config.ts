@@ -57,6 +57,8 @@ export default defineNuxtConfig({
     '@fontsource/noto-sans-tc/400.css',
     '@fontsource/noto-sans-tc/500.css',
     '@fontsource/noto-sans-tc/700.css',
+    '@fontsource/fraunces/600.css',
+    '@fontsource/fraunces/700.css',
     '~/assets/css/typography.css',
     '~/assets/css/data-table.css',
     '@vuepic/vue-datepicker/dist/main.css',

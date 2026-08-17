@@ -53,6 +53,7 @@
   },
   "auth": {
     "login": "Sign In",
+    "goToLogin": "Sign In",
     "createAccount": "Create Account",
     "register": "Register",
     "registerSuccess": "Registration successful, please log in",
@@ -107,6 +108,7 @@
   },
   "home": {
     "hero": {
+      "eyebrow": "Membership platform",
       "title": "Build your own membership platform, without building it from scratch",
       "subtitle": "From member sign-up to back-office management, one system is all you need to start running your membership program. Skip months of development and spend your time growing the business, not solving technical problems.",
       "ctaPrimary": "Get started free",
@@ -114,6 +116,7 @@
     },
     "process": {
       "title": "How much effort does it take to build a membership system the traditional way?",
+      "stepCount": "{count} steps",
       "traditional": {
         "label": "The traditional way",
         "note": "From hiring engineers to launch, this usually takes months",
@@ -193,6 +196,48 @@
           "description": "Ongoing maintenance, updates, security patches, and technical support to keep the system running smoothly."
         }
       }
+    },
+    "qa": {
+      "eyebrow": "FAQ",
+      "title": "Everything you might want to know about this membership platform",
+      "items": {
+        "0": {
+          "question": "What is this system, and who is it for?",
+          "answer": "It's a ready-to-use membership platform covering member sign-up and login, profile management, points and tiers, and admin governance. Restaurants, gyms, salons, tutoring centers, retail and e-commerce brands can all quickly stand up their own membership system."
+        },
+        "1": {
+          "question": "What do the Admin backend and LIFF member app each do?",
+          "answer": "LIFF is the self-service app members use inside LINE to sign up, log in, check their points and tier, and claim or redeem coupons. The Admin backend is where staff log in to manage member data, configure points and tier rules, issue coupons, and review login and audit logs."
+        },
+        "2": {
+          "question": "Do we need to apply for a new LINE Official Account?",
+          "answer": "No. The system connects LINE Login and the LIFF member app by configuring your existing LINE Official Account's channel credentials, so you can keep using the account you already have instead of applying for a new one."
+        },
+        "3": {
+          "question": "How do member points and tiers work?",
+          "answer": "The points module lets you grant and redeem points under configurable rules, with a full record kept for lookup. The tier module automatically re-evaluates each member on a configurable evaluation period and tier table — when a period ends it settles automatically and opens the next one, so you can manage members by tier."
+        },
+        "4": {
+          "question": "Can feature modules be added as needed?",
+          "answer": "Yes. The system is modular — beyond the basic module included in every plan, additional feature modules can be added on demand, so you only pay for what you actually use."
+        },
+        "5": {
+          "question": "How is pricing structured?",
+          "answer": "Pricing covers the basic module (included in the plan), optional feature modules added as needed, custom development (quoted per request), a one-time environment setup fee, and a monthly maintenance fee for ongoing support."
+        },
+        "6": {
+          "question": "How long does onboarding take? Do we need to build anything ourselves?",
+          "answer": "No custom development is required. Compared to the traditional path of hiring engineers, planning, building, testing, and launching over several months, you simply pick the feature modules you need and start running your business right away."
+        },
+        "7": {
+          "question": "Is member data secure? How are admin permissions managed?",
+          "answer": "The backend uses role-based access control (RBAC), admin logins are authenticated, and every login plus key action is recorded in login and audit logs for traceability and access control."
+        }
+      }
+    },
+    "footer": {
+      "brand": "SaaS Starter Kit",
+      "copyright": "© {year} Gk Wang All rights reserved."
     },
     "getStarted": {
       "title": "Own your membership system, starting now",

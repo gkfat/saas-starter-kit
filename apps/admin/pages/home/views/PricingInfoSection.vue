@@ -10,7 +10,7 @@
         <HomeCard class="pa-6 h-100">
           <v-icon :icon="card.icon" color="primary" size="32" class="mb-3" />
           <div class="text-h6 mb-1">{{ $t(`home.pricingInfo.items.${card.key}.title`) }}</div>
-          <v-chip size="small" color="primary" variant="tonal" class="mb-3">
+          <v-chip size="small" color="accent" variant="tonal" class="mb-3">
             {{ $t(`home.pricingInfo.items.${card.key}.tag`) }}
           </v-chip>
           <div class="text-body-2 text-medium-emphasis">
