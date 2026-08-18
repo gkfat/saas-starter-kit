@@ -48,7 +48,7 @@ onMounted(async () => {
       <v-progress-circular indeterminate color="primary" size="48" />
     </template>
     <template v-else-if="status === 'error'">
-      <v-icon icon="mdi-close-circle" color="error" size="96" class="mb-4" />
+      <v-icon icon="mdi-close-circle" color="error" size="94" class="mb-4" />
       <div class="text-body-1 px-6">{{ errorMessage }}</div>
     </template>
   </div>
