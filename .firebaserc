@@ -1,5 +1,18 @@
 {
   "projects": {
     "default": "saas-starter-kit-4f4d8"
-  }
+  },
+  "targets": {
+    "saas-starter-kit-4f4d8": {
+      "hosting": {
+        "admin": [
+          "saas-starter-kit-admin"
+        ],
+        "liff": [
+          "saas-starter-kit-liff"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }
