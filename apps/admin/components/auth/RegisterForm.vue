@@ -96,7 +96,7 @@ const props = withDefaults(
     idToken?: string;
     provider?: 'google' | 'line';
   }>(),
-  { provider: 'google' },
+  { provider: 'google', idToken: undefined },
 );
 
 const emit = defineEmits<{
