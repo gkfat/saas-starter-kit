@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
+import utc from 'dayjs/plugin/utc.js';
 import type { QueryDocumentSnapshot } from 'firebase-admin/firestore';
 import { FeatureFlag } from '@saas-starter-kit/shared';
 import { DUE_PERIOD_PAGE_SIZE, LEVEL_PERIOD_LENGTH } from './level.constants';

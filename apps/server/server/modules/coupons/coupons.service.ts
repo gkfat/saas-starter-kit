@@ -1,6 +1,6 @@
 import { randomUUID, randomInt } from 'node:crypto';
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
+import utc from 'dayjs/plugin/utc.js';
 import { FeatureFlag } from '@saas-starter-kit/shared';
 import {
   createInstances,
