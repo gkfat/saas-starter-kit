@@ -53,6 +53,9 @@ jobs:
     needs: [detect-affected, lint-and-test]
     if: github.event_name == 'push' && contains(needs.detect-affected.outputs.apps, 'server')
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
 
@@ -153,6 +156,7 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           target: admin
           projectId: default
+          channelId: live
 
   deploy-liff:
     needs: [detect-affected, lint-and-test]
@@ -177,3 +181,4 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           target: liff
           projectId: default
+          channelId: live
