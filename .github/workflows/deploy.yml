@@ -43,7 +43,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
-      - run: pnpm test
+      # apps/server/tests/* are integration tests requiring `pnpm dev:server` running
+      # against a real, seeded Firebase project (see apps/server tests' header comments) —
+      # not runnable in CI. Only run the root-level unit tests here; apps/server tests
+      # stay a local/manual verification step.
+      - run: pnpm exec vitest run scripts
 
   deploy-server:
     needs: [detect-affected, lint-and-test]
