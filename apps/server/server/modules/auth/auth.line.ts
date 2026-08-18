@@ -12,8 +12,12 @@ export type LineProviderConfig = {
 
 export function getLineProviderConfig(): LineProviderConfig {
   const config = useRuntimeConfig();
-  const channelId = config.lineChannelId as string | undefined;
-  const channelSecret = config.lineChannelSecret as string | undefined;
+  // Nitro's runtime-config env override (utils.env.mjs `getEnv`) runs every value through
+  // `destr()` regardless of the declared default's type, so a purely numeric
+  // NITRO_LINE_CHANNEL_ID (LINE channel IDs are numeric) arrives here as a JS number, not a
+  // string — which then breaks jose's `audience` option (expects string | string[]).
+  const channelId = config.lineChannelId ? String(config.lineChannelId) : '';
+  const channelSecret = config.lineChannelSecret ? String(config.lineChannelSecret) : '';
 
   if (!channelId) {
     throw new Error('Missing LINE_CHANNEL_ID env var');
