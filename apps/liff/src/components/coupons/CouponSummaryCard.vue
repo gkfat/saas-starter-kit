@@ -3,15 +3,19 @@ import { onMounted, ref } from 'vue';
 import AppCard from '~/components/common/AppCard.vue';
 import { fetchMyCoupons } from '~/utils/coupons-api';
 
+const emit = defineEmits<{ visible: [value: boolean] }>();
+
 const usableCount = ref<number | null>(null);
 
 onMounted(async () => {
   try {
     const coupons = await fetchMyCoupons();
     usableCount.value = coupons.filter((coupon) => coupon.state === 'usable').length;
+    emit('visible', true);
   } catch {
     // 優惠券功能未開啟或查詢失敗時，安靜略過此卡片
     usableCount.value = null;
+    emit('visible', false);
   }
 });
 </script>
