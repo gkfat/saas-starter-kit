@@ -22,7 +22,17 @@
         <span>{{ item.email ?? '-' }}</span>
       </template>
       <template #[`item.role`]="{ item }">
-        <span>{{ item.role ? $t(`role.${item.role}`) : '-' }}</span>
+        <ButtonsAppButton
+          v-if="canWriteUsers"
+          kind="text"
+          size="small"
+          class="border text-caption"
+          prepend-icon="mdi-cog"
+          @click="emit('edit', item)"
+        >
+          {{ item.role ? $t(`role.${item.role}`) : '-' }}
+        </ButtonsAppButton>
+        <span v-else>{{ item.role ? $t(`role.${item.role}`) : '-' }}</span>
       </template>
       <template #[`item.status`]="{ item }">
         <ButtonsAppButton
@@ -55,11 +65,6 @@
             v-if="showMemberFeatures"
             icon="mdi-information-outline"
             @click="emit('detail', item)"
-          />
-          <ButtonsIconActionBtn
-            v-if="canWriteUsers"
-            icon="mdi-pencil"
-            @click="emit('edit', item)"
           />
           <ButtonsIconActionBtn
             v-if="canWriteUsers && item.passwordSetupPending"
@@ -118,7 +123,6 @@ const headers = computed(() => [
   { title: t('users.uid'), key: 'userId' },
   { title: t('users.memberNo'), key: 'memberNo' },
   { title: t('auth.username'), key: 'username' },
-  { title: t('users.email'), key: 'email' },
   { title: t('users.displayName'), key: 'displayName' },
   { title: t('users.role'), key: 'role' },
   { title: t('users.status.label'), key: 'status', sortable: false },

@@ -32,6 +32,20 @@ function getMessage(e: unknown): string | undefined {
   return undefined;
 }
 
+export function getErrorCode(e: unknown): string | undefined {
+  if (e != null && typeof e === 'object' && 'data' in e) {
+    const data = (e as { data: unknown }).data;
+    if (data != null && typeof data === 'object' && 'data' in data) {
+      const inner = (data as { data: unknown }).data;
+      if (inner != null && typeof inner === 'object' && 'code' in inner) {
+        const code = (inner as { code: unknown }).code;
+        if (typeof code === 'string') return code;
+      }
+    }
+  }
+  return undefined;
+}
+
 export function isSessionExpired(
   statusCode: number | undefined,
   message: string | undefined,

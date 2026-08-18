@@ -3,6 +3,7 @@ import { touchUserOnLogin } from '../../modules/users';
 import { listProvidersForUser } from '../../modules/identity';
 import { recordLoginLog } from '../../modules/logs';
 import { resetOnSuccess } from '../../modules/rate-limit';
+import { isSyntheticEmail } from '@saas-starter-kit/shared';
 import type { LoginProvider } from '@saas-starter-kit/shared';
 
 export default defineEventHandler(async (event) => {
@@ -46,6 +47,8 @@ export default defineEventHandler(async (event) => {
 
   const providers = identity.isSuperAdmin ? [] : await listProvidersForUser(identity.userId);
 
+  const fallbackEmail = identity.email && !isSyntheticEmail(identity.email) ? identity.email : null;
+
   if (!identity.isSuperAdmin) {
     await recordLoginLog({
       severity: 'INFO',
@@ -56,7 +59,7 @@ export default defineEventHandler(async (event) => {
       provider: provider as LoginProvider,
       ip,
       result: 'success',
-      ...(identity.email ? { email: identity.email } : {}),
+      ...(fallbackEmail ? { email: fallbackEmail } : {}),
       ...(firestoreUser?.username ? { username: firestoreUser.username } : {}),
     });
   }
@@ -64,7 +67,7 @@ export default defineEventHandler(async (event) => {
   return {
     userId: identity.userId,
     username: firestoreUser?.username ?? identity.displayName,
-    email: firestoreUser?.email ?? identity.email,
+    email: firestoreUser?.email ?? fallbackEmail,
     displayName: firestoreUser?.displayName ?? identity.displayName,
     phone: firestoreUser?.phone ?? identity.phone,
     memberNo: firestoreUser?.memberNo ?? null,

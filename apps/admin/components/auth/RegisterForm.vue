@@ -42,6 +42,28 @@
           @click:append-inner="showConfirmPassword = !showConfirmPassword"
         />
       </v-col>
+      <v-col v-if="!isQuickRegisterMode">
+        <v-text-field
+          v-model="email"
+          v-bind="emailAttrs"
+          :label="$t('auth.emailOptional')"
+          type="email"
+          :error-messages="errors.email"
+          :disabled="loading"
+          hide-details="auto"
+        />
+      </v-col>
+      <v-col v-if="!isQuickRegisterMode">
+        <v-text-field
+          v-model="phone"
+          v-bind="phoneAttrs"
+          :label="$t('auth.phoneOptional')"
+          type="tel"
+          :error-messages="errors.phone"
+          :disabled="loading"
+          hide-details="auto"
+        />
+      </v-col>
       <v-col>
         <ButtonsAppButton
           type="submit"
@@ -67,7 +89,7 @@
 import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import { z } from 'zod';
-import { isValidUsername, isValidPassword } from '@saas-starter-kit/shared';
+import { isValidUsername, isValidPassword, isValidPhone } from '@saas-starter-kit/shared';
 
 const props = withDefaults(
   defineProps<{
@@ -98,6 +120,8 @@ const validationSchema = toTypedSchema(
       username: z.string().refine(isValidUsername, t('auth.error.invalidUsername')),
       password: z.string().optional(),
       confirmPassword: z.string().optional(),
+      email: z.union([z.string().email(t('auth.error.invalidEmail')), z.literal('')]).optional(),
+      phone: z.union([z.string().refine(isValidPhone), z.literal('')]).optional(),
     })
     .superRefine((data, ctx) => {
       if (isQuickRegisterMode.value) return;
@@ -120,12 +144,14 @@ const validationSchema = toTypedSchema(
 
 const { defineField, errors, meta, handleSubmit } = useForm({
   validationSchema,
-  initialValues: { username: '', password: '', confirmPassword: '' },
+  initialValues: { username: '', password: '', confirmPassword: '', email: '', phone: '' },
 });
 
 const [username, usernameAttrs] = defineField('username');
 const [password, passwordAttrs] = defineField('password');
 const [confirmPassword, confirmPasswordAttrs] = defineField('confirmPassword');
+const [email, emailAttrs] = defineField('email');
+const [phone, phoneAttrs] = defineField('phone');
 
 const onSubmit = handleSubmit(async (values) => {
   loading.value = true;
@@ -137,14 +163,21 @@ const onSubmit = handleSubmit(async (values) => {
         await googleRegister(values.username, props.idToken as string);
       }
     } else {
-      await register(values.username, values.password as string);
+      await register(
+        values.username,
+        values.password as string,
+        values.email || undefined,
+        values.phone || undefined,
+      );
       showSuccess(t('auth.registerSuccess'));
     }
     emit('success');
   } catch (e: unknown) {
-    const statusCode = (e as { data?: { statusCode?: number } }).data?.statusCode;
-    if (statusCode === 409) {
+    const errorCode = getErrorCode(e);
+    if (errorCode === 'username-taken') {
       showError(t('auth.error.usernameTaken'));
+    } else if (errorCode === 'contact-taken') {
+      showError(t('auth.error.contactTaken'));
     } else {
       showError(t('auth.error.registerDefault'));
     }

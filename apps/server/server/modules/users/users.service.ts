@@ -9,8 +9,11 @@ import {
   findUserById,
   findUserByMemberNo,
   findUserByUsername,
+  findUserByEmail,
+  findUserByPhone,
   touchLogin,
   updateUserPhone,
+  updateUserEmail,
   updateUserDisplayName,
   markPasswordSetupComplete,
   listUsers,
@@ -51,6 +54,14 @@ export async function registerUserWithProvider(data: {
   const existing = await findUserByUsername(data.username);
   if (existing) {
     throw Object.assign(new Error('此帳號名稱已被使用'), { code: 'username-taken' });
+  }
+
+  const [existingEmail, existingPhone] = await Promise.all([
+    data.email ? findUserByEmail(data.email) : null,
+    data.phone ? findUserByPhone(data.phone) : null,
+  ]);
+  if (existingEmail || existingPhone) {
+    throw Object.assign(new Error('此帳號資料已被使用'), { code: 'contact-taken' });
   }
 
   const userId = randomUUID();
@@ -97,7 +108,19 @@ export async function touchUserOnLogin(data: {
 }
 
 export async function syncUserPhone(userId: string, phone: string): Promise<void> {
+  const existing = await findUserByPhone(phone);
+  if (existing && existing.userId !== userId) {
+    throw Object.assign(new Error('此帳號資料已被使用'), { code: 'contact-taken' });
+  }
   return updateUserPhone(userId, phone);
+}
+
+export async function syncUserEmail(userId: string, email: string): Promise<void> {
+  const existing = await findUserByEmail(email);
+  if (existing && existing.userId !== userId) {
+    throw Object.assign(new Error('此帳號資料已被使用'), { code: 'contact-taken' });
+  }
+  return updateUserEmail(userId, email);
 }
 
 export async function syncUserDisplayName(userId: string, displayName: string): Promise<void> {

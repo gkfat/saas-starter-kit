@@ -1,14 +1,11 @@
 import {
   GoogleAuthProvider,
-  RecaptchaVerifier,
   createUserWithEmailAndPassword,
   getAuth,
-  linkWithPhoneNumber,
   signInWithCustomToken,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
-  type ConfirmationResult,
 } from 'firebase/auth';
 import { getClientApp } from '~/utils/firebase-client';
 import { useAuthStore } from '~/stores/auth';
@@ -28,7 +25,6 @@ export function useAuth() {
   const router = useRouter();
   const { t } = useI18n();
   const { $api } = useNuxtApp();
-  let recaptchaVerifier: RecaptchaVerifier | null = null;
 
   function getLoginErrorMessage(e: unknown): string {
     const code = (e as { code?: string }).code ?? '';
@@ -165,41 +161,6 @@ export function useAuth() {
     await store.setSession(freshIdToken, 'line');
   }
 
-  async function sendPhoneLinkOtp(
-    phone: string,
-    recaptchaContainerId: string,
-  ): Promise<ConfirmationResult> {
-    const auth = getFirebaseAuth();
-    const currentUser = auth.currentUser;
-    if (!currentUser) throw new Error('Must be logged in to link phone');
-
-    if (recaptchaVerifier) {
-      recaptchaVerifier.clear();
-      recaptchaVerifier = null;
-    }
-    recaptchaVerifier = new RecaptchaVerifier(auth, recaptchaContainerId, { size: 'invisible' });
-    return linkWithPhoneNumber(currentUser, phone, recaptchaVerifier);
-  }
-
-  async function confirmPhoneLinkOtp(
-    confirmationResult: ConfirmationResult,
-    otp: string,
-  ): Promise<void> {
-    const auth = getFirebaseAuth();
-    await confirmationResult.confirm(otp);
-
-    const currentUser = auth.currentUser;
-    if (!currentUser) return;
-
-    const freshToken = await currentUser.getIdToken(true);
-    store.updateIdToken(freshToken);
-
-    await $api('/api/profile/phone', {
-      method: 'PATCH',
-      headers: { Authorization: `Bearer ${freshToken}` },
-    });
-  }
-
   async function linkGoogleProvider(): Promise<void> {
     const ownerIdToken = store.idToken;
     if (!ownerIdToken) throw new Error('Must be logged in to link Google');
@@ -316,8 +277,6 @@ export function useAuth() {
     loginWithLineRedirect,
     completeLineLogin,
     lineRegister,
-    sendPhoneLinkOtp,
-    confirmPhoneLinkOtp,
     linkGoogleProvider,
     unlinkGoogleProvider,
     changePassword,

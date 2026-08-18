@@ -3,6 +3,7 @@ export {
   getUserById,
   touchUserOnLogin,
   syncUserPhone,
+  syncUserEmail,
   syncUserDisplayName,
   completePasswordSetup,
   getAllUsers,

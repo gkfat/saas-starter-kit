@@ -1,4 +1,4 @@
-import { Role } from '@saas-starter-kit/shared';
+import { Role, isSyntheticEmail } from '@saas-starter-kit/shared';
 import { getUserById } from '~/modules/users';
 import { listProvidersForUser } from '~/modules/identity';
 
@@ -16,12 +16,15 @@ export default defineEventHandler(async (event) => {
     isSuperAdmin ? Promise.resolve(['password'] as const) : listProvidersForUser(ctx.userId),
   ]);
 
+  const fallbackEmail = ctx.email && !isSyntheticEmail(ctx.email) ? ctx.email : null;
+
   return {
     userId: ctx.userId,
     username: firestoreUser?.username ?? ctx.displayName ?? null,
-    email: firestoreUser?.email ?? ctx.email ?? null,
+    email: firestoreUser?.email ?? fallbackEmail,
     displayName: firestoreUser?.displayName ?? ctx.displayName ?? null,
     phone: firestoreUser?.phone ?? ctx.phone ?? null,
+    memberNo: firestoreUser?.memberNo ?? null,
     providers,
     role: ctx.role,
     permissions: ctx.permissions ?? [],

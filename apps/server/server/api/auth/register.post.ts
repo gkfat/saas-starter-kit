@@ -39,7 +39,18 @@ export default defineEventHandler(async (event): Promise<OkResponse> => {
       .catch(() => {});
     const code = (err as { code?: string }).code;
     if (code === 'username-taken') {
-      throw createError({ statusCode: 409, message: '此帳號名稱已被使用' });
+      throw createError({
+        statusCode: 409,
+        message: '此帳號名稱已被使用',
+        data: { code: 'username-taken' },
+      });
+    }
+    if (code === 'contact-taken') {
+      throw createError({
+        statusCode: 409,
+        message: '註冊失敗，請確認輸入資料後再試',
+        data: { code: 'contact-taken' },
+      });
     }
     throw createError({ statusCode: 500, message: '建立帳號失敗' });
   }

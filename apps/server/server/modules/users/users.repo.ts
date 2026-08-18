@@ -28,6 +28,18 @@ export async function findUserByMemberNo(memberNo: string): Promise<User | null>
   return snapshot.docs[0].data() as User;
 }
 
+export async function findUserByEmail(email: string): Promise<User | null> {
+  const snapshot = await usersCollection().where('email', '==', email).limit(1).get();
+  if (snapshot.empty) return null;
+  return snapshot.docs[0].data() as User;
+}
+
+export async function findUserByPhone(phone: string): Promise<User | null> {
+  const snapshot = await usersCollection().where('phone', '==', phone).limit(1).get();
+  if (snapshot.empty) return null;
+  return snapshot.docs[0].data() as User;
+}
+
 export async function createUser(data: {
   userId: string;
   username: string;
@@ -70,6 +82,10 @@ export async function touchLogin(data: {
 
 export async function updateUserPhone(userId: string, phone: string): Promise<void> {
   await userRef(userId).update({ phone });
+}
+
+export async function updateUserEmail(userId: string, email: string): Promise<void> {
+  await userRef(userId).update({ email });
 }
 
 export async function updateUserDisplayName(userId: string, displayName: string): Promise<void> {

@@ -3,8 +3,8 @@
     <CardsAppCard class="h-100">
       <v-card-title class="d-flex align-center justify-end py-3">
         <span class="mr-auto">{{ $t('profile.profileCardTitle') }}</span>
-        <ButtonsAppButton kind="secondary" size="small" @click="startEditDisplayName">
-          {{ $t('profile.editDisplayName') }}
+        <ButtonsAppButton kind="secondary" size="small" @click="openEditProfileDialog">
+          {{ $t('profile.editProfile') }}
         </ButtonsAppButton>
         <ButtonsAppButton
           kind="secondary"
@@ -24,15 +24,7 @@
 
           <v-col cols="12" sm="6">
             <div class="text-caption text-medium-emphasis">{{ $t('profile.email') }}</div>
-            <div v-if="store.user?.email">{{ store.user.email }}</div>
-            <v-row v-else no-gutters align="center" class="ga-2">
-              <v-col cols="auto" class="text-medium-emphasis">{{ $t('common.notBound') }}</v-col>
-              <v-col cols="auto">
-                <ButtonsAppButton kind="secondary" size="small" disabled>
-                  {{ $t('common.bind') }}
-                </ButtonsAppButton>
-              </v-col>
-            </v-row>
+            <div>{{ store.user?.email ?? '—' }}</div>
           </v-col>
 
           <v-col cols="12" sm="6">
@@ -47,112 +39,69 @@
 
           <v-col cols="12" sm="6">
             <div class="text-caption text-medium-emphasis">{{ $t('profile.phone') }}</div>
-            <v-row v-if="store.user?.phone" no-gutters align="center" class="ga-2">
-              <v-col cols="auto">{{ store.user.phone }}</v-col>
-              <v-col cols="auto">
-                <v-icon size="small" color="success">mdi-check-circle</v-icon>
-              </v-col>
-            </v-row>
-            <v-row v-else no-gutters align="center" class="ga-2">
-              <v-col cols="auto" class="text-medium-emphasis">{{
-                $t('profile.phoneNotVerified')
-              }}</v-col>
-              <v-col cols="auto">
-                <ButtonsAppButton kind="secondary" size="small" @click="openVerifyPhoneDialog">
-                  {{ $t('common.verify') }}
-                </ButtonsAppButton>
-              </v-col>
-            </v-row>
+            <div>{{ store.user?.phone ? `+886 ${store.user.phone}` : '—' }}</div>
           </v-col>
         </v-row>
       </v-card-text>
     </CardsAppCard>
 
-    <v-dialog v-model="editingDisplayName" max-width="400" persistent>
+    <v-dialog v-model="editingProfile" max-width="400" persistent>
       <CardsDialogCard>
-        <v-card-title class="pa-4">{{ $t('profile.editDisplayName') }}</v-card-title>
+        <v-card-title class="pa-4">{{ $t('profile.editProfile') }}</v-card-title>
         <v-card-text>
-          <div class="text-caption text-medium-emphasis mb-1">{{ $t('profile.displayName') }}</div>
-          <v-text-field
-            v-model="displayNameInput"
-            v-bind="displayNameInputAttrs"
-            hide-details="auto"
-            :disabled="displayNameLoading"
-            :error-messages="displayNameFormErrors.displayNameInput"
-          />
+          <v-row no-gutters class="ga-3 flex-column">
+            <v-col>
+              <div class="text-caption text-medium-emphasis mb-1">
+                {{ $t('profile.displayName') }}
+              </div>
+              <v-text-field
+                v-model="displayNameInput"
+                v-bind="displayNameInputAttrs"
+                hide-details="auto"
+                :disabled="profileLoading"
+                :error-messages="profileFormErrors.displayNameInput"
+              />
+            </v-col>
+            <v-col>
+              <div class="text-caption text-medium-emphasis mb-1">{{ $t('profile.email') }}</div>
+              <v-text-field
+                v-model="emailInput"
+                v-bind="emailInputAttrs"
+                type="email"
+                hide-details="auto"
+                :disabled="profileLoading"
+                :error-messages="profileFormErrors.emailInput"
+              />
+            </v-col>
+            <v-col>
+              <div class="text-caption text-medium-emphasis mb-1">{{ $t('profile.phone') }}</div>
+              <v-text-field
+                v-model="phoneInput"
+                v-bind="phoneInputAttrs"
+                prefix="+886"
+                type="tel"
+                :hint="$t('profile.phoneHint')"
+                persistent-hint
+                hide-details="auto"
+                :disabled="profileLoading"
+                :error-messages="profileFormErrors.phoneInput"
+              />
+            </v-col>
+          </v-row>
         </v-card-text>
         <v-card-actions class="pa-4">
           <v-spacer />
-          <ButtonsAppButton
-            kind="secondary"
-            :disabled="displayNameLoading"
-            @click="cancelEditDisplayName"
-          >
+          <ButtonsAppButton kind="secondary" :disabled="profileLoading" @click="cancelEditProfile">
             {{ $t('profile.cancel') }}
           </ButtonsAppButton>
           <ButtonsAppButton
             kind="primary"
-            :loading="displayNameLoading"
-            :disabled="!displayNameFormMeta.valid"
-            @click="onSaveDisplayName"
+            :loading="profileLoading"
+            :disabled="!profileFormMeta.valid"
+            @click="onSaveProfile"
           >
             {{ $t('profile.save') }}
           </ButtonsAppButton>
-        </v-card-actions>
-      </CardsDialogCard>
-    </v-dialog>
-
-    <v-dialog v-model="verifyPhoneDialog" max-width="400" persistent>
-      <CardsDialogCard>
-        <v-card-title class="pa-4">{{ $t('profile.verifyPhone') }}</v-card-title>
-        <v-card-text>
-          <template v-if="!confirmationResult">
-            <div class="text-caption text-medium-emphasis mb-1">
-              {{ $t('profile.phonePlaceholder') }}
-            </div>
-            <v-text-field
-              v-model="phoneLocal"
-              v-bind="phoneLocalAttrs"
-              prefix="+886"
-              type="tel"
-              hide-details="auto"
-              :disabled="loading"
-              :error-messages="phoneFormErrors.phoneLocal"
-            />
-            <div id="recaptcha-container" />
-          </template>
-          <template v-else>
-            <div class="text-caption text-medium-emphasis mb-1">{{ $t('profile.enterOtp') }}</div>
-            <v-otp-input v-model="otp" length="6" :disabled="loading" />
-          </template>
-        </v-card-text>
-        <v-card-actions class="pa-4">
-          <v-spacer />
-          <template v-if="!confirmationResult">
-            <ButtonsAppButton
-              kind="secondary"
-              :disabled="loading"
-              @click="verifyPhoneDialog = false"
-            >
-              {{ $t('profile.cancel') }}
-            </ButtonsAppButton>
-            <ButtonsAppButton
-              kind="primary"
-              :loading="loading"
-              :disabled="!phoneFormMeta.valid"
-              @click="onSendOtp"
-            >
-              {{ $t('auth.sendOtp') }}
-            </ButtonsAppButton>
-          </template>
-          <template v-else>
-            <ButtonsAppButton kind="secondary" :disabled="loading" @click="resetOtp">
-              {{ $t('profile.resendOtp') }}
-            </ButtonsAppButton>
-            <ButtonsAppButton kind="primary" :loading="loading" @click="handleConfirmOtp">
-              {{ $t('profile.confirmOtp') }}
-            </ButtonsAppButton>
-          </template>
         </v-card-actions>
       </CardsDialogCard>
     </v-dialog>
@@ -224,137 +173,149 @@
 
 <script setup lang="ts">
 import { toTypedSchema } from '@vee-validate/zod';
-import type { ConfirmationResult } from 'firebase/auth';
 import { useForm } from 'vee-validate';
 import { z } from 'zod';
 import { useAuthStore } from '~/stores/auth';
-import { isValidPassword } from '@saas-starter-kit/shared';
+import { isValidPassword, isValidPhone } from '@saas-starter-kit/shared';
 import type { OkResponse } from '@saas-starter-kit/shared';
 
 const store = useAuthStore();
-const { sendPhoneLinkOtp, confirmPhoneLinkOtp, changePassword } = useAuth();
+const { changePassword } = useAuth();
 const { showError, showSuccess } = useToast();
 const { t } = useI18n();
 const { apiFetch } = useApi();
 
-const otp = ref('');
-const loading = ref(false);
-const confirmationResult = ref<ConfirmationResult | null>(null);
+const profileLoading = ref(false);
+const editingProfile = ref(false);
 
-const displayNameLoading = ref(false);
-const editingDisplayName = ref(false);
-
-const verifyPhoneDialog = ref(false);
-
-const displayNameValidationSchema = toTypedSchema(
+const profileValidationSchema = toTypedSchema(
   z.object({
     displayNameInput: z
       .string()
       .trim()
       .min(1, t('profile.displayNameRequired'))
       .max(20, t('profile.displayNameTooLong')),
+    emailInput: z
+      .union([z.string().trim().email(t('profile.emailInvalid')), z.literal('')])
+      .optional(),
+    phoneInput: z
+      .union([z.string().trim().refine(isValidPhone, t('profile.phoneInvalid')), z.literal('')])
+      .optional(),
   }),
 );
 const {
-  defineField: defineDisplayNameField,
-  errors: displayNameFormErrors,
-  meta: displayNameFormMeta,
-  handleSubmit: handleDisplayNameSubmit,
-  resetForm: resetDisplayNameForm,
+  defineField: defineProfileField,
+  errors: profileFormErrors,
+  meta: profileFormMeta,
+  handleSubmit: handleProfileSubmit,
+  resetForm: resetProfileForm,
 } = useForm({
-  validationSchema: displayNameValidationSchema,
-  initialValues: { displayNameInput: '' },
+  validationSchema: profileValidationSchema,
+  initialValues: { displayNameInput: '', emailInput: '', phoneInput: '' },
 });
-const [displayNameInput, displayNameInputAttrs] = defineDisplayNameField('displayNameInput');
+const [displayNameInput, displayNameInputAttrs] = defineProfileField('displayNameInput');
+const [emailInput, emailInputAttrs] = defineProfileField('emailInput');
+const [phoneInput, phoneInputAttrs] = defineProfileField('phoneInput');
 
-const phoneValidationSchema = toTypedSchema(
-  z.object({
-    phoneLocal: z.string().regex(/^0?9\d{8}$/, t('profile.phoneInvalid')),
-  }),
-);
-const {
-  defineField: definePhoneField,
-  errors: phoneFormErrors,
-  meta: phoneFormMeta,
-  handleSubmit: handlePhoneSubmit,
-  resetForm: resetPhoneForm,
-} = useForm({
-  validationSchema: phoneValidationSchema,
-  initialValues: { phoneLocal: '' },
-});
-const [phoneLocal, phoneLocalAttrs] = definePhoneField('phoneLocal');
-
-const fullPhone = computed(() => `+886${(phoneLocal.value ?? '').replace(/^0+/, '')}`);
-
-function startEditDisplayName() {
-  resetDisplayNameForm({ values: { displayNameInput: store.user?.displayName ?? '' } });
-  editingDisplayName.value = true;
+function openEditProfileDialog() {
+  resetProfileForm({
+    values: {
+      displayNameInput: store.user?.displayName ?? '',
+      emailInput: store.user?.email ?? '',
+      phoneInput: store.user?.phone ?? '',
+    },
+  });
+  editingProfile.value = true;
 }
 
-function cancelEditDisplayName() {
-  editingDisplayName.value = false;
+function cancelEditProfile() {
+  editingProfile.value = false;
 }
 
-const onSaveDisplayName = handleDisplayNameSubmit(async (values) => {
+const onSaveProfile = handleProfileSubmit(async (values) => {
   if (!store.user) return;
-  const trimmed = values.displayNameInput.trim();
-  displayNameLoading.value = true;
+  const displayName = values.displayNameInput.trim();
+  const email = values.emailInput?.trim() ?? '';
+  const phone = values.phoneInput?.trim() ?? '';
+
+  let hasError = false;
+  const tasks: Promise<void>[] = [];
+
+  if (displayName !== (store.user.displayName ?? '')) {
+    tasks.push(
+      apiFetch<OkResponse>('/api/profile/display-name', {
+        method: 'PATCH',
+        silent: true,
+        body: { displayName },
+      })
+        .then((result) => {
+          if (result !== null && store.user) store.user.displayName = displayName;
+        })
+        .catch(() => {
+          hasError = true;
+          showError(t('profile.displayNameUpdateFailed'));
+        }),
+    );
+  }
+
+  if (email !== (store.user.email ?? '')) {
+    tasks.push(
+      apiFetch<OkResponse>('/api/profile/email', {
+        method: 'PATCH',
+        silent: true,
+        body: { email },
+      })
+        .then((result) => {
+          if (result !== null && store.user) store.user.email = email;
+        })
+        .catch((e: unknown) => {
+          hasError = true;
+          showError(
+            getErrorCode(e) === 'contact-taken'
+              ? t('profile.contactTaken')
+              : t('profile.emailUpdateFailed'),
+          );
+        }),
+    );
+  }
+
+  if (phone !== (store.user.phone ?? '')) {
+    tasks.push(
+      apiFetch<OkResponse>('/api/profile/phone', {
+        method: 'PATCH',
+        silent: true,
+        body: { phone },
+      })
+        .then((result) => {
+          if (result !== null && store.user) store.user.phone = phone;
+        })
+        .catch((e: unknown) => {
+          hasError = true;
+          showError(
+            getErrorCode(e) === 'contact-taken'
+              ? t('profile.contactTaken')
+              : t('profile.phoneUpdateFailed'),
+          );
+        }),
+    );
+  }
+
+  if (tasks.length === 0) {
+    editingProfile.value = false;
+    return;
+  }
+
+  profileLoading.value = true;
   try {
-    const result = await apiFetch<OkResponse>('/api/profile/display-name', {
-      method: 'PATCH',
-      silent: true,
-      body: { displayName: trimmed },
-    });
-    if (result !== null) {
-      store.user.displayName = trimmed;
-      showSuccess(t('profile.displayNameUpdateSuccess'));
-      editingDisplayName.value = false;
+    await Promise.all(tasks);
+    if (!hasError) {
+      showSuccess(t('profile.profileUpdateSuccess'));
+      editingProfile.value = false;
     }
-  } catch {
-    showError(t('profile.displayNameUpdateFailed'));
   } finally {
-    displayNameLoading.value = false;
+    profileLoading.value = false;
   }
 });
-
-function openVerifyPhoneDialog() {
-  resetPhoneForm();
-  otp.value = '';
-  confirmationResult.value = null;
-  verifyPhoneDialog.value = true;
-}
-
-const onSendOtp = handlePhoneSubmit(async () => {
-  loading.value = true;
-  try {
-    confirmationResult.value = await sendPhoneLinkOtp(fullPhone.value, 'recaptcha-container');
-  } catch (e: unknown) {
-    showError(e instanceof Error ? e.message : t('profile.otpSendFailed'));
-  } finally {
-    loading.value = false;
-  }
-});
-
-async function handleConfirmOtp() {
-  if (!confirmationResult.value || !store.user) return;
-  loading.value = true;
-  try {
-    await confirmPhoneLinkOtp(confirmationResult.value, otp.value);
-    store.user.phone = fullPhone.value;
-    showSuccess(t('profile.otpSuccess'));
-    confirmationResult.value = null;
-    verifyPhoneDialog.value = false;
-  } catch (e: unknown) {
-    showError(e instanceof Error ? e.message : t('profile.otpFailed'));
-  } finally {
-    loading.value = false;
-  }
-}
-
-function resetOtp() {
-  confirmationResult.value = null;
-  otp.value = '';
-}
 
 const changePasswordDialog = ref(false);
 const changePasswordLoading = ref(false);

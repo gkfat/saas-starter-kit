@@ -167,8 +167,11 @@ const onSubmit = handleSubmit(async (values) => {
       emit('created', result.setupLink);
     }
   } catch (e: unknown) {
-    if ((e as { data?: { statusCode?: number } }).data?.statusCode === 409) {
+    const errorCode = getErrorCode(e);
+    if (errorCode === 'username-taken') {
       showError(t('auth.error.usernameTaken'));
+    } else if (errorCode === 'contact-taken') {
+      showError(t('auth.error.contactTaken'));
     } else {
       showError(t('auth.error.registerDefault'));
     }

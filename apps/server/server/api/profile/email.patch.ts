@@ -1,11 +1,10 @@
 import { z } from 'zod';
-import { syncUserPhone } from '~/modules/users';
+import { syncUserEmail } from '~/modules/users';
 import type { AuthenticatedContext } from '~/shared/types/context';
-import { isValidPhone } from '@saas-starter-kit/shared';
 import type { OkResponse } from '@saas-starter-kit/shared';
 
 const BodySchema = z.object({
-  phone: z.string().trim().refine(isValidPhone),
+  email: z.string().trim().email(),
 });
 
 export default defineEventHandler(async (event): Promise<OkResponse> => {
@@ -20,7 +19,7 @@ export default defineEventHandler(async (event): Promise<OkResponse> => {
   }
 
   try {
-    await syncUserPhone(ctx.userId, parsed.data.phone);
+    await syncUserEmail(ctx.userId, parsed.data.email);
   } catch (err: unknown) {
     const code = (err as { code?: string }).code;
     if (code === 'contact-taken') {

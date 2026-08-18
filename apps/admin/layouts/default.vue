@@ -3,27 +3,19 @@
     <template v-if="isLoggedIn">
       <LayoutAppDrawer v-model="drawerOpen" />
       <LayoutAppSettingsDrawer v-model="settingsOpen" />
-
-      <v-main>
-        <LayoutPageContent>
-          <LayoutAppHeader
-            @toggle-drawer="drawerOpen = !drawerOpen"
-            @toggle-settings="settingsOpen = !settingsOpen"
-          />
-          <slot />
-        </LayoutPageContent>
-      </v-main>
     </template>
+    <LayoutPublicHeader v-else />
 
-    <template v-else>
-      <LayoutPublicHeader />
-
-      <v-main class="public-main">
-        <LayoutPageContent>
-          <slot />
-        </LayoutPageContent>
-      </v-main>
-    </template>
+    <v-main :class="{ 'public-main': !isLoggedIn }">
+      <LayoutPageContent>
+        <LayoutAppHeader
+          v-if="isLoggedIn"
+          @toggle-drawer="drawerOpen = !drawerOpen"
+          @toggle-settings="settingsOpen = !settingsOpen"
+        />
+        <slot />
+      </LayoutPageContent>
+    </v-main>
   </v-app>
 </template>
 

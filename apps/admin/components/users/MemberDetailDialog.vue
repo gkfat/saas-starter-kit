@@ -5,14 +5,14 @@
       <v-card-text>
         <template v-if="detail">
           <div class="text-subtitle-2 mb-2">{{ $t('users.groupBasic') }}</div>
-          <v-row>
+          <v-row dense>
             <v-col cols="12" sm="6">
               <div class="text-caption text-medium-emphasis">{{ $t('users.uid') }}</div>
-              <div class="text-caption font-mono">{{ detail.userId }}</div>
+              <div>{{ detail.userId }}</div>
             </v-col>
             <v-col cols="12" sm="6">
               <div class="text-caption text-medium-emphasis">{{ $t('users.memberNo') }}</div>
-              <div class="text-caption font-mono">{{ detail.memberNo }}</div>
+              <div>{{ detail.memberNo }}</div>
             </v-col>
             <v-col cols="12" sm="6">
               <div class="text-caption text-medium-emphasis">{{ $t('auth.username') }}</div>
@@ -38,7 +38,7 @@
 
           <v-divider class="my-4" />
           <div class="text-subtitle-2 mb-2">{{ $t('users.groupActivity') }}</div>
-          <v-row>
+          <v-row dense>
             <v-col cols="12" sm="6">
               <div class="text-caption text-medium-emphasis">{{ $t('users.status.label') }}</div>
               <div>
@@ -58,11 +58,11 @@
           <template v-if="isLevelEnabled">
             <v-divider class="my-4" />
             <div class="text-subtitle-2 mb-2">{{ $t('users.groupLevel') }}</div>
-            <v-row>
+            <v-row dense>
               <v-col cols="12" sm="6">
                 <div class="text-caption text-medium-emphasis">{{ $t('level.levelNumber') }}</div>
                 <div v-if="detail.level">
-                  {{ detail.level.levelName }}（Lv.{{ detail.level.levelNumber }}）
+                  {{ detail.level.levelName }}
                 </div>
                 <span v-else class="text-medium-emphasis">{{ $t('level.notInitialized') }}</span>
               </v-col>
@@ -90,7 +90,7 @@
           <template v-if="isPointsEnabled && canReadPoints">
             <v-divider class="my-4" />
             <div class="text-subtitle-2 mb-2">{{ $t('users.groupPoints') }}</div>
-            <v-row>
+            <v-row dense>
               <v-col cols="12" sm="6">
                 <div class="text-caption text-medium-emphasis">
                   {{ $t('pointsMembers.currentBalance') }}
