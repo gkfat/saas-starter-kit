@@ -104,7 +104,11 @@ export function useAuth() {
       method: 'POST',
       body: { username, idToken },
     });
-    await store.setSession(idToken, 'google');
+
+    const auth = getFirebaseAuth();
+    if (!auth.currentUser) throw new Error('Google user session lost after registration');
+    const freshIdToken = await auth.currentUser.getIdToken(true);
+    await store.setSession(freshIdToken, 'google');
   }
 
   /**
