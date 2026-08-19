@@ -36,6 +36,7 @@ export async function resolveLineLogin(idToken: string): Promise<LineLoginResult
     });
 
   if (!accountExists) {
+    // 綁定指向的 Firebase Auth 帳號已不存在，清除 stale 綁定後導回快速註冊
     await deleteUserAuth('line', identity.lineUserId);
     return {
       status: 'quick-register',
