@@ -33,6 +33,8 @@ Copy `.env.example` to `.env` and fill in Firebase credentials. Two separate SDK
 - **Server** (`FIREBASE_*`): Admin SDK — service account credentials
 - **Browser** (`VITE_FIREBASE_*`): Client SDK — public config from Firebase console
 
+`scripts/seed-*.ts` do not read the root `.env` — they read `scripts/env/.env.dev` / `scripts/env/.env.prod` (see `docs/setup/seed.md`).
+
 ## Architecture
 
 **Nuxt 3, SPA mode** (`ssr: false`). No SSR hydration concerns; Firebase Client SDK runs browser-only.

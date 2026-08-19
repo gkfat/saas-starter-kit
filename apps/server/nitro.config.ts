@@ -1,8 +1,5 @@
-import { resolve } from 'node:path';
-import { config as loadEnv } from 'dotenv';
 import { defineNitroConfig } from 'nitropack/config';
-
-loadEnv({ path: resolve(import.meta.dirname, '../../.env') });
+import '../../scripts/load-root-env';
 
 export default defineNitroConfig({
   srcDir: 'server',

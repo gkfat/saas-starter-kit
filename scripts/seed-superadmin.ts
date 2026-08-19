@@ -1,6 +1,6 @@
 import { cert, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
-import 'dotenv/config';
+import './load-env';
 import { Role, toSyntheticEmail } from '@saas-starter-kit/shared';
 
 const username = process.env.SUPERADMIN_USERNAME;

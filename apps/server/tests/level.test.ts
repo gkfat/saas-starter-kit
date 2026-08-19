@@ -10,16 +10,13 @@
  * 在目前「純 HTTP 整合測試」慣例下沒有入口可測，留待該次 change 一併補上（tasks.md 8.1/8.2/8.8）。
  */
 import { randomUUID } from 'node:crypto';
-import { resolve } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { cert, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
-import { config as loadEnv } from 'dotenv';
+import '../../../scripts/load-root-env';
 import { prefixCollection } from '../server/shared/firestore-prefix';
 import { Role } from '@saas-starter-kit/shared';
-
-loadEnv({ path: resolve(import.meta.dirname, '../../../.env') });
 
 const BASE_URL = process.env.TEST_BASE_URL ?? 'http://localhost:3000';
 const LEVEL_BATCH_SECRET = process.env.LEVEL_BATCH_SECRET ?? '';

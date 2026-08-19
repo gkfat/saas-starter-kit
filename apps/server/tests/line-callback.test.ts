@@ -8,11 +8,8 @@
  * 有效的 authorization code，CI/本機測試環境無法取得）。以下測試改以「無效的
  * authorization code」驗證 code exchange 失敗時的行為，以及缺少必要欄位時的驗證邏輯。
  */
-import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { config as loadEnv } from 'dotenv';
-
-loadEnv({ path: resolve(import.meta.dirname, '../../../.env') });
+import '../../../scripts/load-root-env';
 
 const BASE_URL = process.env.TEST_BASE_URL ?? 'http://localhost:3000';
 

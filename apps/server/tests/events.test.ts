@@ -7,17 +7,14 @@
  * 圖片上傳（banner）相關測試需額外設定 R2_* 環境變數，指向一個可用的 Cloudflare R2 bucket。
  */
 import { randomUUID } from 'node:crypto';
-import { resolve } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { cert, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
-import { config as loadEnv } from 'dotenv';
+import '../../../scripts/load-root-env';
 import { prefixCollection } from '../server/shared/firestore-prefix';
 import { Role } from '@saas-starter-kit/shared';
 import type { Event, EventWithStatus } from '@saas-starter-kit/shared';
-
-loadEnv({ path: resolve(import.meta.dirname, '../../../.env') });
 
 const BASE_URL = process.env.TEST_BASE_URL ?? 'http://localhost:3000';
 const RUN_ID = Date.now().toString(36).slice(-5);

@@ -4,16 +4,13 @@
  * 需要一組可用的 Firebase 專案（.env 的 FIREBASE_* / VITE_FIREBASE_API_KEY 變數）。
  */
 import { randomUUID } from 'node:crypto';
-import { resolve } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { cert, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
-import { config as loadEnv } from 'dotenv';
+import '../../../scripts/load-root-env';
 import { prefixCollection } from '../server/shared/firestore-prefix';
 import { toSyntheticEmail } from '@saas-starter-kit/shared';
-
-loadEnv({ path: resolve(import.meta.dirname, '../../../.env') });
 
 const BASE_URL = process.env.TEST_BASE_URL ?? 'http://localhost:3000';
 const FIREBASE_API_KEY = process.env.VITE_FIREBASE_API_KEY;

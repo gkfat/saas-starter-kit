@@ -1,6 +1,6 @@
 import { cert, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-import 'dotenv/config';
+import './load-env';
 import { prefixCollection } from '../apps/server/server/shared/firestore-prefix';
 import {
   type Permission,

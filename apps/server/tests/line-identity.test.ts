@@ -9,15 +9,12 @@
  *   行為，以及邀請連結/bind code 在到達 LINE token 驗證之前就先擋下過期/已使用案例的邏輯。
  * - Google quick-register/登入/綁定 的端到端流程（需要真實 Google OAuth，理由同上）。
  */
-import { resolve } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { cert, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
-import { config as loadEnv } from 'dotenv';
+import '../../../scripts/load-root-env';
 import { prefixCollection } from '../server/shared/firestore-prefix';
-
-loadEnv({ path: resolve(import.meta.dirname, '../../../.env') });
 
 const BASE_URL = process.env.TEST_BASE_URL ?? 'http://localhost:3000';
 const FIREBASE_API_KEY = process.env.VITE_FIREBASE_API_KEY;

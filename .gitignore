@@ -8,6 +8,7 @@ dist/
 .env
 .env.*
 !.env.example
+!scripts/env/*.example
 
 # Firebase
 *service_account*.json

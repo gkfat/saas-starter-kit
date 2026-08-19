@@ -2,7 +2,7 @@ import { randomUUID } from 'crypto';
 import { cert, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
-import 'dotenv/config';
+import './load-env';
 import { prefixCollection } from '../apps/server/server/shared/firestore-prefix';
 import { Role, toSyntheticEmail } from '@saas-starter-kit/shared';
 

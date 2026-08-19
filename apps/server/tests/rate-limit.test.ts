@@ -13,15 +13,12 @@
  * 未涵蓋：
  * - 登入頁鎖定警示文案（需瀏覽器操作）
  */
-import { resolve } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { cert, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
-import { config as loadEnv } from 'dotenv';
+import '../../../scripts/load-root-env';
 import { prefixCollection } from '../server/shared/firestore-prefix';
-
-loadEnv({ path: resolve(import.meta.dirname, '../../../.env') });
 
 const BASE_URL = process.env.TEST_BASE_URL ?? 'http://localhost:3000';
 const FIREBASE_API_KEY = process.env.VITE_FIREBASE_API_KEY;
