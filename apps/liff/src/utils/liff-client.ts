@@ -41,6 +41,13 @@ function isIdTokenExpired(idToken: string): boolean {
  * rest of the app can be tested without a real, HTTPS-registered LIFF endpoint URL
  * (liff.init() rejects plain http://localhost). Never set this in production.
  */
+// Set right before liff.login() redirects away, cleared on a successful token read.
+// If we land back here and still can't produce a token, this tells us it's a repeat
+// attempt so we surface an error instead of redirecting again — otherwise a LIFF/LINE
+// session edge case (e.g. isLoggedIn() never flips true after auth) silently loops
+// the user between this app and LINE's login screen forever with no feedback.
+const REDIRECT_GUARD_KEY = 'liff_login_redirect_attempted';
+
 export async function getLineIdToken(): Promise<string> {
   const devToken = import.meta.env.VITE_LIFF_ACCESS_TOKEN;
   if (devToken) {
@@ -50,6 +57,11 @@ export async function getLineIdToken(): Promise<string> {
   await initLiff();
 
   if (!liff.isLoggedIn()) {
+    if (sessionStorage.getItem(REDIRECT_GUARD_KEY)) {
+      sessionStorage.removeItem(REDIRECT_GUARD_KEY);
+      throw new Error('LINE 登入失敗，請重新嘗試');
+    }
+    sessionStorage.setItem(REDIRECT_GUARD_KEY, '1');
     liff.login();
     // liff.login() navigates the page away to LINE's login flow; execution resumes
     // on redirect back to this app, so nothing further runs here.
@@ -58,6 +70,11 @@ export async function getLineIdToken(): Promise<string> {
 
   const idToken = liff.getIDToken();
   if (!idToken || isIdTokenExpired(idToken)) {
+    if (sessionStorage.getItem(REDIRECT_GUARD_KEY)) {
+      sessionStorage.removeItem(REDIRECT_GUARD_KEY);
+      throw new Error('LINE 登入失敗，請重新嘗試');
+    }
+    sessionStorage.setItem(REDIRECT_GUARD_KEY, '1');
     // liff.isLoggedIn() can still report true off a stale cached accessToken, in which
     // case liff.login() silently reuses that same session instead of re-authenticating —
     // looping forever with the same expired ID token. logout() first forces a clean
@@ -68,5 +85,7 @@ export async function getLineIdToken(): Promise<string> {
     // on redirect back to this app, so nothing further runs here.
     return new Promise<string>(() => {});
   }
+
+  sessionStorage.removeItem(REDIRECT_GUARD_KEY);
   return idToken;
 }
