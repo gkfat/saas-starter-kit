@@ -15,6 +15,7 @@ COPY packages/shared/package.json packages/shared/package.json
 RUN pnpm install --frozen-lockfile
 
 COPY packages/shared packages/shared
+COPY scripts scripts
 COPY apps/server apps/server
 
 RUN pnpm --dir apps/server build
