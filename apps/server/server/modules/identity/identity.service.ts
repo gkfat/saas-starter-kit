@@ -89,12 +89,14 @@ export async function revokeSessionsForUser(userId: string): Promise<void> {
 
 export async function deleteAllProvidersForUser(userId: string): Promise<void> {
   const records = await listUserAuthsByUserId(userId);
-  await Promise.all([
-    ...records.map((record) => deleteUserAuth(record.providerType, record.providerUserId)),
-    ...records.map((record) =>
-      adminAuth()
-        .deleteUser(record.firebaseUid)
-        .catch(() => {}),
-    ),
-  ]);
+  await Promise.all(
+    records.map(async (record) => {
+      try {
+        await adminAuth().deleteUser(record.firebaseUid);
+      } catch (err) {
+        if ((err as { code?: string }).code !== 'auth/user-not-found') throw err;
+      }
+      await deleteUserAuth(record.providerType, record.providerUserId);
+    }),
+  );
 }

@@ -1,4 +1,6 @@
+import { adminAuth } from '../../shared/firebase-admin';
 import { verifyLineIdToken, createCustomToken } from '../auth';
+import { deleteUserAuth } from './identity.repo';
 import { resolveUserIdByProvider, findUserAuthRecord } from './identity.service';
 
 export type LineLoginResult =
@@ -23,6 +25,25 @@ export async function resolveLineLogin(idToken: string): Promise<LineLoginResult
   }
 
   const record = await findUserAuthRecord('line', identity.lineUserId);
-  const customToken = await createCustomToken(record!.firebaseUid);
+  const firebaseUid = record!.firebaseUid;
+
+  const accountExists = await adminAuth()
+    .getUser(firebaseUid)
+    .then(() => true)
+    .catch((err) => {
+      if ((err as { code?: string }).code === 'auth/user-not-found') return false;
+      throw err;
+    });
+
+  if (!accountExists) {
+    await deleteUserAuth('line', identity.lineUserId);
+    return {
+      status: 'quick-register',
+      displayName: identity.displayName,
+      email: identity.email,
+    };
+  }
+
+  const customToken = await createCustomToken(firebaseUid);
   return { status: 'ready', customToken };
 }
