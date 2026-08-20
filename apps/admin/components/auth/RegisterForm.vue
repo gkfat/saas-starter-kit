@@ -94,9 +94,8 @@ import { isValidUsername, isValidPassword, isValidPhone } from '@saas-starter-ki
 const props = withDefaults(
   defineProps<{
     idToken?: string;
-    provider?: 'google' | 'line';
   }>(),
-  { provider: 'google', idToken: undefined },
+  { idToken: undefined },
 );
 
 const emit = defineEmits<{
@@ -106,7 +105,7 @@ const emit = defineEmits<{
 
 const isQuickRegisterMode = computed(() => !!props.idToken);
 
-const { register, googleRegister, lineRegister } = useAuth();
+const { register, googleRegister } = useAuth();
 const { showError, showSuccess } = useToast();
 const { t } = useI18n();
 
@@ -157,11 +156,7 @@ const onSubmit = handleSubmit(async (values) => {
   loading.value = true;
   try {
     if (isQuickRegisterMode.value) {
-      if (props.provider === 'line') {
-        await lineRegister(values.username, props.idToken as string);
-      } else {
-        await googleRegister(values.username, props.idToken as string);
-      }
+      await googleRegister(values.username, props.idToken as string);
     } else {
       await register(
         values.username,

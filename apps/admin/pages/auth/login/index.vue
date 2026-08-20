@@ -30,17 +30,6 @@
             {{ $t('auth.loginWithGoogle') }}
           </v-btn>
 
-          <v-btn
-            block
-            size="large"
-            variant="outlined"
-            class="text-none mt-3"
-            prepend-icon="mdi-chat"
-            @click="handleLineLogin"
-          >
-            {{ $t('auth.loginWithLine') }}
-          </v-btn>
-
           <div class="text-center text-body-2 mt-6">
             {{ $t('auth.noAccount') }}
             <NuxtLink :to="ROUTES.register">{{ $t('auth.registerLink') }}</NuxtLink>
@@ -57,7 +46,7 @@ import { ROUTES } from '~/config/app-routes';
 
 definePageMeta({ path: ROUTES.login });
 
-const { loginWithGoogle, loginWithLineRedirect, getLoginErrorMessage } = useAuth();
+const { loginWithGoogle, getLoginErrorMessage } = useAuth();
 const { showError } = useToast();
 const router = useRouter();
 const { t } = useI18n();
@@ -91,9 +80,5 @@ async function handleGoogleLogin() {
   } finally {
     googleLoading.value = false;
   }
-}
-
-function handleLineLogin() {
-  loginWithLineRedirect();
 }
 </script>

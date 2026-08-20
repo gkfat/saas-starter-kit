@@ -72,7 +72,7 @@
             @click="emit('regenerate-link', item)"
           />
           <ButtonsIconActionBtn
-            v-if="canWriteUsers && item.passwordSetupPending"
+            v-if="canWriteUsers && item.passwordSetupPending && item.role === Role.Member"
             icon="mdi-cellphone-key"
             @click="emit('generate-line-invite', item)"
           />
@@ -89,7 +89,7 @@
 </template>
 
 <script setup lang="ts">
-import { FeatureFlag } from '@saas-starter-kit/shared';
+import { FeatureFlag, Role } from '@saas-starter-kit/shared';
 import type { UserRow } from '@saas-starter-kit/shared';
 
 const props = withDefaults(

@@ -31,8 +31,6 @@
     "groupAbout": "關於",
     "dashboard": "儀表板",
     "profile": "個人資料",
-    "memberInfo": "會員資訊",
-    "myCoupons": "我的優惠券",
     "users": "使用者管理",
     "permissions": "權限",
     "adminRoles": "角色管理",
@@ -69,7 +67,6 @@
     "passwordHint": "6–8 碼英數字，不含特殊符號",
     "confirmUsername": "確認並完成註冊",
     "loginWithGoogle": "透過 Google 繼續",
-    "loginWithLine": "透過 LINE 繼續",
     "loginWithPhone": "使用手機號碼登入",
     "noAccount": "還沒有帳號？",
     "hasAccount": "已有帳號？",
@@ -101,9 +98,7 @@
       "registerDefault": "註冊失敗，請再試一次",
       "googleAlreadyLinked": "綁定失敗",
       "popupClosed": "已取消 Google 登入視窗",
-      "popupBlocked": "瀏覽器封鎖了彈出視窗，請允許彈出視窗後再試一次",
-      "lineLoginFailed": "LINE 登入失敗，請重新嘗試",
-      "lineStateMismatch": "登入驗證失敗，請重新嘗試"
+      "popupBlocked": "瀏覽器封鎖了彈出視窗，請允許彈出視窗後再試一次"
     }
   },
   "home": {
@@ -338,9 +333,6 @@
     "displayName": "顯示名稱",
     "email": "Email",
     "role": "角色",
-    "phone": "手機號碼",
-    "phoneInvalid": "請輸入正確的手機號碼（09 開頭共 10 碼，或 9 開頭共 9 碼）",
-    "phoneHint": "09 開頭共 10 碼，或 9 開頭共 9 碼",
     "loginMethods": "登入方式",
     "googleLogin": "Google 登入",
     "bindGoogle": "綁定 Google 帳號",
@@ -352,18 +344,8 @@
     "unbindGoogleLastProvider": "無法解除唯一的登入方式",
     "unbindGoogleConfirmTitle": "解除 Google 帳號綁定",
     "unbindGoogleConfirmMessage": "確定要解除 Google 帳號的登入綁定嗎？",
-    "lineLogin": "LINE 登入",
     "bindLine": "綁定 LINE",
     "lineBound": "已綁定 LINE",
-    "bindLineFailed": "產生綁定驗證碼失敗",
-    "lineBindCodeTitle": "綁定 LINE",
-    "lineBindCodeInstruction": "請在 LINE App 內開啟綁定頁面，並於 5 分鐘內輸入以下驗證碼",
-    "lineBindCodeExpired": "驗證碼已過期，請重新產生",
-    "unbindLineSuccess": "已解除綁定，請重新登入",
-    "unbindLineFailed": "解除綁定失敗",
-    "unbindLineLastProvider": "無法解除唯一的登入方式",
-    "unbindLineConfirmTitle": "解除 LINE 綁定",
-    "unbindLineConfirmMessage": "確定要解除 LINE 的登入綁定嗎？",
     "changePassword": "變更密碼",
     "currentPassword": "目前密碼",
     "newPassword": "新密碼",
@@ -380,7 +362,6 @@
     "displayNameTooLong": "顯示名稱長度不可超過 20 字元",
     "emailInvalid": "請輸入正確的 Email 格式",
     "emailUpdateFailed": "Email 更新失敗",
-    "phoneUpdateFailed": "手機號碼更新失敗",
     "contactTaken": "更新失敗，請確認輸入資料後再試",
     "profileCardTitle": "基本資料"
   },
@@ -433,11 +414,6 @@
     "groupPoints": "點數資料",
     "detail": "會員詳情",
     "detailTitle": "會員詳情"
-  },
-  "memberInfo": {
-    "title": "會員資訊",
-    "memberNo": "會員編號",
-    "expiresAt": "將於 {date} 到期"
   },
   "level": {
     "cardTitle": "會員等級",
@@ -514,18 +490,7 @@
       "redeemed": "已使用",
       "expired": "已過期"
     },
-    "searchMember": "搜尋姓名/會員編號/電話",
-    "myCard": {
-      "cardTitle": "我的優惠券",
-      "filterState": "狀態",
-      "filterAll": "全部",
-      "usable": "可使用",
-      "redeemed": "已使用",
-      "expired": "已失效",
-      "expiresAt": "到期日：{date}",
-      "redeemedAt": "使用時間：{date}",
-      "empty": "尚無優惠券"
-    }
+    "searchMember": "搜尋姓名/會員編號/電話"
   },
   "points": {
     "myCard": {
@@ -588,27 +553,51 @@
     "detailTitle": "稽核紀錄詳情",
     "metadata": "詳細資料",
     "actions": {
-      "role": { "permissions": { "update": "更新角色權限" } },
+      "role": {
+        "permissions": {
+          "update": "更新角色權限"
+        }
+      },
       "coupon": {
-        "template": { "create": "新增優惠券範本", "update": "更新優惠券範本" },
-        "instance": { "issue": "派發優惠券", "redeem": "核銷優惠券" }
+        "template": {
+          "create": "新增優惠券範本",
+          "update": "更新優惠券範本"
+        },
+        "instance": {
+          "issue": "派發優惠券",
+          "redeem": "核銷優惠券"
+        }
       },
       "user": {
         "create": "新增使用者",
         "delete": "刪除使用者",
-        "role": { "assign": "指派使用者角色" },
-        "status": { "update": "更新使用者狀態" },
-        "setup_link": { "regenerate": "重新產生設定連結" },
-        "line_invite": { "generate": "產生 LINE 邀請連結" }
+        "role": {
+          "assign": "指派使用者角色"
+        },
+        "status": {
+          "update": "更新使用者狀態"
+        },
+        "setup_link": {
+          "regenerate": "重新產生設定連結"
+        },
+        "line_invite": {
+          "generate": "產生 LINE 邀請連結"
+        }
       },
       "level": {
-        "tier": { "create": "新增等級分級", "update": "更新等級分級", "delete": "刪除等級分級" }
+        "tier": {
+          "create": "新增等級分級",
+          "update": "更新等級分級",
+          "delete": "刪除等級分級"
+        }
       },
       "event": {
         "create": "新增活動",
         "update": "更新活動",
         "delete": "刪除活動",
-        "banner": { "upload": "上傳活動橫幅" }
+        "banner": {
+          "upload": "上傳活動橫幅"
+        }
       }
     }
   },

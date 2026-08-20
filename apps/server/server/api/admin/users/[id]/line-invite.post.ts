@@ -17,6 +17,9 @@ export default defineEventHandler(async (event): Promise<GenerateLineInviteRespo
     event,
     targetRole === Role.Member ? Permission.Members.Write : Permission.AdminAccounts.Write,
   );
+  if (targetRole !== Role.Member) {
+    throw createError({ statusCode: 400, message: '管理員帳號不支援 LINE 邀請綁定' });
+  }
 
   const targetUser = await getUserById(userId);
   if (!targetUser) {

@@ -31,8 +31,6 @@
     "groupAbout": "About",
     "dashboard": "Dashboard",
     "profile": "Profile",
-    "memberInfo": "Member Info",
-    "myCoupons": "My Coupons",
     "users": "User Management",
     "permissions": "Permissions",
     "adminRoles": "Roles",
@@ -69,7 +67,6 @@
     "passwordHint": "6–8 alphanumeric characters, no special symbols",
     "confirmUsername": "Confirm & Complete Registration",
     "loginWithGoogle": "Continue with Google",
-    "loginWithLine": "Continue with LINE",
     "loginWithPhone": "Sign in with Phone",
     "noAccount": "Don't have an account?",
     "hasAccount": "Already have an account?",
@@ -101,9 +98,7 @@
       "registerDefault": "Registration failed, please try again",
       "googleAlreadyLinked": "Failed to link",
       "popupClosed": "Google sign-in window was closed",
-      "popupBlocked": "Your browser blocked the popup window. Please allow popups and try again.",
-      "lineLoginFailed": "LINE login failed, please try again",
-      "lineStateMismatch": "Login verification failed, please try again"
+      "popupBlocked": "Your browser blocked the popup window. Please allow popups and try again."
     }
   },
   "home": {
@@ -338,9 +333,6 @@
     "displayName": "Display Name",
     "email": "Email",
     "role": "Role",
-    "phone": "Phone Number",
-    "phoneInvalid": "Enter a valid mobile number (e.g. 0912345678 or 912345678)",
-    "phoneHint": "10 digits starting with 09, or 9 digits starting with 9",
     "loginMethods": "Login Methods",
     "googleLogin": "Google Login",
     "bindGoogle": "Link Google Account",
@@ -352,18 +344,8 @@
     "unbindGoogleLastProvider": "Cannot unlink your only login method",
     "unbindGoogleConfirmTitle": "Unlink Google Account",
     "unbindGoogleConfirmMessage": "Are you sure you want to unlink your Google account?",
-    "lineLogin": "LINE Login",
     "bindLine": "Link LINE",
     "lineBound": "LINE linked",
-    "bindLineFailed": "Failed to generate bind code",
-    "lineBindCodeTitle": "Link LINE",
-    "lineBindCodeInstruction": "Open the bind page in the LINE app and enter this code within 5 minutes",
-    "lineBindCodeExpired": "Code expired, please generate a new one",
-    "unbindLineSuccess": "Account unlinked. Please sign in again.",
-    "unbindLineFailed": "Failed to unlink",
-    "unbindLineLastProvider": "Cannot remove the only login method",
-    "unbindLineConfirmTitle": "Unlink LINE",
-    "unbindLineConfirmMessage": "Are you sure you want to unlink LINE?",
     "changePassword": "Change Password",
     "currentPassword": "Current Password",
     "newPassword": "New Password",
@@ -380,7 +362,6 @@
     "displayNameTooLong": "Display name must be at most 20 characters",
     "emailInvalid": "Enter a valid email address",
     "emailUpdateFailed": "Failed to update email",
-    "phoneUpdateFailed": "Failed to update phone number",
     "contactTaken": "Update failed, please check your details and try again",
     "profileCardTitle": "Basic Info"
   },
@@ -433,11 +414,6 @@
     "groupPoints": "Points",
     "detail": "Member Detail",
     "detailTitle": "Member Detail"
-  },
-  "memberInfo": {
-    "title": "Member Info",
-    "memberNo": "Member No.",
-    "expiresAt": "Expires at {date}"
   },
   "level": {
     "cardTitle": "Member Level",
@@ -514,18 +490,7 @@
       "redeemed": "Redeemed",
       "expired": "Expired"
     },
-    "searchMember": "Search by name/member no./phone",
-    "myCard": {
-      "cardTitle": "My Coupons",
-      "filterState": "Status",
-      "filterAll": "All",
-      "usable": "Usable",
-      "redeemed": "Redeemed",
-      "expired": "Expired",
-      "expiresAt": "Expires at: {date}",
-      "redeemedAt": "Redeemed at: {date}",
-      "empty": "No coupons yet"
-    }
+    "searchMember": "Search by name/member no./phone"
   },
   "points": {
     "myCard": {
@@ -588,18 +553,36 @@
     "detailTitle": "Audit Log Detail",
     "metadata": "Details",
     "actions": {
-      "role": { "permissions": { "update": "Update Role Permissions" } },
+      "role": {
+        "permissions": {
+          "update": "Update Role Permissions"
+        }
+      },
       "coupon": {
-        "template": { "create": "Create Coupon Template", "update": "Update Coupon Template" },
-        "instance": { "issue": "Issue Coupon", "redeem": "Redeem Coupon" }
+        "template": {
+          "create": "Create Coupon Template",
+          "update": "Update Coupon Template"
+        },
+        "instance": {
+          "issue": "Issue Coupon",
+          "redeem": "Redeem Coupon"
+        }
       },
       "user": {
         "create": "Create User",
         "delete": "Delete User",
-        "role": { "assign": "Assign User Role" },
-        "status": { "update": "Update User Status" },
-        "setup_link": { "regenerate": "Regenerate Setup Link" },
-        "line_invite": { "generate": "Generate LINE Invite Link" }
+        "role": {
+          "assign": "Assign User Role"
+        },
+        "status": {
+          "update": "Update User Status"
+        },
+        "setup_link": {
+          "regenerate": "Regenerate Setup Link"
+        },
+        "line_invite": {
+          "generate": "Generate LINE Invite Link"
+        }
       },
       "level": {
         "tier": {
@@ -612,7 +595,9 @@
         "create": "Create Event",
         "update": "Update Event",
         "delete": "Delete Event",
-        "banner": { "upload": "Upload Event Banner" }
+        "banner": {
+          "upload": "Upload Event Banner"
+        }
       }
     }
   },

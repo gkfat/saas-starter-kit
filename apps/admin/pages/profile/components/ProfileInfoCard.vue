@@ -36,11 +36,6 @@
             <div class="text-caption text-medium-emphasis">{{ $t('profile.role') }}</div>
             <div>{{ $t(`role.${store.user?.role}`) }}</div>
           </v-col>
-
-          <v-col cols="12" sm="6">
-            <div class="text-caption text-medium-emphasis">{{ $t('profile.phone') }}</div>
-            <div>{{ store.user?.phone ? `+886 ${store.user.phone}` : '—' }}</div>
-          </v-col>
         </v-row>
       </v-card-text>
     </CardsAppCard>
@@ -71,20 +66,6 @@
                 hide-details="auto"
                 :disabled="profileLoading"
                 :error-messages="profileFormErrors.emailInput"
-              />
-            </v-col>
-            <v-col>
-              <div class="text-caption text-medium-emphasis mb-1">{{ $t('profile.phone') }}</div>
-              <v-text-field
-                v-model="phoneInput"
-                v-bind="phoneInputAttrs"
-                prefix="+886"
-                type="tel"
-                :hint="$t('profile.phoneHint')"
-                persistent-hint
-                hide-details="auto"
-                :disabled="profileLoading"
-                :error-messages="profileFormErrors.phoneInput"
               />
             </v-col>
           </v-row>
@@ -176,7 +157,7 @@ import { toTypedSchema } from '@vee-validate/zod';
 import { useForm } from 'vee-validate';
 import { z } from 'zod';
 import { useAuthStore } from '~/stores/auth';
-import { isValidPassword, isValidPhone } from '@saas-starter-kit/shared';
+import { isValidPassword } from '@saas-starter-kit/shared';
 import type { OkResponse } from '@saas-starter-kit/shared';
 
 const store = useAuthStore();
@@ -198,9 +179,6 @@ const profileValidationSchema = toTypedSchema(
     emailInput: z
       .union([z.string().trim().email(t('profile.emailInvalid')), z.literal('')])
       .optional(),
-    phoneInput: z
-      .union([z.string().trim().refine(isValidPhone, t('profile.phoneInvalid')), z.literal('')])
-      .optional(),
   }),
 );
 const {
@@ -211,18 +189,16 @@ const {
   resetForm: resetProfileForm,
 } = useForm({
   validationSchema: profileValidationSchema,
-  initialValues: { displayNameInput: '', emailInput: '', phoneInput: '' },
+  initialValues: { displayNameInput: '', emailInput: '' },
 });
 const [displayNameInput, displayNameInputAttrs] = defineProfileField('displayNameInput');
 const [emailInput, emailInputAttrs] = defineProfileField('emailInput');
-const [phoneInput, phoneInputAttrs] = defineProfileField('phoneInput');
 
 function openEditProfileDialog() {
   resetProfileForm({
     values: {
       displayNameInput: store.user?.displayName ?? '',
       emailInput: store.user?.email ?? '',
-      phoneInput: store.user?.phone ?? '',
     },
   });
   editingProfile.value = true;
@@ -236,7 +212,6 @@ const onSaveProfile = handleProfileSubmit(async (values) => {
   if (!store.user) return;
   const displayName = values.displayNameInput.trim();
   const email = values.emailInput?.trim() ?? '';
-  const phone = values.phoneInput?.trim() ?? '';
 
   let hasError = false;
   const tasks: Promise<void>[] = [];
@@ -274,27 +249,6 @@ const onSaveProfile = handleProfileSubmit(async (values) => {
             getErrorCode(e) === 'contact-taken'
               ? t('profile.contactTaken')
               : t('profile.emailUpdateFailed'),
-          );
-        }),
-    );
-  }
-
-  if (phone !== (store.user.phone ?? '')) {
-    tasks.push(
-      apiFetch<OkResponse>('/api/profile/phone', {
-        method: 'PATCH',
-        silent: true,
-        body: { phone },
-      })
-        .then((result) => {
-          if (result !== null && store.user) store.user.phone = phone;
-        })
-        .catch((e: unknown) => {
-          hasError = true;
-          showError(
-            getErrorCode(e) === 'contact-taken'
-              ? t('profile.contactTaken')
-              : t('profile.phoneUpdateFailed'),
           );
         }),
     );
