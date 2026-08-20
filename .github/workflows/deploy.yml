@@ -70,10 +70,20 @@ jobs:
 
       - run: gcloud auth configure-docker ${{ secrets.GCP_REGION }}-docker.pkg.dev --quiet
 
+      # Feature flags are baked into Nitro's runtimeConfig at build time (see
+      # apps/server/nitro.config.ts and apps/server/Dockerfile) — pass them as build args
+      # here, not as Cloud Run runtime env vars, or they silently fall back to defaults.
+      # Feature flag secrets are optional — fall back to the same defaults as .env.example.
       - name: Build and push image
         run: |
           IMAGE="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REPO }}/saas-starter-kit-server:${{ github.sha }}"
-          docker build --platform=linux/amd64 -f apps/server/Dockerfile -t "$IMAGE" .
+          docker build --platform=linux/amd64 -f apps/server/Dockerfile -t "$IMAGE" . \
+            --build-arg FEATURE_AUDIT_LOG_ENABLED="${{ secrets.FEATURE_AUDIT_LOG_ENABLED || 'true' }}" \
+            --build-arg FEATURE_LOGIN_LOG_ENABLED="${{ secrets.FEATURE_LOGIN_LOG_ENABLED || 'true' }}" \
+            --build-arg FEATURE_LEVEL_ENABLED="${{ secrets.FEATURE_LEVEL_ENABLED || 'true' }}" \
+            --build-arg FEATURE_COUPON_ENABLED="${{ secrets.FEATURE_COUPON_ENABLED || 'false' }}" \
+            --build-arg FEATURE_POINTS_ENABLED="${{ secrets.FEATURE_POINTS_ENABLED || 'true' }}" \
+            --build-arg FEATURE_EVENT_ENABLED="${{ secrets.FEATURE_EVENT_ENABLED || 'true' }}"
           docker push "$IMAGE"
           echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
@@ -81,7 +91,8 @@ jobs:
       # from the repo-root .env (not present in this Docker build) — so these MUST be
       # injected at deploy time as NITRO_<KEY> env vars, or Nitro's env-override never
       # finds the (missing) config key. See apps/server/nitro.config.ts / firebase-admin.ts.
-      # Requires repo secrets: LIFF_APP_URL, ADMIN_APP_URL, CORS_ALLOWED_ORIGINS
+      # Requires repo secrets: LIFF_APP_URL, ADMIN_APP_URL, CORS_ALLOWED_ORIGINS,
+      # R2_ACCOUNT_ID, R2_BUCKET_NAME, R2_PUBLIC_BASE_URL
       # (LINE_CHANNEL_ID / VITE_LIFF_ID already required by deploy-admin below).
       - name: Write runtime env vars file
         run: |
@@ -93,11 +104,14 @@ jobs:
           NITRO_LIFF_APP_URL: ${{ secrets.LIFF_APP_URL }}
           NITRO_ADMIN_APP_URL: ${{ secrets.ADMIN_APP_URL }}
           NITRO_CORS_ALLOWED_ORIGINS: "${{ secrets.CORS_ALLOWED_ORIGINS }}"
+          NITRO_R2_ACCOUNT_ID: "${{ secrets.R2_ACCOUNT_ID }}"
+          NITRO_R2_BUCKET_NAME: "${{ secrets.R2_BUCKET_NAME }}"
+          NITRO_R2_PUBLIC_BASE_URL: "${{ secrets.R2_PUBLIC_BASE_URL }}"
           EOF
 
       # Sensitive values live in Secret Manager (not GitHub secrets) — created via:
       #   gcloud secrets create firebase-private-key / firebase-client-email /
-      #   line-channel-secret / level-batch-secret
+      #   line-channel-secret / level-batch-secret / r2-access-key-id / r2-secret-access-key
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy saas-starter-kit-server \
@@ -110,7 +124,7 @@ jobs:
             --memory 256Mi \
             --allow-unauthenticated \
             --env-vars-file=/tmp/server-env-vars.yaml \
-            --set-secrets="NITRO_FIREBASE_PRIVATE_KEY=firebase-private-key:latest,NITRO_FIREBASE_CLIENT_EMAIL=firebase-client-email:latest,NITRO_LINE_CHANNEL_SECRET=line-channel-secret:latest,NITRO_LEVEL_BATCH_SECRET=level-batch-secret:latest"
+            --set-secrets="NITRO_FIREBASE_PRIVATE_KEY=firebase-private-key:latest,NITRO_FIREBASE_CLIENT_EMAIL=firebase-client-email:latest,NITRO_LINE_CHANNEL_SECRET=line-channel-secret:latest,NITRO_LEVEL_BATCH_SECRET=level-batch-secret:latest,NITRO_R2_ACCESS_KEY_ID=r2-access-key-id:latest,NITRO_R2_SECRET_ACCESS_KEY=r2-secret-access-key:latest"
 
   deploy-admin:
     needs: [detect-affected, lint-and-test]

@@ -18,6 +18,22 @@ COPY packages/shared packages/shared
 COPY scripts scripts
 COPY apps/server apps/server
 
+# Feature flags are baked into Nitro's runtimeConfig at build time (see
+# apps/server/nitro.config.ts) — they must be supplied here, not as Cloud Run
+# runtime env vars, or they silently fall back to the hardcoded defaults.
+ARG FEATURE_AUDIT_LOG_ENABLED=true
+ARG FEATURE_LOGIN_LOG_ENABLED=true
+ARG FEATURE_LEVEL_ENABLED=true
+ARG FEATURE_COUPON_ENABLED=false
+ARG FEATURE_POINTS_ENABLED=true
+ARG FEATURE_EVENT_ENABLED=true
+ENV FEATURE_AUDIT_LOG_ENABLED=$FEATURE_AUDIT_LOG_ENABLED
+ENV FEATURE_LOGIN_LOG_ENABLED=$FEATURE_LOGIN_LOG_ENABLED
+ENV FEATURE_LEVEL_ENABLED=$FEATURE_LEVEL_ENABLED
+ENV FEATURE_COUPON_ENABLED=$FEATURE_COUPON_ENABLED
+ENV FEATURE_POINTS_ENABLED=$FEATURE_POINTS_ENABLED
+ENV FEATURE_EVENT_ENABLED=$FEATURE_EVENT_ENABLED
+
 RUN pnpm --dir apps/server build
 
 # Runtime image: Nitro's node-server output is self-contained (deps bundled),

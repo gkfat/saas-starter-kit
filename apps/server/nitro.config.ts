@@ -6,6 +6,8 @@ export default defineNitroConfig({
   compatibilityDate: '2024-04-03',
   preset: 'node-server',
 
+  // R2 credentials and FEATURE_* flags are supplied in CI via docker build args /
+  // Cloud Run env vars & secrets — see .github/workflows/deploy.yml.
   runtimeConfig: {
     firebaseProjectId: process.env.FIREBASE_PROJECT_ID ?? '',
     firebaseClientEmail: process.env.FIREBASE_CLIENT_EMAIL ?? '',
