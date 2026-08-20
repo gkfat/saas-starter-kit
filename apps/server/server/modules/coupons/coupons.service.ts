@@ -80,7 +80,7 @@ export async function createCouponTemplate(input: {
     title: parsed.title,
     description: parsed.description,
     discountType: parsed.discountType,
-    discountValue: parsed.discountValue,
+    ...(parsed.discountValue !== undefined ? { discountValue: parsed.discountValue } : {}),
     validDays: parsed.validDays,
     status: parsed.status ?? 'draft',
     createdAt: now,
@@ -107,6 +107,14 @@ export async function updateCouponTemplate(
   if (!existing) {
     throw Object.assign(new Error(`coupon template ${id} not found`), {
       code: 'coupon-template-not-found',
+    });
+  }
+
+  const effectiveDiscountType = patch.discountType ?? existing.discountType;
+  const effectiveDiscountValue = patch.discountValue ?? existing.discountValue;
+  if (effectiveDiscountType !== 'item' && effectiveDiscountValue === undefined) {
+    throw Object.assign(new Error('discountValue is required for fixed/percentage discountType'), {
+      code: 'coupon-template-discount-value-required',
     });
   }
 

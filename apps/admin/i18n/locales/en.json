@@ -480,6 +480,10 @@
       "item": "Item Redemption"
     },
     "discountValue": "Discount Value",
+    "discountValueHint": {
+      "fixed": "Amount to deduct (currency units)",
+      "percentage": "Percentage to deduct, e.g. 20 = 20% off"
+    },
     "validDays": "Valid Days",
     "status": "Status",
     "statusOption": {

@@ -50,6 +50,9 @@ export default defineEventHandler(async (event): Promise<CouponTemplate> => {
         if (code === 'coupon-template-not-found') {
           throw createError({ statusCode: 404, message: (err as Error).message });
         }
+        if (code === 'coupon-template-discount-value-required') {
+          throw createError({ statusCode: 400, message: (err as Error).message });
+        }
         throw err;
       }
     },

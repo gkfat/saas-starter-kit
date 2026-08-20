@@ -41,6 +41,8 @@
               v-bind="discountValueAttrs"
               type="number"
               :label="$t('coupons.discountValue')"
+              :hint="$t(`coupons.discountValueHint.${discountType}`)"
+              persistent-hint
               :error-messages="formErrors.discountValue"
               hide-details="auto"
             />

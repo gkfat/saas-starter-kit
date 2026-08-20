@@ -480,6 +480,10 @@
       "item": "兌換品項"
     },
     "discountValue": "折扣值",
+    "discountValueHint": {
+      "fixed": "折抵金額（元）",
+      "percentage": "折扣百分比，例如填 20 代表折抵 20%"
+    },
     "validDays": "有效天數",
     "status": "狀態",
     "statusOption": {
