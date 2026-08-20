@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Allow a user to register/sign in via LINE Login (through the LIFF frontend, and via Web OAuth from the admin app) and interoperate with the existing member system, so the same person maps to a single account regardless of whether they registered via the SaaS frontend, were created by an admin, or registered via LINE. LINE is not a Firebase Auth-native provider, so identity mapping is maintained independently of Firebase Auth through a `user` / `user_auth` data model owned by `modules/identity`.
+Allow a user to register/sign in via LINE Login through the LIFF frontend and interoperate with the existing member system, so the same person maps to a single account regardless of whether they registered via the SaaS frontend, were created by an admin, or registered via LINE. LINE is not a Firebase Auth-native provider, so identity mapping is maintained independently of Firebase Auth through a `user` / `user_auth` data model owned by `modules/identity`.
 
 ## Requirements
 
@@ -41,11 +41,11 @@ The system SHALL verify the LINE-issued ID Token (JWT) on the server by validati
 
 ### Requirement: Binding LINE to an existing password-based account requires proof of ownership
 
-The system SHALL require a user with an existing password-based account to authenticate with that account's credentials (obtaining a valid idToken) before the system links a LINE identity to it. The system SHALL NOT bind a LINE identity to an existing account based solely on matching email or phone number.
+The system SHALL require a user with an existing password-based account to authenticate with that account's credentials (obtaining a valid idToken) before the system links a LINE identity to it. The system SHALL NOT bind a LINE identity to an existing account based solely on matching email or phone number. This binding flow SHALL be offered only through the LIFF frontend's account settings; the admin app SHALL NOT offer a "綁定 LINE" entry point.
 
 #### Scenario: Authenticated user binds LINE from account settings
 
-- **WHEN** a user who is signed in with a valid idToken initiates "綁定 LINE" and completes LINE Login
+- **WHEN** a user who is signed in with a valid idToken initiates "綁定 LINE" from the LIFF app's account settings and completes LINE Login
 - **THEN** system creates a `user_auth` document with `provider_type: 'line'` pointing to the authenticated user's `userId`
 
 #### Scenario: Unauthenticated attempt to bind LINE is rejected
@@ -55,11 +55,11 @@ The system SHALL require a user with an existing password-based account to authe
 
 ### Requirement: Invite-link activation for accounts never logged in
 
-The system SHALL allow an account created by an administrator that has no login history (only a `user_auth` document with `provider_type: 'password'` and no successful login) to be activated and bound to a LINE identity via a single-use invite link. The invite token SHALL be stored in Firestore with an `expiresAt` set to 24 hours after issuance and a `usedAt` field, SHALL be rejected once expired, and SHALL be rejected if `usedAt` is already set.
+The system SHALL allow an account created by an administrator that has no login history (only a `user_auth` document with `provider_type: 'password'` and no successful login) to be activated and bound to a LINE identity via a single-use invite link, **provided the account's role is `member`**. The invite token SHALL be stored in Firestore with an `expiresAt` set to 24 hours after issuance and a `usedAt` field, SHALL be rejected once expired, and SHALL be rejected if `usedAt` is already set. The system SHALL NOT generate or accept an invite link for an account whose role is `admin` or `superadmin`, regardless of the requesting operator's permissions — admin-role accounts are internal accounts intended for Username/Password login only and SHALL NOT be bound to a LINE identity.
 
 #### Scenario: Valid, unused invite link activates and binds LINE
 
-- **WHEN** a user opens a valid, unexpired, unused invite link in the LIFF app and completes LINE Login
+- **WHEN** a user opens a valid, unexpired, unused invite link for a member-role account in the LIFF app and completes LINE Login
 - **THEN** system marks the invite token's `usedAt`, creates a `user_auth` document with `provider_type: 'line'` for the invited `userId`, and signs the user in
 
 #### Scenario: Expired invite link is rejected
@@ -71,6 +71,11 @@ The system SHALL allow an account created by an administrator that has no login 
 
 - **WHEN** a user opens an invite link whose `usedAt` is already set
 - **THEN** system rejects the activation and does not modify any `user`/`user_auth` document
+
+#### Scenario: Invite-link generation is rejected for admin-role accounts
+
+- **WHEN** an authorized operator (holding `AdminAccounts.Write`) requests a LINE invite link for a target account whose role is `admin` or `superadmin`
+- **THEN** system rejects the request without creating an invite token, regardless of the operator's permissions
 
 ### Requirement: Invite-link activation detects an already-registered LINE identity
 
