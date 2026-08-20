@@ -37,8 +37,9 @@ ENV FEATURE_EVENT_ENABLED=$FEATURE_EVENT_ENABLED
 RUN pnpm --dir apps/server build
 
 # Runtime image: Nitro's node-server output is self-contained (deps bundled),
-# no node_modules / pnpm workspace needed at runtime.
-FROM node:22-slim AS runner
+# no node_modules / pnpm workspace needed at runtime. Alpine is safe here —
+# no native (.node) addons in the bundled deps, all pure JS (e.g. @grpc/grpc-js).
+FROM node:22-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production
