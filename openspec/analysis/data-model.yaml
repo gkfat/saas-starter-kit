@@ -1,0 +1,127 @@
+version: 1
+generatedBy: data-modeling
+updatedAt: 2026-08-20T00:00:00Z
+relatedChanges: [booking-module]
+
+tables:
+  - id: DATA-001
+    name: booking_services
+    description: >
+      Firestore top-level collection，對應 AGG-001 Service。命名比照既有
+      coupon_instances/login_logs 等 snake_case 複數慣例。
+    columns:
+      - { name: id, type: string, constraints: "document id" }
+      - { name: name, type: string, constraints: required }
+      - { name: description, type: string, constraints: optional }
+      - { name: approvalMode, type: "string(auto|manual)", constraints: required }
+      - { name: enabled, type: boolean, constraints: required }
+      - { name: createdAt, type: timestamp, constraints: required }
+      - { name: updatedAt, type: timestamp, constraints: required }
+    primaryKey: id
+    domainModel: [ENT-001]
+    api: [API-001, API-002, API-003, API-011]
+
+  - id: DATA-002
+    name: booking_time_slots
+    description: >
+      Firestore top-level collection，對應 AGG-002 TimeSlot（含 VO-002 TimeRange 內嵌為
+      startAt/endAt 兩個欄位，因為 TimeRange 只在 TimeSlot 內使用，無獨立查詢需求，
+      不需要獨立表）。以 serviceId 欄位參照 booking_services（無真正 FK，靠 query）。
+
+      容量併發控制（RULE-001/NFR-001）：建立 Booking 時，須在同一個 Firestore
+      transaction 內同時讀取本文件的 confirmedCount/pendingCount、驗證未超過
+      capacity、寫入 bookings 新文件、並遞增本文件對應計數欄位——這代表
+      booking_time_slots 與 bookings 這兩個 collection 的寫入必須落在同一次
+      transaction 呼叫內（Firestore 跨 collection transaction 原生支援，不需要
+      額外的 subcollection 結構）。
+
+      查詢慣例：依 serviceId + startAt 排序列出某服務項目的時段（UC-002/UC-004），
+      需要 (serviceId, startAt) 複合索引；確切索引定義留待實作階段依實際查詢調整。
+    columns:
+      - { name: id, type: string, constraints: "document id" }
+      - { name: serviceId, type: string, constraints: "required, references booking_services.id" }
+      - { name: startAt, type: timestamp, constraints: required }
+      - { name: endAt, type: timestamp, constraints: "required, > startAt" }
+      - { name: capacity, type: int, constraints: "required, >= 1" }
+      - { name: confirmedCount, type: int, constraints: "required, default 0, invariant: confirmedCount + pendingCount <= capacity" }
+      - { name: pendingCount, type: int, constraints: "required, default 0" }
+      - { name: createdAt, type: timestamp, constraints: required }
+      - { name: updatedAt, type: timestamp, constraints: required }
+    primaryKey: id
+    domainModel: [ENT-002, VO-002]
+    api: [API-004, API-005, API-006, API-012, API-014]
+
+  - id: DATA-003
+    name: booking_providers
+    description: >
+      Firestore top-level collection，對應 AGG-004 Provider。**此表是否需要存在，
+      隨上游 CTX-ASM-002（Provider 是否為獨立管理實體）確認而定**——若最終確認
+      Provider 只是簡單欄位，此表應廢除，改由 bookings.providerName 之類的內嵌
+      字串欄位取代，屆時保留 DATA-003 這個 ID 並標記 status: deprecated。
+    columns:
+      - { name: id, type: string, constraints: "document id" }
+      - { name: name, type: string, constraints: required }
+      - { name: createdAt, type: timestamp, constraints: required }
+    primaryKey: id
+    domainModel: [ENT-004]
+    api: [API-007, API-008]
+    note: "table existence pending CTX-ASM-002 confirmation, needs review"
+
+  - id: DATA-004
+    name: bookings
+    description: >
+      Firestore top-level collection，對應 AGG-003 Booking（含 VO-001 BookingStatus
+      內嵌為 status 欄位，理由同 TimeRange：BookingStatus 無獨立查詢需求）。
+      查詢慣例：後台篩選（UC-009）依 serviceId/timeSlotId/status/memberId/providerId
+      任意組合查詢，視實際使用頻率可能需要對應複合索引，確切索引組合留待實作階段。
+    columns:
+      - { name: id, type: string, constraints: "document id" }
+      - { name: memberId, type: string, constraints: "required, references users.id (existing users collection, out of this module's scope)" }
+      - { name: serviceId, type: string, constraints: "required, references booking_services.id" }
+      - { name: timeSlotId, type: string, constraints: "required, references booking_time_slots.id" }
+      - { name: providerId, type: string, constraints: "optional, references booking_providers.id (pending DATA-003 existence)" }
+      - { name: status, type: "string(pendingReview|confirmed|rejected|cancelled)", constraints: required }
+      - { name: createdAt, type: timestamp, constraints: required }
+      - { name: updatedAt, type: timestamp, constraints: required }
+      - { name: reviewDeadlineAt, type: timestamp, constraints: "optional, nullable — 逾期未審核判定所需，計算公式待確認（RULE-008）" }
+      - { name: cancellableUntil, type: timestamp, constraints: "optional, nullable — 取消時限判定所需，計算公式待確認（RULE-007）" }
+    primaryKey: id
+    domainModel: [ENT-003, VO-001]
+    api: [API-009, API-010, API-013, API-014, API-015, API-016]
+    note: "reviewDeadlineAt / cancellableUntil are placeholder columns reserving space for RULE-008 / RULE-007 once confirmed; do not assume a specific computation until upstream review resolves those rules"
+
+relationships:
+  - id: REL-001
+    from: DATA-002
+    to: DATA-001
+    type: many-to-one
+    description: 每個時段隸屬一個服務項目（booking_time_slots.serviceId → booking_services.id）。
+
+  - id: REL-002
+    from: DATA-004
+    to: DATA-001
+    type: many-to-one
+    description: 每筆預約對應一個服務項目（bookings.serviceId → booking_services.id）。
+
+  - id: REL-003
+    from: DATA-004
+    to: DATA-002
+    type: many-to-one
+    description: >
+      每筆預約對應一個時段（bookings.timeSlotId → booking_time_slots.id）；
+      建立時須與 DATA-002 的計數欄位在同一 transaction 內原子更新（RULE-001）。
+
+  - id: REL-004
+    from: DATA-004
+    to: DATA-003
+    type: many-to-one
+    description: 每筆預約可選對應一位人員（bookings.providerId → booking_providers.id）。
+    note: "relationship existence depends on DATA-003 (pending CTX-ASM-002)"
+
+  - id: REL-005
+    from: DATA-004
+    to: "external:users"
+    type: many-to-one
+    description: >
+      每筆預約對應一位既有會員（bookings.memberId → users.id）。users 為既有模組的
+      collection，不在本次 booking-module 資料模型範圍內定義，僅記錄參照關係。

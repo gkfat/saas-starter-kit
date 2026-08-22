@@ -1,0 +1,263 @@
+version: 1
+generatedBy: requirement-modeling
+updatedAt: 2026-08-20T00:00:00Z
+relatedChanges: [booking-module]
+
+stories:
+  - id: STORY-001
+    actor: CTX-ACTOR-002
+    story: As an Admin, I want to create/edit/disable service items with capacity and approval mode, so that I can control what members can book and how bookings are confirmed.
+    requirements: [FR-001]
+
+  - id: STORY-002
+    actor: CTX-ACTOR-002
+    story: As an Admin, I want to configure bookable time slots for a service item, so that members can only book within defined, capacity-limited windows.
+    requirements: [FR-002]
+
+  - id: STORY-003
+    actor: CTX-ACTOR-002
+    story: As an Admin, I want to optionally assign a provider to a service item, so that bookings can be attributed to a specific staff member when needed.
+    requirements: [FR-003]
+
+  - id: STORY-004
+    actor: CTX-ACTOR-001
+    story: As a Member, I want to browse enabled service items and their available time slots, so that I can choose one to book.
+    requirements: [FR-004]
+
+  - id: STORY-005
+    actor: CTX-ACTOR-001
+    story: As a Member, I want to create a booking within an available time slot (optionally choosing a provider), so that I can reserve a service.
+    requirements: [FR-005, FR-006, FR-009, FR-010]
+
+  - id: STORY-006
+    actor: CTX-ACTOR-002
+    story: As an Admin, I want to approve or reject pending bookings, so that bookings requiring manual review are properly controlled.
+    requirements: [FR-007]
+
+  - id: STORY-007
+    actor: CTX-ACTOR-001
+    story: As a Member, I want to cancel my own booking, so that I can free up the slot when my plans change.
+    requirements: [FR-008]
+
+  - id: STORY-008
+    actor: CTX-ACTOR-003
+    story: As the booking system, I want to notify a member via LINE whenever their booking status changes, so that the member stays informed without checking the app.
+    requirements: [FR-011]
+
+  - id: STORY-009
+    actor: CTX-ACTOR-002
+    story: As an Admin, I want to search and filter the booking list by service, slot, status, or member, so that I can manage bookings efficiently.
+    requirements: [FR-013]
+
+  - id: STORY-010
+    actor: CTX-ACTOR-003
+    story: As the booking system, I want to process bookings left pending review past a threshold, so that stale requests don't sit unresolved indefinitely.
+    requirements: [FR-014]
+
+use_cases:
+  - id: UC-001
+    title: Admin 建立/編輯/停用服務項目
+    actor: CTX-ACTOR-002
+    preconditions:
+      - Admin 已登入且具備服務項目管理權限
+      - `booking` feature flag 為啟用狀態（CTX-CON-001）
+    mainFlow:
+      - Admin 於後台開啟服務項目管理頁面
+      - Admin 輸入/編輯名稱、說明、容量上限、審核模式（自動確認 / 人工審核）
+      - 系統驗證輸入（名稱必填、容量為正整數等）
+      - 系統儲存服務項目
+    alternateFlows:
+      - 輸入無效（例如容量為 0 或非數字）：系統顯示驗證錯誤，不儲存
+      - 權限不足：系統拒絕請求並回傳 403
+    postconditions:
+      - 服務項目建立/更新完成，`enabled` 狀態依 Admin 設定
+    requirements: [FR-001]
+    story: STORY-001
+
+  - id: UC-002
+    title: Admin 設定服務項目時段
+    actor: CTX-ACTOR-002
+    preconditions:
+      - 對應服務項目已存在
+      - `booking` feature flag 為啟用狀態（CTX-CON-001）
+    mainFlow:
+      - Admin 選擇一個服務項目
+      - Admin 新增時段，輸入起訖時間與該時段容量上限
+      - 系統驗證時段時間區間合理（結束時間須晚於起始時間，且不得與同服務項目其他時段重疊——重疊規則細節待確認）
+      - 系統儲存時段
+    alternateFlows:
+      - 輸入無效（結束早於起始、容量非正整數）：系統顯示驗證錯誤
+      - 權限不足：系統拒絕請求並回傳 403
+    postconditions:
+      - 時段建立完成，可供會員瀏覽與預約
+    requirements: [FR-002]
+    story: STORY-002
+    note: "time slot overlap rule not specified upstream, needs review"
+
+  - id: UC-003
+    title: Admin 指定服務項目的可選人員
+    actor: CTX-ACTOR-002
+    preconditions:
+      - 對應服務項目已存在
+      - Provider 是否為獨立管理實體尚待確認（CTX-ASM-002）
+    mainFlow:
+      - Admin 於服務項目（或時段）設定中選填指定人員
+      - 系統儲存人員關聯
+    alternateFlows:
+      - 權限不足：系統拒絕請求並回傳 403
+    postconditions:
+      - 服務項目/時段記錄可選的人員資訊
+    requirements: [FR-003]
+    story: STORY-003
+    note: "no upstream source for Provider entity scope (standalone entity vs simple field), needs review"
+
+  - id: UC-004
+    title: 會員瀏覽可預約服務項目與時段
+    actor: CTX-ACTOR-001
+    preconditions:
+      - 會員已登入（LIFF session 有效）
+      - `booking` feature flag 為啟用狀態（CTX-CON-001）
+    mainFlow:
+      - 會員開啟 LIFF 預約頁面
+      - 系統回傳目前 `enabled` 的服務項目清單
+      - 會員選擇一個服務項目
+      - 系統回傳該服務項目的可預約時段與剩餘容量
+    alternateFlows:
+      - 未登入：系統拒絕請求
+      - 無任何啟用中的服務項目：系統回傳空清單
+    postconditions:
+      - 會員取得可預約時段清單，尚未建立預約
+    requirements: [FR-004]
+    story: STORY-004
+
+  - id: UC-005
+    title: 會員建立預約
+    actor: CTX-ACTOR-001
+    preconditions:
+      - 會員已登入（LIFF session 有效）
+      - `booking` feature flag 為啟用狀態（CTX-CON-001）
+    mainFlow:
+      - 會員選擇服務項目與時段，選填指定人員
+      - 系統於 Firestore transaction 中檢查該時段目前已確認+待審核數是否已達容量上限
+      - 系統依服務項目審核模式決定初始狀態：自動確認模式 → 直接建立為「已確認」；人工審核模式 → 建立為「待審核」
+      - 系統寫入預約紀錄
+      - 系統觸發 LINE 通知（見 UC-008，best-effort，非好友會員通知會靜默失敗但不影響本流程）
+    alternateFlows:
+      - 容量已滿：系統拒絕建立並回傳明確錯誤，不寫入紀錄（FR-009）
+      - 輸入無效（時段不存在、已過去）：系統拒絕並回傳驗證錯誤
+      - 併發衝突（多個請求同時搶最後名額）：僅其中之一成功，其餘依「容量已滿」處理
+    postconditions:
+      - 預約紀錄建立，狀態為「已確認」或「待審核」
+      - 系統嘗試發送對應 LINE 通知（前提：通知機制已就緒；會員非好友時通知會失敗但不影響本紀錄）
+    requirements: [FR-005, FR-006, FR-009]
+    constraints: [NFR-001]
+    story: STORY-005
+    note: "2026-08-20: removed the LINE-friend precondition (was FR-010, now deprecated) per user decision — booking creation only requires LIFF login"
+
+  - id: UC-006
+    title: Admin 審核待審核預約
+    actor: CTX-ACTOR-002
+    preconditions:
+      - 預約狀態為「待審核」
+      - Admin 具備審核權限
+      - `booking` feature flag 為啟用狀態（CTX-CON-001）
+    mainFlow:
+      - Admin 於後台預約列表選擇一筆「待審核」預約
+      - Admin 選擇核准或拒絕
+      - 系統更新預約狀態為「已確認」或「已拒絕」
+      - 系統觸發 LINE 通知（見 UC-008）
+    alternateFlows:
+      - 預約已非「待審核」狀態（例如會員已自行取消）：系統拒絕此次審核操作並提示狀態已變更
+      - 權限不足：系統拒絕請求並回傳 403
+    postconditions:
+      - 預約狀態更新為「已確認」或「已拒絕」
+      - 會員收到對應 LINE 通知
+    requirements: [FR-007]
+    story: STORY-006
+
+  - id: UC-007
+    title: 會員取消預約
+    actor: CTX-ACTOR-001
+    preconditions:
+      - 預約屬於該會員本人
+      - 預約尚未開始
+      - 是否受取消時限限制待確認（FR-008）
+    mainFlow:
+      - 會員於 LIFF 端選擇一筆自己的預約
+      - 會員送出取消請求
+      - 系統驗證是否在允許取消的時限內（規則待確認）
+      - 系統更新預約狀態為「已取消」，釋放該時段容量
+      - 系統觸發 LINE 通知（見 UC-008）
+    alternateFlows:
+      - 非本人預約：系統拒絕並回傳 403
+      - 超過取消時限（若有此規則）：系統拒絕取消
+      - 預約已是「已取消」或「已拒絕」：系統回傳目前狀態，不重複處理
+    postconditions:
+      - 預約狀態為「已取消」，該時段容量恢復可預約
+    requirements: [FR-008]
+    story: STORY-007
+    note: "cancellation window policy not specified upstream, needs review"
+
+  - id: UC-008
+    title: 系統於預約狀態變化時發送 LINE 通知
+    actor: CTX-ACTOR-003
+    preconditions:
+      - 預約狀態剛完成變化（建立/待審核/核准/拒絕/取消）
+      - LINE Messaging API 整合已就緒（channel 憑證、會員 LINE 對應識別）——目前專案尚未具備
+    mainFlow:
+      - 系統依狀態變化類型組成通知內容（內容規則待確認）
+      - 系統呼叫 LINE Messaging API 發送通知給會員
+    alternateFlows:
+      - LINE API 呼叫失敗：系統記錄失敗（不得阻斷觸發此通知的主流程，見 NFR-002），重試策略待確認
+      - 會員非好友或已封鎖官方帳號：系統記錄無法送達，不視為系統錯誤
+    postconditions:
+      - 通知已送出，或失敗已記錄待後續處理（補償策略待確認）
+    requirements: [FR-011]
+    constraints: [NFR-002]
+    story: STORY-008
+    note: >
+      actor CTX-ACTOR-003 目前 context.yaml 定義偏向「逾期處理排程」，此處借用為「系統觸發通知」的執行者；
+      是否需要在 context.yaml 新增更貼切的獨立角色（例如 Notification Service）待 system-analysis 階段review，
+      no upstream source for a dedicated notification-system actor, needs review.
+
+  - id: UC-009
+    title: Admin 查詢/篩選預約列表
+    actor: CTX-ACTOR-002
+    preconditions:
+      - Admin 已登入且具備預約查詢權限
+      - `booking` feature flag 為啟用狀態（CTX-CON-001）
+    mainFlow:
+      - Admin 開啟預約列表頁面
+      - Admin 輸入篩選條件（服務項目、時段、狀態、會員）
+      - 系統回傳符合條件的預約列表
+    alternateFlows:
+      - 查無符合條件的資料：系統回傳空清單
+      - 權限不足：系統拒絕請求並回傳 403
+    postconditions:
+      - Admin 取得篩選後的預約列表
+    requirements: [FR-013]
+    story: STORY-009
+
+  - id: UC-010
+    title: 系統處理逾期未審核預約
+    actor: CTX-ACTOR-003
+    preconditions:
+      - 預約狀態為「待審核」且已超過待確認的逾期門檻（門檻值待確認）
+      - 觸發機制待確認（排程 API vs 其他方式，比照 level 模組 evaluate-due-periods 慣例）
+    mainFlow:
+      - 系統排程掃描逾期仍為「待審核」的預約
+      - 系統依既定規則處理（自動取消 or 標記提醒後台，規則待確認）
+    alternateFlows:
+      - 掃描期間預約已被 Admin 審核：系統略過該筆
+    postconditions:
+      - 逾期預約依規則被處理（規則待確認）
+    requirements: [FR-014]
+    story: STORY-010
+    note: "overdue threshold, trigger mechanism, and handling policy not specified upstream, needs review"
+
+gap_notes:
+  - requirement: FR-012
+    note: >
+      FR-012（預約模組受 feature flag 控制）為跨切面的系統行為，不對應單一使用者互動流程，
+      因此未產生獨立 use case。其效果以 `preconditions` 形式套用於所有其他 use case
+      （每個 use case 皆列「`booking` feature flag 為啟用狀態」為前置條件）。此為刻意設計，非遺漏。

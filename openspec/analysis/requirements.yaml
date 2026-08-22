@@ -1,0 +1,162 @@
+version: 1
+generatedBy: system-analysis
+updatedAt: 2026-08-20T00:00:00Z
+relatedChanges: [booking-module]
+
+functional_requirements:
+  - id: FR-001
+    title: 後台建立/編輯/停用服務項目
+    description: >
+      系統 SHALL 允許具權限的後台人員建立、編輯、停用服務項目（Service），
+      每個服務項目包含名稱、說明、容量上限、審核模式（自動確認 / 人工審核）。
+    priority: must
+    context: [CTX-ACTOR-002, CTX-CON-002]
+
+  - id: FR-002
+    title: 後台設定服務項目的可預約時段
+    description: >
+      系統 SHALL 允許後台人員為服務項目設定可預約時段（Time Slot），
+      每個時段包含起訖時間與該時段的容量上限。
+    priority: must
+    context: [CTX-ACTOR-002]
+
+  - id: FR-003
+    title: 服務項目可選填指定人員
+    description: >
+      系統 SHALL 允許後台人員為服務項目或時段指定可選的執行人員（Provider）。
+      是否需要獨立的人員管理實體（含各自可預約時段）待確認。
+    priority: should
+    context: [CTX-ACTOR-002, CTX-ASM-002]
+    note: "no upstream source for Provider entity scope, needs review"
+
+  - id: FR-004
+    title: 會員瀏覽可預約服務項目與時段
+    description: >
+      系統 SHALL 允許已登入會員在 LIFF 端瀏覽已啟用（enabled）的服務項目
+      與其可預約時段及剩餘容量。
+    priority: must
+    context: [CTX-ACTOR-001]
+
+  - id: FR-005
+    title: 會員建立預約
+    description: >
+      系統 SHALL 允許已登入會員在容量未滿的時段內建立預約，並可選填指定人員。
+    priority: must
+    context: [CTX-ACTOR-001]
+
+  - id: FR-006
+    title: 依審核模式決定預約初始狀態
+    description: >
+      系統 SHALL 依服務項目設定的審核模式，決定新建預約的初始狀態：
+      自動確認模式下直接為「已確認」，人工審核模式下為「待審核」。
+    priority: must
+    context: [CTX-ACTOR-002, CTX-ASM-003]
+
+  - id: FR-007
+    title: 後台審核待審核預約
+    description: >
+      系統 SHALL 允許具權限的後台人員對「待審核」狀態的預約進行核准或拒絕。
+    priority: must
+    context: [CTX-ACTOR-002]
+
+  - id: FR-008
+    title: 會員取消自己的預約
+    description: >
+      系統 SHALL 允許會員取消自己尚未開始的預約。取消時限規則（例如開始前
+      幾小時內不可取消）待確認。
+    priority: should
+    context: [CTX-ACTOR-001]
+    note: "cancellation window policy not specified, needs review"
+
+  - id: FR-009
+    title: 容量已滿拒絕新預約並避免超賣
+    description: >
+      系統 SHALL 在時段容量已滿時拒絕新的預約請求，並 SHALL 透過 Firestore
+      transaction 保證併發建立預約時不會超過容量上限（避免 over-booking）。
+    priority: must
+    context: [CTX-CON-004]
+
+  - id: FR-010
+    title: 要求會員為 LINE 好友才能預約
+    status: deprecated
+    reason: >
+      2026-08-20 使用者明確決策：不強求會員加 LINE 好友才能預約，只要能登入 LIFF 即可
+      建立預約。移除此需求，改由 CTX-EXT-002 的通知能力以 best-effort 方式運作
+      （非好友會員的通知會靜默失敗，不影響預約流程）。
+    title_note: "(deprecated, kept for historical traceability)"
+    description: >
+      （已廢棄）系統 SHALL 要求會員須為專案綁定 LINE 官方帳號的好友，才能建立預約；
+      非好友狀態的會員建立預約請求 SHALL 被拒絕並提示加入好友。
+    priority: must
+    context: [CTX-EXT-002, CTX-ASM-001]
+    note: "deprecated 2026-08-20; superseded by user decision to drop the friend precondition"
+
+  - id: FR-011
+    title: 預約狀態變化發送 LINE 通知
+    description: >
+      系統 SHALL 在預約狀態變化（成立、待審核、核准、拒絕、取消、提醒）時
+      透過 LINE 發送通知給會員。通知內容/時機規則、失敗重試策略待確認。
+    priority: must
+    context: [CTX-EXT-002]
+    note: "no existing LINE Messaging API integration; content/timing/retry rules need review"
+
+  - id: FR-012
+    title: 預約模組受 feature flag 控制
+    description: >
+      系統 SHALL 新增 `booking` feature flag（比照既有 FeatureFlag 機制）。
+      停用時：admin/liff 相關 API SHALL 回拒絕、後台導覽項目 SHALL 隱藏、
+      LIFF 預約相關頁面直連 SHALL 被導向離開。
+    priority: must
+    context: [CTX-CON-001]
+
+  - id: FR-013
+    title: 後台查詢/篩選預約列表
+    description: >
+      系統 SHALL 允許後台人員依服務項目、時段、狀態、會員查詢與篩選預約列表。
+    priority: must
+    context: [CTX-ACTOR-002]
+
+  - id: FR-014
+    title: 逾期未審核預約的處理
+    description: >
+      系統 SHALL 對超過一定時間仍處於「待審核」狀態的預約進行處理（例如自動
+      取消或維持待審核並提醒後台）。處理規則與觸發機制待確認。
+    priority: could
+    context: [CTX-ACTOR-003]
+    note: "no upstream source for overdue-approval policy, needs review"
+
+non_functional_requirements:
+  - id: NFR-001
+    title: 容量併發控制正確性
+    description: >
+      時段容量的鎖定機制 SHALL 避免競態導致超賣。
+    metric: "併發預約請求下，已確認+待審核預約數不可超過時段容量上限（需以 Firestore transaction 驗證）"
+    priority: must
+    context: [CTX-CON-004]
+
+  - id: NFR-002
+    title: LINE 通知失敗不阻斷主流程
+    description: >
+      LINE 通知發送失敗 SHALL NOT 阻斷預約建立、審核、取消等主要業務流程的完成。
+    metric: "未量化，需與相關人確認重試/補償策略"
+    priority: must
+    context: [CTX-EXT-002]
+    note: "retry/compensation policy not specified, needs review"
+
+  - id: NFR-003
+    title: Feature flag 行為一致性
+    description: >
+      `booking` flag 停用時的 API 拒絕與導覽隱藏行為 SHALL 與既有 feature-flag
+      spec 中其他模組（auditLog/loginLog/points）的驗收模式一致。
+    metric: "行為對照 openspec/specs/feature-flags/spec.md 既有 Scenario"
+    priority: must
+    context: [CTX-CON-001]
+
+  - id: NFR-004
+    title: LINE Messaging API 憑證安全存放
+    description: >
+      新增的 LINE Messaging API channel access token/secret SHALL 比照既有
+      LINE_CHANNEL_ID/SECRET 的環境變數管理方式存放，不得硬編碼於程式碼中。
+    metric: "未量化，屬安全慣例要求"
+    priority: must
+    context: [CTX-CON-003]

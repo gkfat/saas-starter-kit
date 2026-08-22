@@ -1,0 +1,443 @@
+openapi: 3.0.3
+info:
+  title: Booking Module API
+  version: "0.1.0-analysis"
+  description: >
+    分析階段草稿，資源邊界對齊 domain model 的 Aggregate（Service/TimeSlot/Booking/Provider）。
+
+servers:
+  - url: /api
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: "Authorization: Bearer <idToken>"
+    internalSecret:
+      type: apiKey
+      in: header
+      name: X-Internal-Secret
+      description: 內部排程專用共享密鑰（比照既有 level 模組模式）。
+
+  schemas:
+    Service:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string }
+        approvalMode: { type: string, enum: [auto, manual] }
+        enabled: { type: boolean }
+      required: [id, name, approvalMode, enabled]
+
+    ServiceInput:
+      type: object
+      properties:
+        name: { type: string }
+        description: { type: string }
+        approvalMode: { type: string, enum: [auto, manual] }
+        enabled: { type: boolean }
+      required: [name, approvalMode]
+
+    TimeSlot:
+      type: object
+      properties:
+        id: { type: string }
+        serviceId: { type: string }
+        startAt: { type: string, format: date-time }
+        endAt: { type: string, format: date-time }
+        capacity: { type: integer, minimum: 1 }
+        confirmedCount: { type: integer }
+        pendingCount: { type: integer }
+      required: [id, serviceId, startAt, endAt, capacity]
+
+    TimeSlotInput:
+      type: object
+      properties:
+        startAt: { type: string, format: date-time }
+        endAt: { type: string, format: date-time }
+        capacity: { type: integer, minimum: 1 }
+      required: [startAt, endAt, capacity]
+
+    Provider:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+      required: [id, name]
+
+    ProviderInput:
+      type: object
+      properties:
+        name: { type: string }
+      required: [name]
+
+    Booking:
+      type: object
+      properties:
+        id: { type: string }
+        memberId: { type: string }
+        serviceId: { type: string }
+        timeSlotId: { type: string }
+        providerId: { type: string, nullable: true }
+        status: { type: string, enum: [pendingReview, confirmed, rejected, cancelled] }
+        createdAt: { type: string, format: date-time }
+      required: [id, memberId, serviceId, timeSlotId, status, createdAt]
+
+    BookingCreateInput:
+      type: object
+      properties:
+        serviceId: { type: string }
+        timeSlotId: { type: string }
+        providerId: { type: string, nullable: true }
+      required: [serviceId, timeSlotId]
+
+    BookingReviewInput:
+      type: object
+      properties:
+        status: { type: string, enum: [confirmed, rejected] }
+      required: [status]
+
+    BookingCancelInput:
+      type: object
+      properties:
+        status: { type: string, enum: [cancelled] }
+      required: [status]
+
+    Error:
+      type: object
+      properties:
+        statusCode: { type: integer }
+        message: { type: string }
+      required: [statusCode, message]
+
+  responses:
+    FeatureDisabled:
+      description: booking feature flag 未啟用
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Forbidden:
+      description: 權限不足
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NotFound:
+      description: 資源不存在
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    ValidationError:
+      description: 輸入驗證失敗
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+paths:
+  /admin/booking/services:
+    get:
+      operationId: adminListBookingServices
+      summary: 後台列出所有服務項目（含停用）
+      responses:
+        "200":
+          description: 服務項目列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Service" }
+        "404": { $ref: "#/components/responses/FeatureDisabled" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+    post:
+      operationId: adminCreateBookingService
+      summary: 建立服務項目
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ServiceInput" }
+      responses:
+        "201":
+          description: 建立成功
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Service" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "404": { $ref: "#/components/responses/FeatureDisabled" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /admin/booking/services/{id}:
+    patch:
+      operationId: adminUpdateBookingService
+      summary: 編輯/停用服務項目
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ServiceInput" }
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Service" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /admin/booking/services/{id}/slots:
+    get:
+      operationId: adminListBookingServiceSlots
+      summary: 列出服務項目的所有時段
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: 時段列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/TimeSlot" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    post:
+      operationId: adminCreateBookingServiceSlot
+      summary: 建立時段
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TimeSlotInput" }
+      responses:
+        "201":
+          description: 建立成功
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TimeSlot" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /admin/booking/services/{serviceId}/slots/{slotId}:
+    patch:
+      operationId: adminUpdateBookingServiceSlot
+      summary: 編輯時段（時間/容量）
+      parameters:
+        - { name: serviceId, in: path, required: true, schema: { type: string } }
+        - { name: slotId, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TimeSlotInput" }
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TimeSlot" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409":
+          description: 容量調降至低於目前已確認+待審核數
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /admin/booking/providers:
+    get:
+      operationId: adminListBookingProviders
+      summary: 列出人員（Provider）
+      responses:
+        "200":
+          description: 人員列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Provider" }
+        "404": { $ref: "#/components/responses/FeatureDisabled" }
+    post:
+      operationId: adminCreateBookingProvider
+      summary: 建立人員
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProviderInput" }
+      responses:
+        "201":
+          description: 建立成功
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Provider" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+
+  /admin/booking/bookings:
+    get:
+      operationId: adminListBookings
+      summary: 查詢/篩選預約列表
+      parameters:
+        - { name: serviceId, in: query, schema: { type: string } }
+        - { name: timeSlotId, in: query, schema: { type: string } }
+        - { name: status, in: query, schema: { type: string, enum: [pendingReview, confirmed, rejected, cancelled] } }
+        - { name: memberId, in: query, schema: { type: string } }
+        - { name: providerId, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: 預約列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Booking" }
+        "404": { $ref: "#/components/responses/FeatureDisabled" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /admin/booking/bookings/{id}:
+    patch:
+      operationId: adminReviewBooking
+      summary: 核准或拒絕待審核預約
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BookingReviewInput" }
+      responses:
+        "200":
+          description: 審核結果
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Booking" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409":
+          description: 預約已非 pendingReview 狀態
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+
+  /liff/booking/services:
+    get:
+      operationId: liffListBookingServices
+      summary: 會員瀏覽已啟用的服務項目
+      responses:
+        "200":
+          description: 啟用中的服務項目列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Service" }
+        "404": { $ref: "#/components/responses/FeatureDisabled" }
+        "401":
+          description: 未登入
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /liff/booking/services/{id}/slots:
+    get:
+      operationId: liffListBookingServiceSlots
+      summary: 會員瀏覽某服務項目的可預約時段與剩餘容量
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: 時段列表（含剩餘容量）
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/TimeSlot" }
+        "404": { $ref: "#/components/responses/NotFound" }
+
+  /liff/booking/bookings:
+    get:
+      operationId: liffListMyBookings
+      summary: 會員查看自己的預約列表
+      responses:
+        "200":
+          description: 自己的預約列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Booking" }
+        "404": { $ref: "#/components/responses/FeatureDisabled" }
+    post:
+      operationId: liffCreateBooking
+      summary: 會員建立預約
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BookingCreateInput" }
+      responses:
+        "201":
+          description: 建立成功（狀態依 Service.approvalMode 決定）
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Booking" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "404": { $ref: "#/components/responses/FeatureDisabled" }
+        "409":
+          description: 時段容量已滿
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /liff/booking/bookings/{id}:
+    patch:
+      operationId: liffCancelBooking
+      summary: 會員取消自己的預約
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BookingCancelInput" }
+      responses:
+        "200":
+          description: 取消成功
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Booking" }
+        "403":
+          description: 非本人預約
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409":
+          description: 已逾取消時限或狀態不可取消
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+
+  /internal/booking/process-overdue-bookings:
+    post:
+      operationId: internalProcessOverdueBookings
+      summary: 系統排程處理逾期未審核預約
+      security:
+        - internalSecret: []
+      responses:
+        "200":
+          description: 處理結果摘要
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  processedCount: { type: integer }
+        "404": { $ref: "#/components/responses/FeatureDisabled" }

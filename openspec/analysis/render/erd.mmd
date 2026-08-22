@@ -1,0 +1,52 @@
+erDiagram
+    booking_services {
+        string id PK
+        string name
+        string description
+        string approvalMode "auto|manual"
+        boolean enabled
+        timestamp createdAt
+        timestamp updatedAt
+    }
+
+    booking_time_slots {
+        string id PK
+        string serviceId FK
+        timestamp startAt
+        timestamp endAt
+        int capacity
+        int confirmedCount "invariant: confirmedCount+pendingCount<=capacity"
+        int pendingCount
+        timestamp createdAt
+        timestamp updatedAt
+    }
+
+    booking_providers {
+        string id PK
+        string name
+        timestamp createdAt
+    }
+
+    bookings {
+        string id PK
+        string memberId FK "-> users.id (external)"
+        string serviceId FK
+        string timeSlotId FK
+        string providerId FK "optional"
+        string status "pendingReview|confirmed|rejected|cancelled"
+        timestamp createdAt
+        timestamp updatedAt
+        timestamp reviewDeadlineAt "nullable, formula pending (RULE-008)"
+        timestamp cancellableUntil "nullable, formula pending (RULE-007)"
+    }
+
+    users {
+        string id PK
+        note "既有 collection，非本模組範圍"
+    }
+
+    booking_services ||--o{ booking_time_slots : "has slots"
+    booking_services ||--o{ bookings : "booked as"
+    booking_time_slots ||--o{ bookings : "booked in (same tx as counter update)"
+    booking_providers ||--o{ bookings : "optionally assigned to"
+    users ||--o{ bookings : "made by"

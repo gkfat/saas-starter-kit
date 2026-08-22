@@ -1,0 +1,82 @@
+classDiagram
+    %% Aggregate: Service (AGG-001)
+    class Service {
+        <<Entity, AGG root>>
+        +name: string
+        +description: string
+        +approvalMode: enum(auto|manual)
+        +enabled: boolean
+    }
+
+    %% Aggregate: TimeSlot (AGG-002)
+    class TimeSlot {
+        <<Entity, AGG root>>
+        +serviceId: ref(Service)
+        +timeRange: TimeRange
+        +capacity: integer
+        +confirmedCount: integer
+        +pendingCount: integer
+    }
+
+    class TimeRange {
+        <<Value Object>>
+        +startAt: datetime
+        +endAt: datetime
+    }
+
+    %% Aggregate: Booking (AGG-003)
+    class Booking {
+        <<Entity, AGG root>>
+        +memberId: ref(external User)
+        +serviceId: ref(Service)
+        +timeSlotId: ref(TimeSlot)
+        +providerId: ref(Provider), optional
+        +status: BookingStatus
+        +createdAt: datetime
+    }
+
+    class BookingStatus {
+        <<Value Object>>
+        +value: enum(pendingReview|confirmed|rejected|cancelled)
+    }
+
+    %% Aggregate: Provider (AGG-004) — scope pending confirmation
+    class Provider {
+        <<Entity, AGG root>>
+        +name: string
+    }
+
+    TimeSlot "1" o-- "1" TimeRange
+    Booking "1" o-- "1" BookingStatus
+    TimeSlot "1" --> "1" Service : serviceId
+    Booking "1" --> "1" Service : serviceId
+    Booking "1" --> "1" TimeSlot : timeSlotId
+    Booking "0..1" --> "1" Provider : providerId
+
+    %% Domain Events (triggeredBy Booking aggregate)
+    class BookingConfirmed {
+        <<Event>>
+    }
+    class BookingPendingReview {
+        <<Event>>
+    }
+    class BookingRejected {
+        <<Event>>
+    }
+    class BookingCancelled {
+        <<Event>>
+    }
+    class BookingReviewOverdue {
+        <<Event>>
+        note: 後續處理結果(auto-cancel vs remind)待確認
+    }
+
+    Booking ..> BookingConfirmed : triggers
+    Booking ..> BookingPendingReview : triggers
+    Booking ..> BookingRejected : triggers
+    Booking ..> BookingCancelled : triggers
+    Booking ..> BookingReviewOverdue : triggers
+
+    note for TimeSlot "RULE-001: confirmedCount + pendingCount <= capacity\n(enforced via Firestore transaction)"
+    note for Booking "RULE-002: status machine — PendingReview→Confirmed/Rejected/Cancelled, Confirmed→Cancelled (terminal: Rejected, Cancelled)\nRULE-003: only owner member or Admin may cancel\nRULE-004: DEPRECATED 2026-08-20 (LINE friend precondition removed)\nRULE-006: initial status per Service.approvalMode\nRULE-007: cancellation window — pending\nRULE-008: overdue handling — pending"
+    note for Provider "AGG-004 existence/scope pending confirmation (CTX-ASM-002)"

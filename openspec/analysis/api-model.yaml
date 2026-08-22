@@ -1,0 +1,573 @@
+version: 1
+generatedBy: api-modeling
+updatedAt: 2026-08-20T00:00:00Z
+relatedChanges: [booking-module]
+
+openapi: 3.0.3
+info:
+  title: Booking Module API
+  version: "0.1.0-analysis"
+  description: >
+    分析階段草稿，資源邊界對齊 domain-model.yaml 的 Aggregate（Service/TimeSlot/Booking/Provider）。
+    路徑風格與認證慣例沿用既有 apps/server/server/api/ 慣例（見各 operation 的 x-trace.notes）。
+
+servers:
+  - url: /api
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: >
+        `Authorization: Bearer <idToken>`，由 server/middleware/03.auth.ts 驗證後注入
+        event.context.userId/role/permissions（admin 路由）或 LIFF session 對應之會員身分（liff 路由）。
+    internalSecret:
+      type: apiKey
+      in: header
+      name: X-Internal-Secret
+      description: >
+        比照既有 requireLevelBatchSecret（apps/server/server/shared/internal-auth.ts）的
+        共享密鑰機制；booking 模組的實際 header 名稱/密鑰管理方式待設計階段確認。
+
+  schemas:
+    Service:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string }
+        approvalMode: { type: string, enum: [auto, manual] }
+        enabled: { type: boolean }
+      required: [id, name, approvalMode, enabled]
+
+    ServiceInput:
+      type: object
+      properties:
+        name: { type: string }
+        description: { type: string }
+        approvalMode: { type: string, enum: [auto, manual] }
+        enabled: { type: boolean }
+      required: [name, approvalMode]
+
+    TimeSlot:
+      type: object
+      properties:
+        id: { type: string }
+        serviceId: { type: string }
+        startAt: { type: string, format: date-time }
+        endAt: { type: string, format: date-time }
+        capacity: { type: integer, minimum: 1 }
+        confirmedCount: { type: integer }
+        pendingCount: { type: integer }
+      required: [id, serviceId, startAt, endAt, capacity]
+
+    TimeSlotInput:
+      type: object
+      properties:
+        startAt: { type: string, format: date-time }
+        endAt: { type: string, format: date-time }
+        capacity: { type: integer, minimum: 1 }
+      required: [startAt, endAt, capacity]
+      description: >
+        endAt 須晚於 startAt（400）。同服務項目時段重疊規則未定義（RULE 待補），
+        本階段不在 schema 層驗證重疊。
+
+    Provider:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+      required: [id, name]
+      description: >
+        此 schema 與對應的 /admin/booking/providers 端點是否存在，隨 ENT-004/AGG-004
+        範圍確認而定，見 x-trace.note。
+
+    ProviderInput:
+      type: object
+      properties:
+        name: { type: string }
+      required: [name]
+
+    Booking:
+      type: object
+      properties:
+        id: { type: string }
+        memberId: { type: string }
+        serviceId: { type: string }
+        timeSlotId: { type: string }
+        providerId: { type: string, nullable: true }
+        status: { type: string, enum: [pendingReview, confirmed, rejected, cancelled] }
+        createdAt: { type: string, format: date-time }
+      required: [id, memberId, serviceId, timeSlotId, status, createdAt]
+
+    BookingCreateInput:
+      type: object
+      properties:
+        serviceId: { type: string }
+        timeSlotId: { type: string }
+        providerId: { type: string, nullable: true }
+      required: [serviceId, timeSlotId]
+
+    BookingReviewInput:
+      type: object
+      properties:
+        status: { type: string, enum: [confirmed, rejected] }
+      required: [status]
+      description: 僅允許從 pendingReview 轉移；狀態不符時回 409（RULE-002）。
+
+    BookingCancelInput:
+      type: object
+      properties:
+        status: { type: string, enum: [cancelled] }
+      required: [status]
+      description: 是否受取消時限限制待確認（RULE-007），本階段 schema 不含時限欄位。
+
+    Error:
+      type: object
+      properties:
+        statusCode: { type: integer }
+        message: { type: string }
+      required: [statusCode, message]
+      description: >
+        沿用既有 H3 createError({ statusCode, message }) 慣例；feature flag 停用時固定為
+        { statusCode: 404, message: 'Feature disabled' }（見 apps/server/server/api/admin/logs/audit.get.ts）。
+
+  responses:
+    FeatureDisabled:
+      description: booking feature flag 未啟用
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Forbidden:
+      description: 權限不足（requirePermission 慣例，statusCode 403）
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    NotFound:
+      description: 資源不存在
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Conflict:
+      description: 狀態衝突（例如容量已滿、狀態機不允許的轉移）
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    ValidationError:
+      description: 輸入驗證失敗
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+
+paths:
+  /admin/booking/services:
+    get:
+      operationId: adminListBookingServices
+      summary: 後台列出所有服務項目（含停用）
+      responses:
+        "200":
+          description: 服務項目列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Service" }
+        "404": { $ref: "#/components/responses/FeatureDisabled" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+      x-trace:
+        id: API-001
+        useCases: [UC-001]
+        domainModel: [AGG-001]
+        notes: 對齊既有 GET /api/admin/events 列表慣例
+
+    post:
+      operationId: adminCreateBookingService
+      summary: 建立服務項目
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ServiceInput" }
+      responses:
+        "201":
+          description: 建立成功
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Service" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "404": { $ref: "#/components/responses/FeatureDisabled" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+      x-trace:
+        id: API-002
+        useCases: [UC-001]
+        domainModel: [AGG-001]
+        businessRules: [RULE-006]
+
+  /admin/booking/services/{id}:
+    patch:
+      operationId: adminUpdateBookingService
+      summary: 編輯/停用服務項目
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ServiceInput" }
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Service" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+      x-trace:
+        id: API-003
+        useCases: [UC-001]
+        domainModel: [AGG-001]
+        notes: >
+          UC-001 主流程涵蓋建立與編輯/停用，故推導出獨立 PATCH endpoint，
+          對齊既有 PATCH /api/admin/events/[id] 慣例。
+
+  /admin/booking/services/{id}/slots:
+    get:
+      operationId: adminListBookingServiceSlots
+      summary: 列出服務項目的所有時段
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: 時段列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/TimeSlot" }
+        "404": { $ref: "#/components/responses/NotFound" }
+      x-trace:
+        id: API-004
+        useCases: [UC-002]
+        domainModel: [AGG-002]
+
+    post:
+      operationId: adminCreateBookingServiceSlot
+      summary: 建立時段
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TimeSlotInput" }
+      responses:
+        "201":
+          description: 建立成功
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TimeSlot" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+      x-trace:
+        id: API-005
+        useCases: [UC-002]
+        domainModel: [AGG-002]
+        businessRules: [RULE-001]
+
+  /admin/booking/services/{serviceId}/slots/{slotId}:
+    patch:
+      operationId: adminUpdateBookingServiceSlot
+      summary: 編輯時段（時間/容量）
+      parameters:
+        - { name: serviceId, in: path, required: true, schema: { type: string } }
+        - { name: slotId, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/TimeSlotInput" }
+      responses:
+        "200":
+          description: 更新成功
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TimeSlot" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409":
+          description: 容量調降至低於目前已確認+待審核數
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+      x-trace:
+        id: API-006
+        useCases: [UC-002]
+        domainModel: [AGG-002]
+        businessRules: [RULE-001]
+        notes: >
+          UC-002 主流程未明確列出「編輯既有時段」步驟，此 endpoint 為依 FR-002「設定」
+          語意與既有資源慣例（Service 亦有對應 PATCH）推導的合理延伸，非上游明確枚舉——
+          若日後確認不需要此操作，應移除本 operation。
+
+  /admin/booking/providers:
+    get:
+      operationId: adminListBookingProviders
+      summary: 列出人員（Provider）
+      responses:
+        "200":
+          description: 人員列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Provider" }
+        "404": { $ref: "#/components/responses/FeatureDisabled" }
+      x-trace:
+        id: API-007
+        useCases: [UC-003]
+        domainModel: [AGG-004]
+        note: "endpoint existence depends on unresolved AGG-004 scope (CTX-ASM-002), needs review"
+
+    post:
+      operationId: adminCreateBookingProvider
+      summary: 建立人員
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProviderInput" }
+      responses:
+        "201":
+          description: 建立成功
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Provider" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+      x-trace:
+        id: API-008
+        useCases: [UC-003]
+        domainModel: [AGG-004]
+        note: "endpoint existence depends on unresolved AGG-004 scope (CTX-ASM-002), needs review"
+
+  /admin/booking/bookings:
+    get:
+      operationId: adminListBookings
+      summary: 查詢/篩選預約列表
+      parameters:
+        - { name: serviceId, in: query, schema: { type: string } }
+        - { name: timeSlotId, in: query, schema: { type: string } }
+        - { name: status, in: query, schema: { type: string, enum: [pendingReview, confirmed, rejected, cancelled] } }
+        - { name: memberId, in: query, schema: { type: string } }
+        - { name: providerId, in: query, schema: { type: string } }
+      responses:
+        "200":
+          description: 預約列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Booking" }
+        "404": { $ref: "#/components/responses/FeatureDisabled" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+      x-trace:
+        id: API-009
+        useCases: [UC-009]
+        domainModel: [AGG-003]
+
+  /admin/booking/bookings/{id}:
+    patch:
+      operationId: adminReviewBooking
+      summary: 核准或拒絕待審核預約
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BookingReviewInput" }
+      responses:
+        "200":
+          description: 審核結果
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Booking" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409":
+          description: 預約已非 pendingReview 狀態（RULE-002）
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+      x-trace:
+        id: API-010
+        useCases: [UC-006]
+        domainModel: [AGG-003]
+        businessRules: [RULE-002]
+
+  /liff/booking/services:
+    get:
+      operationId: liffListBookingServices
+      summary: 會員瀏覽已啟用的服務項目
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: 啟用中的服務項目列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Service" }
+        "404": { $ref: "#/components/responses/FeatureDisabled" }
+        "401":
+          description: 未登入
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+      x-trace:
+        id: API-011
+        useCases: [UC-004]
+        domainModel: [AGG-001]
+        notes: 對齊既有 GET /api/liff/events/active（僅回傳 enabled 資源）慣例
+
+  /liff/booking/services/{id}/slots:
+    get:
+      operationId: liffListBookingServiceSlots
+      summary: 會員瀏覽某服務項目的可預約時段與剩餘容量
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: 時段列表（含剩餘容量）
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/TimeSlot" }
+        "404": { $ref: "#/components/responses/NotFound" }
+      x-trace:
+        id: API-012
+        useCases: [UC-004]
+        domainModel: [AGG-002]
+
+  /liff/booking/bookings:
+    get:
+      operationId: liffListMyBookings
+      summary: 會員查看自己的預約列表
+      responses:
+        "200":
+          description: 自己的預約列表
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/Booking" }
+        "404": { $ref: "#/components/responses/FeatureDisabled" }
+      x-trace:
+        id: API-013
+        useCases: [UC-007]
+        domainModel: [AGG-003]
+        notes: >
+          UC-007 主流程步驟一「會員選擇一筆自己的預約」隱含需要先能列出自己的預約，
+          upstream use case 未獨立列出此步驟為單獨 FR/UC，此 endpoint 為推導出的必要前置能力。
+
+    post:
+      operationId: liffCreateBooking
+      summary: 會員建立預約
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BookingCreateInput" }
+      responses:
+        "201":
+          description: 建立成功（狀態依 Service.approvalMode 決定）
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Booking" }
+        "400": { $ref: "#/components/responses/ValidationError" }
+        "404": { $ref: "#/components/responses/FeatureDisabled" }
+        "409":
+          description: 時段容量已滿（RULE-001）
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+      x-trace:
+        id: API-014
+        useCases: [UC-005]
+        domainModel: [AGG-003, AGG-002]
+        businessRules: [RULE-001, RULE-005, RULE-006]
+        requirements: [NFR-001]
+        note: "2026-08-20: removed the 403 LINE-friend-required response (RULE-004 deprecated) — booking creation no longer requires LINE friendship, only a valid LIFF session"
+
+  /liff/booking/bookings/{id}:
+    patch:
+      operationId: liffCancelBooking
+      summary: 會員取消自己的預約
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/BookingCancelInput" }
+      responses:
+        "200":
+          description: 取消成功
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Booking" }
+        "403":
+          description: 非本人預約
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "409":
+          description: 已逾取消時限或狀態不可取消（RULE-002, RULE-007 — 時限規則待確認）
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+      x-trace:
+        id: API-015
+        useCases: [UC-007]
+        domainModel: [AGG-003]
+        businessRules: [RULE-002, RULE-003, RULE-007]
+        note: "409 cancellation-window condition is a placeholder pending RULE-007 confirmation"
+
+  /internal/booking/process-overdue-bookings:
+    post:
+      operationId: internalProcessOverdueBookings
+      summary: 系統排程處理逾期未審核預約
+      security:
+        - internalSecret: []
+      responses:
+        "200":
+          description: 處理結果摘要（實際處理規則待確認，見 RULE-008）
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  processedCount: { type: integer }
+        "404": { $ref: "#/components/responses/FeatureDisabled" }
+      x-trace:
+        id: API-016
+        useCases: [UC-010]
+        domainModel: [AGG-003]
+        businessRules: [RULE-008]
+        notes: >
+          比照既有 POST /api/internal/level/evaluate-due-periods + requireLevelBatchSecret
+          模式（PUBLIC_PATHS 內、以共享密鑰而非使用者 idToken 認證）。實際處理邏輯待 RULE-008 確認。
+
+gaps:
+  - useCase: UC-008
+    reason: >
+      LINE 通知為狀態變化的內部 side effect（由 EVT-001~004 觸發），不是可定址的資源操作，
+      也非使用者或排程主動呼叫的入口，因此不對外開一條 endpoint。實作會落在 booking service
+      內部呼叫 LINE Messaging API，屬 design 階段的整合細節。

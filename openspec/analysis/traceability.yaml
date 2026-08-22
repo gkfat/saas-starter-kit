@@ -1,0 +1,233 @@
+version: 1
+generatedBy: analysis-validator
+updatedAt: 2026-08-20T00:00:00Z
+relatedChanges: [booking-module]
+
+links:
+  - requirement: FR-001
+    context: [CTX-ACTOR-002, CTX-CON-002]
+    useCases: [UC-001]
+    domainModel: [ENT-001, AGG-001]
+    api: [API-001, API-002, API-003]
+    data: [DATA-001]
+
+  - requirement: FR-002
+    context: [CTX-ACTOR-002]
+    useCases: [UC-002]
+    domainModel: [ENT-002, VO-002, AGG-002]
+    api: [API-004, API-005, API-006]
+    data: [DATA-002]
+
+  - requirement: FR-003
+    context: [CTX-ACTOR-002, CTX-ASM-002]
+    useCases: [UC-003]
+    domainModel: [ENT-004, AGG-004]
+    api: [API-007, API-008]
+    data: [DATA-003]
+    note: "AGG-004/DATA-003/API-007/API-008 existence pending CTX-ASM-002"
+
+  - requirement: FR-004
+    context: [CTX-ACTOR-001]
+    useCases: [UC-004]
+    domainModel: [ENT-002, AGG-002]
+    api: [API-011, API-012]
+    data: [DATA-001, DATA-002]
+
+  - requirement: FR-005
+    context: [CTX-ACTOR-001]
+    useCases: [UC-005]
+    domainModel: [ENT-002, ENT-003, ENT-004, VO-001, AGG-002, AGG-003]
+    api: [API-014]
+    data: [DATA-002, DATA-003, DATA-004]
+
+  - requirement: FR-006
+    context: [CTX-ACTOR-002, CTX-ASM-003]
+    useCases: [UC-005]
+    domainModel: [ENT-001, ENT-003, AGG-001, AGG-003]
+    api: [API-002, API-014]
+    data: [DATA-001, DATA-004]
+
+  - requirement: FR-007
+    context: [CTX-ACTOR-002]
+    useCases: [UC-006]
+    domainModel: [ENT-003, VO-001, AGG-003]
+    api: [API-010]
+    data: [DATA-004]
+
+  - requirement: FR-008
+    context: [CTX-ACTOR-001]
+    useCases: [UC-007]
+    domainModel: [ENT-003, VO-001, AGG-003]
+    api: [API-013, API-015]
+    data: [DATA-004]
+    note: "cancellation window rule pending (RULE-007)"
+
+  - requirement: FR-009
+    context: [CTX-CON-004]
+    useCases: [UC-005]
+    domainModel: [ENT-002, AGG-002]
+    api: [API-014]
+    data: [DATA-002, DATA-004]
+
+  - requirement: FR-010
+    status: deprecated
+    context: [CTX-EXT-002, CTX-ASM-001]
+    useCases: []
+    domainModel: []
+    api: []
+    data: []
+    note: "DEPRECATED 2026-08-20: user decided booking creation only requires LIFF login, not LINE friendship. UC-005/RULE-004/API-014 amended to drop this requirement; kept here for historical traceability only."
+
+  - requirement: FR-011
+    context: [CTX-EXT-002]
+    useCases: [UC-008]
+    domainModel: [EVT-001, EVT-002, EVT-003, EVT-004]
+    api: []
+    data: []
+    note: "Fixed during validation: EVT-001~004 useCases amended to include UC-008 (see gaps[type=orphan, id=UC-008, status=fixed]). api/data intentionally empty (UC-008 has no addressable endpoint)."
+
+  - requirement: FR-012
+    context: [CTX-CON-001]
+    useCases: []
+    domainModel: []
+    api: []
+    data: []
+    note: "Intentional: cross-cutting requirement applied as a precondition to every other use case (see use-cases.yaml gap_notes) and realized as a repeated 404 FeatureDisabled response across nearly all operations, rather than a discrete traced item. Not a defect."
+
+  - requirement: FR-013
+    context: [CTX-ACTOR-002]
+    useCases: [UC-009]
+    domainModel: [ENT-003, AGG-003]
+    api: [API-009]
+    data: [DATA-004]
+
+  - requirement: FR-014
+    context: [CTX-ACTOR-003]
+    useCases: [UC-010]
+    domainModel: [ENT-003, VO-001, AGG-003, EVT-005]
+    api: [API-016]
+    data: [DATA-004]
+    note: "overdue threshold/trigger/handling policy pending (RULE-008)"
+
+  - requirement: NFR-001
+    context: [CTX-CON-004]
+    useCases: [UC-005]
+    domainModel: [AGG-002]
+    api: [API-014]
+    data: [DATA-002]
+
+  - requirement: NFR-002
+    context: [CTX-EXT-002]
+    useCases: [UC-008]
+    domainModel: [EVT-001, EVT-002, EVT-003, EVT-004]
+    api: []
+    data: []
+    note: "Domain model link fixed (see FR-011). Still not landed in api-model.yaml/data-model.yaml — see gaps[type=nfr_not_landed, id=NFR-002] (unchanged, low severity)."
+
+  - requirement: NFR-003
+    context: [CTX-CON-001]
+    useCases: []
+    domainModel: []
+    api: []
+    data: []
+    note: "Conceptually realized (repeated FeatureDisabled response) but not cited by ID in any operation's x-trace — see gaps[type=nfr_not_landed, id=NFR-003]"
+
+  - requirement: NFR-004
+    context: [CTX-CON-003]
+    useCases: []
+    domainModel: []
+    api: []
+    data: []
+    note: "Not expected to land in API/data model at analysis stage — ops/credential-storage concern, belongs in design.md"
+
+gaps:
+  - type: orphan
+    id: UC-008
+    description: >
+      UC-008（系統於預約狀態變化時發送 LINE 通知）原本在 domain-model.yaml 中沒有任何
+      ENT/VO/AGG/EVT/RULE 項目的 useCases 陣列引用它，導致 FR-011 → UC-008 → domain model
+      這段追溯鏈斷裂。
+    severity: medium
+    status: fixed
+    resolution: >
+      已於本次驗證中修訂 domain-model.yaml：EVT-001（BookingConfirmed）、EVT-002
+      （BookingPendingReview）、EVT-003（BookingRejected）、EVT-004（BookingCancelled）
+      的 useCases 皆補上 UC-008（EVT-005/BookingReviewOverdue 因其下游處理結果本身
+      尚未確定，維持不連結 UC-008，避免過早暗示一定會發通知）。
+
+  - type: nfr_not_landed
+    id: NFR-002
+    description: >
+      NFR-002（LINE 通知失敗不阻斷主流程）未在 api-model.yaml 或 data-model.yaml
+      任何一處被引用。根因與上一項相同：其唯一關聯的 UC-008 沒有對應 API endpoint
+      （設計上為內部 side effect），故本階段沒有自然的落地位置。
+    severity: low
+    suggestedAction: >
+      不強制在分析階段落地；建議 /opsx:propose 的 design.md 明確描述通知失敗的
+      重試/記錄/補償機制，避免這條 NFR 真的被遺忘。
+
+  - type: nfr_not_landed
+    id: NFR-003
+    description: >
+      NFR-003（feature flag 行為一致性）已在概念上落地——幾乎每個 operation 都有
+      404 FeatureDisabled response——但沒有任何 operation 的 x-trace.requirements
+      明確引用 "NFR-003"，屬標註遺漏而非行為遺漏。
+    severity: low
+    suggestedAction: 下次跑 api-modeling 時於使用 FeatureDisabled response 的 operation 補上 requirements[NFR-003]。
+
+  - type: informational
+    id: NFR-004
+    description: >
+      NFR-004（LINE Messaging API 憑證安全存放）屬環境變數/機密管理範疇，不是
+      API 契約或資料表 schema 會直接呈現的內容，api-model.yaml 與 data-model.yaml
+      未提及是預期中的，不代表遺漏。
+    severity: low
+    suggestedAction: 留到 design.md 描述新增環境變數（比照既有 LINE_CHANNEL_ID/SECRET 慣例）。
+
+  - type: minor_inconsistency
+    id: AGG-004
+    description: >
+      ENT-004（Provider）的 useCases 含 [UC-003, UC-005]，但其所屬 AGG-004 的
+      useCases 只列 [UC-003]。可能合理（UC-005 只是唯讀參照 Provider，未真正動用
+      Provider 自身的一致性邊界），非必然需要修正，僅供留意。
+    severity: low
+
+  - type: unresolved_assumption
+    id: CTX-EXT-002
+    status: downgraded
+    description: >
+      （2026-08-20 更新）原本「LINE 好友狀態如何取得/驗證」與「LINE 通知觸發機制」皆為
+      未決項，且好友檢查會直接阻擋預約建立（severity: high）。使用者已決策移除好友前提
+      （FR-010/RULE-004 deprecated），預約建立不再依賴 LINE Messaging API。剩餘未決項
+      僅為「channel 憑證管理方式」與「通知內容/時機規則」，只影響 best-effort 通知功能
+      何時可上線，不再阻塞核心預約流程（UC-005），風險等級下修。
+    severity: medium
+    suggestedAction: 建議在 /opsx:propose 的 design.md 中定案 channel 憑證管理方式即可；不再需要於 propose 前解決好友狀態取得方案。
+
+  - type: unresolved_assumption
+    id: CTX-ASM-002
+    description: Provider 是否需要獨立管理實體（roster、聯絡資訊）尚未確認，直接影響 ENT-004/AGG-004/DATA-003/API-007/API-008 是否該存在。
+    severity: medium
+    suggestedAction: 建議在 propose 前或 design 階段與使用者確認，避免落地後端點/資料表後才發現多餘或不足。
+
+  - type: unresolved_assumption
+    id: RULE-007
+    description: 會員取消預約的時間窗限制規則尚未確認（bookings.cancellableUntil 為預留欄位）。
+    severity: medium
+
+  - type: unresolved_assumption
+    id: RULE-008
+    description: 逾期未審核預約的門檻、觸發機制、處理規則（自動取消 vs 提醒）尚未確認（bookings.reviewDeadlineAt 為預留欄位，FR-014 優先度為 could）。
+    severity: medium
+
+  - type: unresolved_assumption
+    id: CTX-ASM-004
+    description: 是否與既有 level/points 模組整合（例如依會員等級開放不同預約權限）尚未確認，目前視為 out of scope。
+    severity: low
+
+  - type: unresolved_assumption
+    id: CTX-ACTOR-003
+    description: UC-008 借用 CTX-ACTOR-003（System Scheduler，原定義偏向「逾期處理排程」）代表「系統觸發通知」的執行者，是否需要在 context.yaml 新增獨立的 Notification 角色尚未確認。
+    severity: low
+
+dangling_references: []

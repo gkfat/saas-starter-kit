@@ -1,0 +1,210 @@
+version: 1
+generatedBy: domain-modeling
+updatedAt: 2026-08-20T00:00:00Z
+relatedChanges: [booking-module]
+
+entities:
+  - id: ENT-001
+    name: Service
+    description: 可預約的服務項目，由 Admin 管理，定義容量規則與審核模式。
+    attributes:
+      - { name: name, type: string, description: 服務項目名稱 }
+      - { name: description, type: string, description: 說明文字 }
+      - { name: approvalMode, type: "enum(auto|manual)", description: 建立預約時是否需人工審核 }
+      - { name: enabled, type: boolean, description: 是否對會員可見/可預約 }
+    useCases: [UC-001]
+
+  - id: ENT-002
+    name: TimeSlot
+    description: >
+      隸屬於某個 Service 的可預約時段，持有自身容量計數。獨立於 Service 作為
+      自己的 aggregate root，避免每次預約都需鎖定整個 Service（見下方 Aggregate 邊界說明）。
+    attributes:
+      - { name: serviceId, type: "ref(ENT-001)", description: 所屬服務項目 }
+      - { name: timeRange, type: "VO-002 TimeRange", description: 起訖時間 }
+      - { name: capacity, type: integer, description: 容量上限 }
+      - { name: confirmedCount, type: integer, description: 目前已確認預約數 }
+      - { name: pendingCount, type: integer, description: 目前待審核預約數 }
+    useCases: [UC-002, UC-004, UC-005]
+
+  - id: ENT-003
+    name: Booking
+    description: 會員對某個 TimeSlot 建立的預約，具狀態機生命週期。
+    attributes:
+      - { name: memberId, type: "ref(external: User)", description: 建立預約的會員；User 屬既有 users 模組，非本次領域範圍 }
+      - { name: serviceId, type: "ref(ENT-001)", description: 對應服務項目 }
+      - { name: timeSlotId, type: "ref(ENT-002)", description: 對應時段 }
+      - { name: providerId, type: "ref(ENT-004), optional", description: 選填指定人員 }
+      - { name: status, type: "VO-001 BookingStatus", description: 狀態機當前狀態 }
+      - { name: createdAt, type: datetime, description: 建立時間 }
+    useCases: [UC-005, UC-006, UC-007, UC-009, UC-010]
+
+  - id: ENT-004
+    name: Provider
+    description: >
+      可選的執行人員。目前僅確認「Booking 可選填指定人員」與「Admin 可指定人員」，
+      是否需要獨立的人員管理頁面（roster、聯絡資訊、各自可預約時段）尚待確認。
+      此處先建為最小獨立 Entity（因 FR-013 要求依人員篩選預約列表，隱含需要穩定的
+      identity 供篩選，而非純文字標籤），但範圍可能隨 CTX-ASM-002 澄清而調整。
+    attributes:
+      - { name: name, type: string, description: 人員顯示名稱 }
+    useCases: [UC-003, UC-005]
+    note: "entity scope (standalone roster management vs simple label) not confirmed upstream, needs review"
+
+value_objects:
+  - id: VO-001
+    name: BookingStatus
+    description: 預約狀態列舉。
+    attributes:
+      - { name: value, type: "enum(pendingReview|confirmed|rejected|cancelled)", description: 狀態值 }
+    useCases: [UC-005, UC-006, UC-007, UC-010]
+
+  - id: VO-002
+    name: TimeRange
+    description: 時段的起訖時間範圍。
+    attributes:
+      - { name: startAt, type: datetime, description: 起始時間 }
+      - { name: endAt, type: datetime, description: 結束時間（須晚於 startAt） }
+    useCases: [UC-002]
+
+aggregates:
+  - id: AGG-001
+    name: Service Aggregate
+    root: ENT-001
+    members: []
+    rationale: >
+      Service 的屬性（名稱、審核模式、啟用狀態）變更頻率低、與單一時段的高頻預約寫入
+      互不相干。若把 TimeSlot 併入同一 aggregate，會讓每次預約 transaction 都要鎖定
+      整個 Service（含所有時段），造成不必要的寫入競爭，因此獨立成小 aggregate。
+    useCases: [UC-001]
+
+  - id: AGG-002
+    name: TimeSlot Aggregate
+    root: ENT-002
+    members: [VO-002]
+    rationale: >
+      容量計數（confirmedCount/pendingCount vs capacity）是這個 aggregate 自身的不變量
+      （見 RULE-001），且是預約流程中寫入頻率最高、最需要交易一致性保護的邊界，
+      故獨立成自己的 aggregate root，而非塞進 Service 或 Booking。
+    useCases: [UC-002, UC-004, UC-005]
+
+  - id: AGG-003
+    name: Booking Aggregate
+    root: ENT-003
+    members: [VO-001]
+    rationale: >
+      Booking 有獨立生命週期與狀態機，被 Admin 審核、會員取消、系統排程各自獨立操作
+      （UC-006/007/009/010 皆直接對單筆 Booking 操作），不應被包在 TimeSlot 底下
+      （避免 TimeSlot aggregate 隨時間累積無界成長的子集合，這是常見的 DDD 反模式）。
+      對 Service/TimeSlot/Provider 的關聯一律以 ID 參照（cross-aggregate reference），
+      不內嵌。容量守恆需要 Booking 建立與 TimeSlot 計數更新在同一次 Firestore
+      transaction 內完成，這是基礎設施層的原子性機制，不代表兩者是同一個 DDD aggregate。
+    useCases: [UC-005, UC-006, UC-007, UC-009, UC-010]
+
+  - id: AGG-004
+    name: Provider Aggregate
+    root: ENT-004
+    members: []
+    rationale: >
+      暫定為獨立 aggregate（無其他從屬概念）。若後續確認 Provider 只是簡單欄位而非
+      獨立管理實體，這個 aggregate 應予以移除並將 ENT-004 降級為 Booking/Service 上
+      的純值欄位——待 CTX-ASM-002 釐清後回頭修正，屆時保留 ENT-004 的 ID 並標記
+      status: deprecated，而非直接刪除。
+    useCases: [UC-003]
+    note: "aggregate existence itself is pending confirmation, needs review"
+
+domain_events:
+  - id: EVT-001
+    name: BookingConfirmed
+    description: >
+      預約成立為「已確認」——可能是自動確認模式下直接發生，也可能是人工審核核准後發生。
+      觸發 LINE 通知（見 FR-011 / UC-008，通知內容與重試策略由外部整合負責，不在本模型範圍）。
+    triggeredBy: AGG-003
+    useCases: [UC-005, UC-006, UC-008]
+
+  - id: EVT-002
+    name: BookingPendingReview
+    description: 人工審核模式下，預約建立後進入「待審核」狀態。觸發 LINE 通知。
+    triggeredBy: AGG-003
+    useCases: [UC-005, UC-008]
+
+  - id: EVT-003
+    name: BookingRejected
+    description: Admin 拒絕待審核預約。觸發 LINE 通知，並釋放 TimeSlot 的 pendingCount。
+    triggeredBy: AGG-003
+    useCases: [UC-006, UC-008]
+
+  - id: EVT-004
+    name: BookingCancelled
+    description: >
+      預約被會員主動取消，或被系統依逾期規則取消（若 FR-014 最終決定為自動取消）。
+      觸發 LINE 通知，並釋放 TimeSlot 對應計數（confirmedCount 或 pendingCount）。
+    triggeredBy: AGG-003
+    useCases: [UC-007, UC-010, UC-008]
+
+  - id: EVT-005
+    name: BookingReviewOverdue
+    description: >
+      待審核預約超過逾期門檻被系統排程偵測到。此事件之後的實際處理結果
+      （自動取消 / 維持待審核並提醒後台）尚未確定，屬 FR-014 待確認範圍，
+      此處先標記事件本身成立，處理結果留待後續澄清。
+    triggeredBy: AGG-003
+    useCases: [UC-010]
+    note: "downstream handling of this event (auto-cancel vs remind) not specified upstream, needs review"
+
+business_rules:
+  - id: RULE-001
+    description: >
+      TimeSlot 的 confirmedCount + pendingCount 不得超過 capacity；建立新 Booking
+      時須在同一 Firestore transaction 內完成「讀取計數、驗證未超限、寫入 Booking、
+      遞增計數」，避免併發超賣。
+    appliesTo: [AGG-002]
+    useCases: [UC-005]
+
+  - id: RULE-002
+    description: >
+      Booking 狀態機僅允許：PendingReview→Confirmed、PendingReview→Rejected、
+      Confirmed→Cancelled、PendingReview→Cancelled。Rejected 與 Cancelled 為終止狀態，
+      不得再轉移。
+    appliesTo: [AGG-003]
+    useCases: [UC-005, UC-006, UC-007, UC-010]
+
+  - id: RULE-003
+    description: 僅 Booking 本人（memberId 相符）或具權限的 Admin 可取消該筆預約。
+    appliesTo: [AGG-003]
+    useCases: [UC-007]
+
+  - id: RULE-004
+    status: deprecated
+    reason: >
+      2026-08-20 使用者決策移除「會員須為 LINE 好友才能預約」的前提，會員只要以 LIFF
+      登入即可建立 Booking。此規則不再是建立 Booking 的前提條件。
+    description: >
+      （已廢棄，保留供歷史追溯）建立 Booking 前，會員須為專案綁定 LINE 官方帳號的好友；
+      非好友狀態應被拒絕。好友狀態的實際取得/驗證機制屬外部整合範圍，不在本模型內定義。
+    appliesTo: [AGG-003]
+    useCases: [UC-005]
+
+  - id: RULE-005
+    description: Booking 的 providerId 為選填；Service 不強制要求指定人員。
+    appliesTo: [AGG-003, AGG-001]
+    useCases: [UC-003, UC-005]
+
+  - id: RULE-006
+    description: >
+      Booking 建立時的初始狀態由所屬 Service 的 approvalMode 決定：
+      auto → 直接 Confirmed；manual → PendingReview。
+    appliesTo: [AGG-001, AGG-003]
+    useCases: [UC-001, UC-005]
+
+  - id: RULE-007
+    description: 會員取消 Booking 是否受時間窗限制（例如開始前 N 小時內不可取消）尚未確定。
+    appliesTo: [AGG-003]
+    useCases: [UC-007]
+    note: "cancellation window not specified upstream, needs review"
+
+  - id: RULE-008
+    description: PendingReview 狀態超過逾期門檻後的具體處理規則（自動取消 vs 提醒）尚未確定。
+    appliesTo: [AGG-003]
+    useCases: [UC-010]
+    note: "overdue handling policy not specified upstream, needs review"

@@ -1,0 +1,118 @@
+version: 1
+generatedBy: system-analysis
+updatedAt: 2026-08-20T00:00:00Z
+relatedChanges: [booking-module]
+
+actors:
+  - id: CTX-ACTOR-001
+    name: Member (會員)
+    description: >
+      透過 LINE LIFF 登入的一般會員，瀏覽可預約服務項目、建立/取消自己的預約，
+      並接收 LINE 通知。
+    source: 澄清對話（本次）
+
+  - id: CTX-ACTOR-002
+    name: Admin / Staff (後台管理人員)
+    description: >
+      透過 apps/admin 後台管理服務項目、時段、容量、審核模式；審核待核准預約；
+      查詢/篩選預約列表。
+    source: 澄清對話（本次），比照既有 events/points/coupons 後台管理慣例
+
+  - id: CTX-ACTOR-003
+    name: System Scheduler (系統排程/背景工作)
+    description: >
+      可能需要的背景工作角色，例如處理逾期未審核預約、發送預約提醒通知。
+      是否需要獨立排程端點（比照既有 /api/internal/level/evaluate-due-periods 模式）待確認。
+    source: 推論自既有 level 模組排程慣例（apps/server/server/api/internal/level/evaluate-due-periods.post.ts），需求細節待確認
+    note: "no upstream source for exact trigger mechanism, needs review"
+
+external_systems:
+  - id: CTX-EXT-001
+    name: LINE LIFF / LINE Login
+    description: >
+      既有整合，僅提供 ID Token 身分驗證（apps/server/server/modules/auth/auth.line.ts）。
+      不提供好友狀態或推播能力。
+    status: existing
+    source: apps/server/server/modules/auth/auth.line.ts
+
+  - id: CTX-EXT-002
+    name: LINE Messaging API（推播通知）
+    description: >
+      預約模組要求「預約狀態變化須發送 LINE 通知」，但專案目前完全未整合 LINE Messaging
+      API（無 channel access token）。這是本次變更的全新外部依賴。原本一併考慮的「會員須為
+      LINE 官方帳號好友才能預約」前提已於 2026-08-20 使用者決策中移除（見 FR-010 deprecated），
+      通知改為 best-effort：會員若非好友，通知會靜默送達失敗，不影響預約流程本身，因此本項不再
+      需要好友狀態 webhook/追蹤機制，範圍縮小為單純的推播發送能力。
+    status: new_dependency
+    source: 澄清對話（本次）；best-effort 調整見 2026-08-20 opsx:update
+    note: "no existing integration in codebase; needs review for credential provisioning and notification content/timing rules. Friend-status retrieval is no longer required (see FR-010 deprecated)."
+
+  - id: CTX-EXT-003
+    name: Firestore
+    description: 既有主要資料儲存，Admin SDK（server）/ Client SDK（browser）。
+    status: existing
+    source: CLAUDE.md（apps/server 架構說明）
+
+constraints:
+  - id: CTX-CON-001
+    description: >
+      新模組必須比照既有 Feature Flag 機制（packages/shared/feature-flags.ts 的
+      FeatureFlag enum + FEATURE_<NAME>_ENABLED 環境變數 + runtimeConfig.public.featureFlags），
+      新增一個 `booking` flag，不得另立機制。
+    type: technical
+    source: openspec/specs/feature-flags/spec.md, packages/shared/feature-flags.ts
+
+  - id: CTX-CON-002
+    description: >
+      伺服端模組須遵循既有分層慣例：modules/<name>/service.ts 呼叫 repo 操作 Firestore，
+      api/ 路由分 admin（後台管理）、profile 或 liff（會員端）。
+    type: technical
+    source: CLAUDE.md（Server 層規則）
+
+  - id: CTX-CON-003
+    description: >
+      目前專案未整合 LINE Messaging API，無 channel access token/secret、無 webhook 接收端點。
+      新增此依賴需比照既有 LINE_CHANNEL_ID/SECRET 的環境變數管理方式，不得硬編碼。
+    type: technical
+    source: .env.example, apps/server/server/modules/auth/auth.line.ts
+
+  - id: CTX-CON-004
+    description: >
+      資料儲存為 Firestore（NoSQL），時段容量的併發鎖定須透過 Firestore transaction
+      處理，無法使用關聯式資料庫的列鎖/唯一約束機制。
+    type: technical
+    source: CLAUDE.md（Firebase SDK split）
+
+assumptions:
+  - id: CTX-ASM-001
+    status: deprecated
+    reason: >
+      原假設「LINE 好友」狀態需要取得/維護機制，但 2026-08-20 使用者決策移除了「會員須為
+      LINE 好友才能預約」的前提（見 FR-010 deprecated）。會員只要以 LIFF 登入即可預約，
+      不再需要判斷好友狀態，此假設不再適用。
+    description: >
+      （已廢棄，保留供歷史追溯）「LINE 好友」狀態指會員與專案綁定的 LINE 官方帳號（OA）
+      之間的好友關係，而非 LINE Login 的一次性授權範圍。如何取得/維護此好友狀態（webhook
+      事件 or 其他查詢方式）待確認。
+    source: 澄清對話（本次）
+
+  - id: CTX-ASM-002
+    description: >
+      服務項目（Service）與時段（Time Slot）為後台可設定資料；人員（Provider）為
+      可選欄位，是否需要獨立的人員管理實體（含各自可預約時段）待確認。
+    source: 澄清對話（本次）
+    note: "no upstream source, needs review"
+
+  - id: CTX-ASM-003
+    description: >
+      審核模式（自動確認 vs 人工審核）是服務項目層級的設定，而非全域設定；
+      每個服務項目可各自選擇。
+    source: 澄清對話（本次）
+
+  - id: CTX-ASM-004
+    description: >
+      本次範圍不包含與既有 level（會員等級）/ points（點數）模組的整合
+      （例如依會員等級開放不同預約權限或消耗點數預約）。是否納入待確認，
+      先視為 out of scope。
+    source: 澄清對話（本次）
+    note: "no upstream source, needs review"
