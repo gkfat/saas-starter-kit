@@ -46,7 +46,12 @@
     "pointsSettings": "折抵比例設定",
     "pointsMembers": "會員點數管理",
     "groupEvents": "活動模組",
-    "events": "活動管理"
+    "events": "活動管理",
+    "groupBooking": "預約模組",
+    "bookingServices": "服務項目管理",
+    "bookingSlotTemplates": "時段樣板",
+    "bookingBookings": "預約管理",
+    "bookingProviders": "人員管理"
   },
   "auth": {
     "login": "登入",
@@ -299,6 +304,10 @@
     "event": {
       "title": "活動公告",
       "description": "設定活動起訖時間與 Banner 圖片，於會員端依排程自動上下架，快速發布行銷活動。"
+    },
+    "booking": {
+      "title": "預約系統",
+      "description": "會員線上預約服務項目與時段，支援人員出勤時間、容量管控與審核流程，適合美容美髮、課程、諮詢等預約制服務。"
     },
     "memberLiff": {
       "title": "會員 LINE LIFF",
@@ -652,7 +661,10 @@
     "events:read": "讀取活動",
     "events:write": "編輯活動",
     "events:create": "建立活動",
-    "events:delete": "刪除活動"
+    "events:delete": "刪除活動",
+    "bookings:read": "讀取預約、服務項目與時段",
+    "bookings:write": "編輯服務項目、時段與人員",
+    "bookings:review": "審核待審核預約"
   },
   "permissionModule": {
     "all": "全部",
@@ -666,7 +678,8 @@
     "level_tiers": "等級管理",
     "coupons": "優惠券管理",
     "points": "會員點數",
-    "events": "活動管理"
+    "events": "活動管理",
+    "bookings": "預約管理"
   },
   "pointsSettings": {
     "title": "點數折抵比例設定",
@@ -708,7 +721,8 @@
       "campaign_gift": "活動贈送",
       "birthday_gift": "生日禮",
       "other": "其他"
-    }
+    },
+    "memberName": "會員名稱"
   },
   "events": {
     "title": "活動管理",
@@ -745,5 +759,160 @@
     "bannerUploadFailed": "Banner 圖片上傳失敗，請重新編輯活動再次上傳",
     "deleteConfirmTitle": "刪除活動",
     "deleteConfirm": "確定要刪除活動「{title}」嗎？"
+  },
+  "bookingServices": {
+    "title": "服務項目管理",
+    "noData": "尚未建立服務項目",
+    "create": "新增服務項目",
+    "edit": "編輯服務項目",
+    "name": "名稱",
+    "description": "說明",
+    "approvalMode": "審核模式",
+    "approvalModeOption": {
+      "auto": "自動確認",
+      "manual": "人工審核"
+    },
+    "enabled": "啟用",
+    "disabled": "未啟用",
+    "manageSlots": "管理時段",
+    "nameRequired": "請輸入名稱",
+    "approvalModeRequired": "請選擇審核模式",
+    "createSuccess": "服務項目已新增",
+    "updateSuccess": "服務項目已更新",
+    "slotSetupLabel": "時段設定",
+    "slotSetupApplyTemplate": "套用時段樣板",
+    "slotSetupLater": "稍後設定",
+    "slotSetupSelectTemplate": "選擇樣板",
+    "slotSetupTemplateRequired": "請選擇時段樣板"
+  },
+  "bookingProviders": {
+    "title": "人員管理",
+    "noData": "尚未建立人員",
+    "create": "新增人員",
+    "edit": "編輯人員",
+    "name": "姓名",
+    "nameRequired": "請輸入姓名",
+    "createdAt": "建立時間",
+    "createSuccess": "人員已新增",
+    "updateSuccess": "人員已更新",
+    "setWorkingHours": "設定出勤時間",
+    "workingWeekdays": "每週出勤日",
+    "dailyStartTime": "每日開始時間",
+    "dailyEndTime": "每日結束時間",
+    "workingHoursColumn": "出勤時間",
+    "workingHoursNotSet": "未設定",
+    "enabled": "啟用",
+    "disabled": "未啟用",
+    "enabledHint": "關閉後此人員將永遠不可被預約，不受出勤時間設定影響",
+    "assignedServices": "可負責的服務項目",
+    "assignedServicesHint": "未選擇任何服務項目時，此人員將無法被指派到任何預約",
+    "assignedServicesColumn": "可負責服務",
+    "assignedServicesNotSet": "未指定",
+    "workingHoursRequiredHint": "未設定出勤時間時，此人員將無法被指派到任何預約"
+  },
+  "bookingTimeSlots": {
+    "title": "時段管理",
+    "subtitle": "服務項目：{name}",
+    "back": "返回服務項目列表",
+    "noData": "尚未建立時段",
+    "startAt": "開始時間",
+    "endAt": "結束時間",
+    "capacity": "容量上限",
+    "confirmedCount": "已確認",
+    "pendingCount": "待審核",
+    "remaining": "剩餘",
+    "startAtRequired": "請選擇開始時間",
+    "endAtRequired": "請選擇結束時間",
+    "capacityRequired": "請輸入容量上限",
+    "scheduleInvalid": "結束時間需晚於開始時間",
+    "capacityBelowUsage": "容量上限不可低於目前已確認+待審核數量",
+    "createSuccess": "時段已新增",
+    "updateSuccess": "時段已更新",
+    "applyTemplate": "套用樣板",
+    "selectTemplate": "選擇樣板",
+    "applyCapacity": "每個時段容量",
+    "applyPreview": "將於 {days} 個營業日（{start} - {end}）產生共 {count} 個時段",
+    "noTemplates": "尚未建立任何時段樣板，請先前往「時段樣板」建立",
+    "applySuccess": "已套用樣板，新增 {created} 個時段（略過 {skipped} 個重複時段）",
+    "commitDraft": "設定完成",
+    "monthLabel": "{year} 年 {month} 月",
+    "dayEditorTitle": "{date} 時段",
+    "cannotDeleteInUse": "已有預約，無法刪除",
+    "addRow": "新增一筆",
+    "commitSuccess": "已儲存：新增 {created}、更新 {updated}、刪除 {deleted}",
+    "commitPartialFailure": "有 {skipped} 筆變更未能套用（可能該時段已有預約），請重新整理後確認",
+    "holidaysNote": "國定假日：{list}",
+    "booked": "已預約",
+    "limit": "上限"
+  },
+  "bookingSlotTemplates": {
+    "title": "時段樣板",
+    "noData": "尚未建立時段樣板",
+    "create": "新增樣板",
+    "edit": "編輯樣板",
+    "name": "樣板名稱",
+    "businessDays": "每週營業日",
+    "businessDaysRequired": "請至少選擇一個營業日",
+    "dailyStartTime": "每日開始時間",
+    "dailyEndTime": "每日結束時間",
+    "startTimeRequired": "請選擇開始時間",
+    "endTimeRequired": "請選擇結束時間",
+    "scheduleInvalid": "結束時間需晚於開始時間",
+    "granularity": "時段切分粒度",
+    "granularityRequired": "請選擇切分粒度",
+    "granularityOption": {
+      "15": "每 15 分鐘",
+      "30": "每 30 分鐘",
+      "60": "每小時"
+    },
+    "defaultCapacity": "預設容量",
+    "capacityRequired": "請輸入預設容量",
+    "hours": "每日時段",
+    "createSuccess": "樣板已新增",
+    "updateSuccess": "樣板已更新",
+    "deleteSuccess": "樣板已刪除",
+    "deleteConfirmTitle": "刪除樣板",
+    "deleteConfirm": "確定要刪除樣板「{name}」嗎？此動作不影響已套用過此樣板產生的時段",
+    "weekdayShort": {
+      "0": "日",
+      "1": "一",
+      "2": "二",
+      "3": "三",
+      "4": "四",
+      "5": "五",
+      "6": "六"
+    },
+    "perDayPreviewCount": "每個營業日預計產生 {count} 個時段",
+    "nameRequired": "請輸入樣板名稱"
+  },
+  "bookings": {
+    "title": "預約管理",
+    "noData": "尚無預約紀錄",
+    "service": "預約服務項目",
+    "timeSlot": "預約時段",
+    "provider": "人員",
+    "status": "狀態",
+    "createdAt": "建立時間",
+    "statusOption": {
+      "pendingReview": "待審核",
+      "confirmed": "已確認",
+      "rejected": "已拒絕",
+      "cancelled": "已取消"
+    },
+    "filterByService": "依服務項目篩選",
+    "filterByStatus": "依狀態篩選",
+    "searchByMemberId": "以會員 ID 搜尋",
+    "approve": "核准",
+    "reject": "拒絕",
+    "approveConfirmTitle": "核准預約",
+    "approveConfirm": "確定要核准這筆預約嗎？",
+    "rejectConfirmTitle": "拒絕預約",
+    "rejectConfirm": "確定要拒絕這筆預約嗎？",
+    "approveSuccess": "預約已核准",
+    "rejectSuccess": "預約已拒絕",
+    "memberNo": "會員編號",
+    "memberName": "會員名稱",
+    "note": "客人備註",
+    "date": "預約日期"
   }
 }

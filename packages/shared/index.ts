@@ -1,4 +1,5 @@
 export * from './dto/auth';
+export * from './dto/booking';
 export * from './dto/common';
 export * from './dto/coupons';
 export * from './dto/dashboard';

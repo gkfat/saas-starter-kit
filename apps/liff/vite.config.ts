@@ -31,6 +31,9 @@ export default defineConfig(({ mode }) => {
       'import.meta.env.VITE_FEATURE_POINTS_ENABLED': JSON.stringify(
         env.FEATURE_POINTS_ENABLED !== 'false',
       ),
+      'import.meta.env.VITE_FEATURE_BOOKING_ENABLED': JSON.stringify(
+        env.FEATURE_BOOKING_ENABLED !== 'false',
+      ),
     },
   };
 });

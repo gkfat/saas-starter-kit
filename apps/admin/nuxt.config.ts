@@ -90,6 +90,7 @@ export default defineNuxtConfig({
         coupon: process.env.FEATURE_COUPON_ENABLED === 'true',
         points: process.env.FEATURE_POINTS_ENABLED !== 'false',
         event: process.env.FEATURE_EVENT_ENABLED !== 'false',
+        booking: process.env.FEATURE_BOOKING_ENABLED !== 'false',
       },
     },
   },

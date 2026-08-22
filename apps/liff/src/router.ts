@@ -78,6 +78,50 @@ const router = createRouter({
           props: true,
           meta: { requiresAuth: true },
         },
+        {
+          path: 'booking',
+          name: 'bookingServices',
+          component: () => import('~/pages/booking/index.vue'),
+          meta: { requiresAuth: true, featureFlag: 'booking' },
+        },
+        {
+          path: 'booking/my',
+          name: 'myBookings',
+          component: () => import('~/pages/booking/my.vue'),
+          meta: { requiresAuth: true, featureFlag: 'booking' },
+        },
+        {
+          path: 'booking/:serviceId',
+          name: 'bookingService',
+          component: () => import('~/pages/booking/[serviceId].vue'),
+          props: true,
+          // backTo 讓 sheet 底部的「上一頁」明確導回指定的前一步，不依賴瀏覽器 history
+          // ——重新整理或深連結進入時並不存在可 back() 的紀錄，history-based 返回會失效。
+          meta: { requiresAuth: true, featureFlag: 'booking', backTo: 'bookingServices' },
+        },
+        {
+          path: 'booking/:serviceId/provider',
+          name: 'bookingProvider',
+          component: () => import('~/pages/booking/[serviceId]/provider.vue'),
+          props: true,
+          meta: { requiresAuth: true, featureFlag: 'booking', backTo: 'bookingService' },
+        },
+        {
+          path: 'booking/:serviceId/confirm',
+          name: 'bookingConfirm',
+          component: () => import('~/pages/booking/[serviceId]/confirm.vue'),
+          props: true,
+          meta: { requiresAuth: true, featureFlag: 'booking', backTo: 'bookingProvider' },
+        },
+        {
+          path: 'booking/:serviceId/result',
+          name: 'bookingResult',
+          component: () => import('~/pages/booking/[serviceId]/result.vue'),
+          props: true,
+          // sheetClose 讓 MemberLayout 的 sheet 底部按鈕改顯示「關閉」而非「返回」
+          // ——送出結果為預約流程終點，不應允許返回上一步重新操作。
+          meta: { requiresAuth: true, featureFlag: 'booking', sheetClose: true },
+        },
       ],
     },
   ],
@@ -86,6 +130,9 @@ const router = createRouter({
 router.beforeEach((to) => {
   if (to.meta.requiresAuth && !useAuthStore().isLoggedIn) {
     return '/auth/login';
+  }
+  if (to.meta.featureFlag === 'booking' && !import.meta.env.VITE_FEATURE_BOOKING_ENABLED) {
+    return '/home';
   }
 });
 

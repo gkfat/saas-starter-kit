@@ -46,7 +46,12 @@
     "pointsSettings": "Redemption Ratio",
     "pointsMembers": "Member Points",
     "groupEvents": "Event Module",
-    "events": "Event Management"
+    "events": "Event Management",
+    "groupBooking": "Booking Module",
+    "bookingServices": "Service Management",
+    "bookingSlotTemplates": "Slot Templates",
+    "bookingBookings": "Booking Management",
+    "bookingProviders": "Provider Management"
   },
   "auth": {
     "login": "Sign In",
@@ -299,6 +304,10 @@
     "event": {
       "title": "Event announcements",
       "description": "Schedule event start/end times and banner images, shown to members automatically within the active window."
+    },
+    "booking": {
+      "title": "Booking system",
+      "description": "Members book services and time slots online, with provider working hours, capacity limits, and an approval workflow — built for salons, classes, and consultations."
     },
     "memberLiff": {
       "title": "Member LINE LIFF",
@@ -652,7 +661,10 @@
     "events:read": "Read events",
     "events:write": "Edit events",
     "events:create": "Create events",
-    "events:delete": "Delete events"
+    "events:delete": "Delete events",
+    "bookings:read": "Read bookings, services and time slots",
+    "bookings:write": "Edit services, time slots and providers",
+    "bookings:review": "Review pending bookings"
   },
   "permissionModule": {
     "all": "All",
@@ -666,7 +678,8 @@
     "level_tiers": "Level Tiers",
     "coupons": "Coupons",
     "points": "Member Points",
-    "events": "Events"
+    "events": "Events",
+    "bookings": "Bookings"
   },
   "pointsSettings": {
     "title": "Points Redemption Ratio",
@@ -708,7 +721,8 @@
       "campaign_gift": "Campaign Gift",
       "birthday_gift": "Birthday Gift",
       "other": "Other"
-    }
+    },
+    "memberName": "Member Name"
   },
   "events": {
     "title": "Event Management",
@@ -745,5 +759,160 @@
     "bannerUploadFailed": "Banner upload failed, please edit the event to upload again",
     "deleteConfirmTitle": "Delete Event",
     "deleteConfirm": "Are you sure you want to delete event \"{title}\"?"
+  },
+  "bookingServices": {
+    "title": "Service Management",
+    "noData": "No service items yet",
+    "create": "New Service",
+    "edit": "Edit Service",
+    "name": "Name",
+    "description": "Description",
+    "approvalMode": "Approval Mode",
+    "approvalModeOption": {
+      "auto": "Auto-confirm",
+      "manual": "Manual review"
+    },
+    "enabled": "Enabled",
+    "disabled": "Not enabled",
+    "manageSlots": "Manage Time Slots",
+    "nameRequired": "Name is required",
+    "approvalModeRequired": "Approval mode is required",
+    "createSuccess": "Service item created",
+    "updateSuccess": "Service item updated",
+    "slotSetupLabel": "Slot Setup",
+    "slotSetupApplyTemplate": "Apply a slot template",
+    "slotSetupLater": "Set up later",
+    "slotSetupSelectTemplate": "Select Template",
+    "slotSetupTemplateRequired": "Please select a slot template"
+  },
+  "bookingProviders": {
+    "title": "Provider Management",
+    "noData": "No providers yet",
+    "create": "New Provider",
+    "edit": "Edit Provider",
+    "name": "Name",
+    "nameRequired": "Name is required",
+    "createdAt": "Created At",
+    "createSuccess": "Provider created",
+    "updateSuccess": "Provider updated",
+    "setWorkingHours": "Set working hours",
+    "workingWeekdays": "Working weekdays",
+    "dailyStartTime": "Daily start time",
+    "dailyEndTime": "Daily end time",
+    "workingHoursColumn": "Working Hours",
+    "workingHoursNotSet": "Not set",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "enabledHint": "When off, this provider can never be booked, regardless of working hours",
+    "assignedServices": "Assignable services",
+    "assignedServicesHint": "With no service selected, this provider can't be assigned to any booking",
+    "assignedServicesColumn": "Assignable Services",
+    "assignedServicesNotSet": "None",
+    "workingHoursRequiredHint": "Without working hours set, this provider can't be assigned to any booking"
+  },
+  "bookingTimeSlots": {
+    "title": "Time Slot Management",
+    "subtitle": "Service: {name}",
+    "back": "Back to service list",
+    "noData": "No time slots yet",
+    "startAt": "Start Time",
+    "endAt": "End Time",
+    "capacity": "Capacity",
+    "confirmedCount": "Confirmed",
+    "pendingCount": "Pending",
+    "remaining": "Remaining",
+    "startAtRequired": "Start time is required",
+    "endAtRequired": "End time is required",
+    "capacityRequired": "Capacity is required",
+    "scheduleInvalid": "End time must be later than start time",
+    "capacityBelowUsage": "Capacity cannot be lower than the current confirmed + pending count",
+    "createSuccess": "Time slot created",
+    "updateSuccess": "Time slot updated",
+    "applyTemplate": "Apply Template",
+    "selectTemplate": "Select Template",
+    "applyCapacity": "Capacity per slot",
+    "applyPreview": "Will create {count} slots across {days} business days ({start} - {end})",
+    "noTemplates": "No slot templates yet — create one under \"Slot Templates\" first",
+    "applySuccess": "Template applied: {created} slots created, {skipped} duplicates skipped",
+    "commitDraft": "Save Changes",
+    "monthLabel": "{month}/{year}",
+    "dayEditorTitle": "Time slots on {date}",
+    "cannotDeleteInUse": "Has bookings, cannot delete",
+    "addRow": "Add slot",
+    "commitSuccess": "Saved: {created} created, {updated} updated, {deleted} deleted",
+    "commitPartialFailure": "{skipped} change(s) could not be applied (the slot may already have bookings) — refresh to check",
+    "holidaysNote": "Public holidays: {list}",
+    "booked": "Booked",
+    "limit": "Limit"
+  },
+  "bookingSlotTemplates": {
+    "title": "Slot Templates",
+    "noData": "No slot templates yet",
+    "create": "New Template",
+    "edit": "Edit Template",
+    "name": "Template Name",
+    "businessDays": "Weekly Business Days",
+    "businessDaysRequired": "Select at least one business day",
+    "dailyStartTime": "Daily Start Time",
+    "dailyEndTime": "Daily End Time",
+    "startTimeRequired": "Start time is required",
+    "endTimeRequired": "End time is required",
+    "scheduleInvalid": "End time must be later than start time",
+    "granularity": "Slot Granularity",
+    "granularityRequired": "Granularity is required",
+    "granularityOption": {
+      "15": "Every 15 minutes",
+      "30": "Every 30 minutes",
+      "60": "Every hour"
+    },
+    "defaultCapacity": "Default Capacity",
+    "capacityRequired": "Default capacity is required",
+    "hours": "Daily Hours",
+    "createSuccess": "Template created",
+    "updateSuccess": "Template updated",
+    "deleteSuccess": "Template deleted",
+    "deleteConfirmTitle": "Delete Template",
+    "deleteConfirm": "Are you sure you want to delete template \"{name}\"? This does not affect slots already generated from it.",
+    "weekdayShort": {
+      "0": "Sun",
+      "1": "Mon",
+      "2": "Tue",
+      "3": "Wed",
+      "4": "Thu",
+      "5": "Fri",
+      "6": "Sat"
+    },
+    "perDayPreviewCount": "Generates {count} slots per matching day",
+    "nameRequired": "Template name is required"
+  },
+  "bookings": {
+    "title": "Booking Management",
+    "noData": "No bookings yet",
+    "service": "Booked Service",
+    "timeSlot": "Booked Time Slot",
+    "provider": "Provider",
+    "status": "Status",
+    "createdAt": "Created At",
+    "statusOption": {
+      "pendingReview": "Pending Review",
+      "confirmed": "Confirmed",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled"
+    },
+    "filterByService": "Filter by service",
+    "filterByStatus": "Filter by status",
+    "searchByMemberId": "Search by member ID",
+    "approve": "Approve",
+    "reject": "Reject",
+    "approveConfirmTitle": "Approve Booking",
+    "approveConfirm": "Are you sure you want to approve this booking?",
+    "rejectConfirmTitle": "Reject Booking",
+    "rejectConfirm": "Are you sure you want to reject this booking?",
+    "approveSuccess": "Booking approved",
+    "rejectSuccess": "Booking rejected",
+    "memberNo": "Member No.",
+    "memberName": "Member Name",
+    "note": "Customer Note",
+    "date": "Booking Date"
   }
 }

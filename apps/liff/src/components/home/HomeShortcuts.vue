@@ -10,6 +10,9 @@ const shortcuts = computed(() => [
   ...(import.meta.env.VITE_FEATURE_POINTS_ENABLED
     ? [{ icon: 'mdi-cash-multiple', label: '點數', to: { name: 'points' } }]
     : []),
+  ...(import.meta.env.VITE_FEATURE_BOOKING_ENABLED
+    ? [{ icon: 'mdi-calendar-check-outline', label: '預約', to: { name: 'myBookings' } }]
+    : []),
 ]);
 </script>
 

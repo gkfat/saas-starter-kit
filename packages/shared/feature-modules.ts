@@ -9,6 +9,7 @@ export const FeatureModule = {
   Coupon: 'coupon',
   Points: 'points',
   Event: 'event',
+  Booking: 'booking',
   MemberLiff: 'memberLiff',
 } as const;
 
@@ -25,6 +26,7 @@ export const FEATURE_MODULES: FeatureModule[] = [
   FeatureModule.Coupon,
   FeatureModule.Points,
   FeatureModule.Event,
+  FeatureModule.Booking,
 ];
 
 // Every membership site needs sign-up/login and member data management, so these

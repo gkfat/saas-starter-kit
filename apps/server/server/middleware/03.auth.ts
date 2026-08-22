@@ -13,6 +13,7 @@ const PUBLIC_PATHS = new Set([
   '/api/auth/set-password',
   '/api/marketing/feature-request',
   '/api/internal/level/evaluate-due-periods',
+  '/api/internal/booking/process-overdue-bookings',
 ]);
 
 export default defineEventHandler(async (event) => {

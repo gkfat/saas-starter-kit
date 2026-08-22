@@ -47,6 +47,11 @@ export const Permission = {
     Create: 'events:create',
     Delete: 'events:delete',
   },
+  Bookings: {
+    Read: 'bookings:read',
+    Write: 'bookings:write',
+    Review: 'bookings:review',
+  },
 } as const;
 
 type NestedValues<T> = T extends string ? T : { [K in keyof T]: NestedValues<T[K]> }[keyof T];
@@ -80,4 +85,7 @@ export const PermissionMeta: Record<Permission, string> = {
   'events:write': '編輯活動',
   'events:create': '建立活動',
   'events:delete': '刪除活動',
+  'bookings:read': '讀取預約、服務項目與時段',
+  'bookings:write': '編輯服務項目、時段與人員',
+  'bookings:review': '審核待審核預約',
 };

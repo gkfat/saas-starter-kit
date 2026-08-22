@@ -70,6 +70,7 @@ const FEATURE_MODULE_ICONS: Record<FeatureModule, string> = {
   [FeatureModule.Coupon]: 'mdi-ticket-percent',
   [FeatureModule.Points]: 'mdi-cash-multiple',
   [FeatureModule.Event]: 'mdi-bullhorn-outline',
+  [FeatureModule.Booking]: 'mdi-calendar-check-outline',
   [FeatureModule.MemberLiff]: 'mdi-cellphone-message',
 };
 
@@ -84,6 +85,7 @@ const FEATURE_MODULE_TAGS: Record<FeatureModule, string> = {
   [FeatureModule.Coupon]: 'COUPON',
   [FeatureModule.Points]: 'POINTS',
   [FeatureModule.Event]: 'EVENT',
+  [FeatureModule.Booking]: 'BOOKING',
   [FeatureModule.MemberLiff]: 'LIFF',
 };
 
@@ -103,7 +105,13 @@ const featureCategories: FeatureCategory[] = [
   },
   {
     labelKey: 'home.explore.categories.engagement',
-    modules: [FeatureModule.Level, FeatureModule.Coupon, FeatureModule.Points, FeatureModule.Event],
+    modules: [
+      FeatureModule.Level,
+      FeatureModule.Coupon,
+      FeatureModule.Points,
+      FeatureModule.Event,
+      FeatureModule.Booking,
+    ],
   },
   {
     labelKey: 'home.explore.categories.analytics',

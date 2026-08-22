@@ -44,6 +44,7 @@
 - 實作會員點數 feature
 - 實作活動 feature
 - admin: 實作會員資訊頁面、我的優惠券頁面
+- 實作預約模組 feature
 
 ### Changed
 

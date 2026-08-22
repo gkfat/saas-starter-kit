@@ -20,9 +20,7 @@
     <v-card class="bg-background" rounded="0">
       <v-container :max-width="400" class="pt-4 pb-12">
         <router-view v-slot="{ Component, route: matchedRoute }">
-          <keep-alive>
-            <component :is="Component" v-if="matchedRoute.name === level1Name" />
-          </keep-alive>
+          <component :is="Component" v-if="matchedRoute.name === level1Name" />
         </router-view>
       </v-container>
 
@@ -42,14 +40,16 @@
     <v-card class="bg-background fill-height" rounded="0">
       <v-container :max-width="400" class="pt-4 pb-12">
         <router-view v-slot="{ Component, route: matchedRoute }">
-          <keep-alive>
-            <component :is="Component" v-if="matchedRoute.name === level2Name" />
-          </keep-alive>
+          <component :is="Component" v-if="matchedRoute.name === level2Name" />
         </router-view>
       </v-container>
 
       <div class="dialog-nav-bar d-flex justify-center">
-        <v-btn icon="mdi-arrow-left" variant="tonal" @click="backFromLevel2" />
+        <v-btn
+          :icon="route.meta.sheetClose ? 'mdi-close' : 'mdi-arrow-left'"
+          variant="tonal"
+          @click="route.meta.sheetClose ? closeToHome() : backFromLevel2()"
+        />
       </div>
     </v-card>
   </v-dialog>
@@ -101,12 +101,19 @@ function closeToHome() {
 }
 
 function backFromLevel2() {
-  level2Name.value = null;
+  // 用 route.meta.backTo 明確導回指定的前一步，而非依賴瀏覽器 history——重新整理
+  // 或深連結進入時並沒有可 back() 的紀錄，history-based 返回會失效或無反應。
+  // params/query 原樣帶過去，前一步用不到的欄位會被忽略。
+  const backTo = route.meta.backTo as string | undefined;
+  if (backTo) {
+    router.push({ name: backTo, params: route.params, query: route.query });
+    return;
+  }
   if (level1Name.value) {
     router.push({ name: level1Name.value });
-  } else {
-    router.back();
+    return;
   }
+  router.back();
 }
 </script>
 
