@@ -16,6 +16,8 @@ export type {
   Booking,
   CreateBookingRequest,
   ReviewBookingRequest,
+  AdminUpdateBookingStatusRequest,
+  AdminRescheduleBookingRequest,
   ProcessOverdueBookingsResult,
   BookingSlotGranularityMinutes,
   BookingWeekday,

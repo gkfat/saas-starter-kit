@@ -143,3 +143,13 @@ export const CreateBookingSchema = z.object({
 export const ReviewBookingSchema = z.object({
   status: z.enum(['confirmed', 'rejected']),
 });
+
+export const AdminUpdateBookingStatusSchema = z.object({
+  status: z.enum(['confirmed', 'rejected', 'cancelled']),
+  note: z.string().trim().min(1).max(200).optional(),
+});
+
+export const AdminRescheduleBookingSchema = z.object({
+  timeSlotId: z.string().min(1),
+  note: z.string().trim().min(1).max(200).optional(),
+});

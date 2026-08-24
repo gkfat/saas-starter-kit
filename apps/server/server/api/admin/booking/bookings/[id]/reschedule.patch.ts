@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { adminCancelBooking, reviewBooking } from '~/modules/booking';
+import { adminRescheduleBooking } from '~/modules/booking';
 import { withAuditLog } from '~/modules/logs';
 import { getUserById } from '~/modules/users';
 import { requirePermission } from '~/shared/rbac';
@@ -9,8 +9,8 @@ import { FeatureFlag, Permission } from '@saas-starter-kit/shared';
 import type { Booking } from '@saas-starter-kit/shared';
 
 const BodySchema = z.object({
-  status: z.enum(['confirmed', 'rejected', 'cancelled']),
-  /** Optional staff-facing note explaining the action; recorded in the audit log and shown on the booking. */
+  timeSlotId: z.string().min(1),
+  /** Optional staff-facing note explaining the change; recorded in the audit log and shown on the booking. */
   note: z.string().trim().min(1).max(200).optional(),
 });
 
@@ -34,7 +34,7 @@ export default defineEventHandler(async (event): Promise<Booking> => {
 
   return withAuditLog(
     {
-      action: body.status === 'cancelled' ? 'booking.booking.cancel' : 'booking.booking.review',
+      action: 'booking.booking.reschedule',
       actor,
       requestId,
       metadata: () => ({ bookingId: id, ...body }),
@@ -42,15 +42,20 @@ export default defineEventHandler(async (event): Promise<Booking> => {
     },
     async () => {
       try {
-        return body.status === 'cancelled'
-          ? await adminCancelBooking(id, { note: body.note })
-          : await reviewBooking(id, { status: body.status });
+        return await adminRescheduleBooking(id, body.timeSlotId, { note: body.note });
       } catch (err: unknown) {
         const code = (err as { code?: string }).code;
         if (code === 'booking-not-found' || code === 'booking-time-slot-not-found') {
           throw createError({ statusCode: 404, message: (err as Error).message });
         }
-        if (code === 'booking-invalid-status-transition') {
+        if (
+          code === 'booking-invalid-status-transition' ||
+          code === 'booking-time-slot-service-mismatch' ||
+          code === 'booking-time-slot-unchanged'
+        ) {
+          throw createError({ statusCode: 409, message: (err as Error).message });
+        }
+        if (code === 'booking-time-slot-full') {
           throw createError({ statusCode: 409, message: (err as Error).message });
         }
         throw err;

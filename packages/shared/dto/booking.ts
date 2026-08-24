@@ -156,6 +156,8 @@ export type Booking = {
   providerId?: string;
   /** Optional free-text note the member leaves when creating the booking. */
   note?: string;
+  /** Staff-facing note left on the most recent admin cancel/reschedule action. */
+  staffNote?: string;
   status: BookingStatus;
   createdAt: string;
   updatedAt: string;
@@ -172,6 +174,19 @@ export type CreateBookingRequest = {
 
 export type ReviewBookingRequest = {
   status: 'confirmed' | 'rejected';
+};
+
+/** Admin-facing status update for a booking; `cancelled` is admin-only (members use their own cancel flow). */
+export type AdminUpdateBookingStatusRequest = {
+  status: 'confirmed' | 'rejected' | 'cancelled';
+  /** Optional staff-facing note explaining the action; recorded in the audit log and shown on the booking. */
+  note?: string;
+};
+
+export type AdminRescheduleBookingRequest = {
+  timeSlotId: string;
+  /** Optional staff-facing note explaining the change; recorded in the audit log and shown on the booking. */
+  note?: string;
 };
 
 /**
@@ -191,6 +206,8 @@ export type AdminBookingRow = {
   providerId?: string;
   providerName?: string;
   note?: string;
+  /** Staff-facing note left on the most recent admin cancel/reschedule action. */
+  staffNote?: string;
   status: BookingStatus;
   createdAt: string;
 };

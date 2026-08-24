@@ -7,15 +7,15 @@ import { fetchBookingServices, fetchBookingTimeSlots, fetchMyBookings } from '~/
 const emit = defineEmits<{ visible: [value: boolean] }>();
 
 const serviceName = ref('');
+const slotMonth = ref('');
+const slotDay = ref('');
 const slotTime = ref('');
 
-function formatDateTime(value: string): string {
-  return new Date(value).toLocaleString('zh-TW', {
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+function applySlotDate(value: string): void {
+  const date = new Date(value);
+  slotMonth.value = date.toLocaleString('zh-TW', { month: 'short' });
+  slotDay.value = String(date.getDate());
+  slotTime.value = date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
 }
 
 onMounted(async () => {
@@ -51,7 +51,7 @@ onMounted(async () => {
     }
 
     serviceName.value = servicesById.get(next.booking.serviceId)?.name ?? '';
-    slotTime.value = formatDateTime(next.slot.startAt);
+    applySlotDate(next.slot.startAt);
     emit('visible', true);
   } catch {
     // 預約功能未開啟或查詢失敗時，安靜略過此卡片
@@ -61,10 +61,59 @@ onMounted(async () => {
 </script>
 
 <template>
-  <AppCard v-if="slotTime" class="h-100" :to="{ name: 'myBookings' }">
-    <v-icon icon="mdi-calendar-check-outline" color="primary" size="28" class="mb-2" />
-    <div class="text-caption text-medium-emphasis">即將到來的預約</div>
-    <div class="text-body-1 font-weight-bold">{{ serviceName }}</div>
-    <div class="text-caption text-medium-emphasis">{{ slotTime }}</div>
+  <AppCard
+    v-if="slotTime"
+    class="h-100 booking-summary-card"
+    padding="0"
+    :to="{ name: 'myBookings' }"
+  >
+    <div class="d-flex align-stretch">
+      <div class="booking-summary-card__date">
+        <span class="booking-summary-card__month">{{ slotMonth }}</span>
+        <span class="booking-summary-card__day">{{ slotDay }}</span>
+      </div>
+      <div class="booking-summary-card__body">
+        <div class="text-caption text-medium-emphasis">即將到來的預約</div>
+        <div class="text-h6 font-weight-bold booking-summary-card__service">{{ serviceName }}</div>
+        <div class="text-body-2 text-medium-emphasis">{{ slotTime }}</div>
+      </div>
+    </div>
   </AppCard>
 </template>
+
+<style scoped>
+.booking-summary-card__date {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  padding: 12px 8px;
+  background: rgba(var(--v-theme-primary), 0.14);
+  color: rgb(var(--v-theme-primary));
+}
+
+.booking-summary-card__month {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.booking-summary-card__day {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.booking-summary-card__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 12px 16px;
+}
+
+.booking-summary-card__service {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+</style>

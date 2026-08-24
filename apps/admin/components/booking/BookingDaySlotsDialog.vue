@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :model-value="modelValue" max-width="560" persistent @update:model-value="close">
+  <v-dialog :model-value="modelValue" max-width="760" persistent @update:model-value="close">
     <CardsDialogCard>
       <v-card-title class="pa-4">{{
         $t('bookingTimeSlots.dayEditorTitle', { date })
@@ -20,13 +20,21 @@
           </v-col>
           <v-col cols="2">
             <div class="text-caption text-medium-emphasis mb-1">
-              {{ $t('bookingTimeSlots.booked') }}
+              {{ $t('bookingTimeSlots.confirmedCount') }}
             </div>
             <div class="text-body-2 d-flex align-center booked-reference">
-              {{ row.confirmedCount + row.pendingCount }}
+              {{ row.confirmedCount }}
             </div>
           </v-col>
-          <v-col cols="3">
+          <v-col cols="2">
+            <div class="text-caption text-medium-emphasis mb-1">
+              {{ $t('bookingTimeSlots.pendingCount') }}
+            </div>
+            <div class="text-body-2 d-flex align-center booked-reference">
+              {{ row.pendingCount }}
+            </div>
+          </v-col>
+          <v-col cols="2">
             <div class="text-caption text-medium-emphasis mb-1">
               {{ $t('bookingTimeSlots.capacity') }}
             </div>

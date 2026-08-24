@@ -3,8 +3,9 @@ withDefaults(
   defineProps<{
     loading?: boolean;
     disabled?: boolean;
+    color?: string;
   }>(),
-  { loading: false, disabled: false },
+  { loading: false, disabled: false, color: 'primary' },
 );
 
 defineEmits<{ click: [] }>();
@@ -13,7 +14,7 @@ defineEmits<{ click: [] }>();
 <template>
   <div class="booking-bottom-action">
     <v-btn
-      color="primary"
+      :color="color"
       block
       size="large"
       :loading="loading"

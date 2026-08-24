@@ -317,6 +317,62 @@ export async function createBookingTransaction(
  * (approve/reject) and cancel, since both are "booking status transition + slot count
  * release" operations.
  */
+/**
+ * Reads the booking, its current time slot, and the target time slot, lets `compute` (pure
+ * decision logic owned by the service layer — status-machine + capacity checks, slot count
+ * adjustment on both slots) derive the updated booking + both slot patches, then writes all
+ * three atomically. Used by admin reschedule, where a booking moves from one time slot to
+ * another within the same service.
+ */
+export async function rescheduleBookingTransaction(
+  bookingId: string,
+  newTimeSlotId: string,
+  compute: (
+    booking: Booking,
+    oldSlot: BookingTimeSlot,
+    newSlot: BookingTimeSlot,
+  ) => {
+    updatedBooking: Booking;
+    oldSlotPatch: Partial<Pick<BookingTimeSlot, 'confirmedCount' | 'pendingCount' | 'updatedAt'>>;
+    newSlotPatch: Partial<Pick<BookingTimeSlot, 'confirmedCount' | 'pendingCount' | 'updatedAt'>>;
+  },
+): Promise<Booking> {
+  return adminDb().runTransaction(async (tx) => {
+    const bookingRef = bookingsCollection().doc(bookingId);
+    const bookingSnap = await tx.get(bookingRef);
+    if (!bookingSnap.exists) {
+      throw Object.assign(new Error(`booking ${bookingId} not found`), {
+        code: 'booking-not-found',
+      });
+    }
+
+    const booking = bookingSnap.data() as Booking;
+    const oldSlotRef = timeSlotRef(booking.timeSlotId);
+    const newSlotRef = timeSlotRef(newTimeSlotId);
+    const [oldSlotSnap, newSlotSnap] = await Promise.all([tx.get(oldSlotRef), tx.get(newSlotRef)]);
+    if (!oldSlotSnap.exists) {
+      throw Object.assign(new Error(`time slot ${booking.timeSlotId} not found`), {
+        code: 'booking-time-slot-not-found',
+      });
+    }
+    if (!newSlotSnap.exists) {
+      throw Object.assign(new Error(`time slot ${newTimeSlotId} not found`), {
+        code: 'booking-time-slot-not-found',
+      });
+    }
+
+    const { updatedBooking, oldSlotPatch, newSlotPatch } = compute(
+      booking,
+      oldSlotSnap.data() as BookingTimeSlot,
+      newSlotSnap.data() as BookingTimeSlot,
+    );
+    tx.set(bookingRef, updatedBooking);
+    tx.update(oldSlotRef, oldSlotPatch);
+    tx.update(newSlotRef, newSlotPatch);
+    return updatedBooking;
+  });
+}
+
 export async function transitionBookingTransaction(
   bookingId: string,
   compute: (

@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { getAccountStatus } from '~/modules/identity';
 import { getLevelsForUsers } from '~/modules/level';
 import { getAllUsers } from '~/modules/users';
+import { getMemberBalancesForUsers } from '~/modules/points';
 import { getRoleForUser } from '~/modules/roles';
 import { requirePermission } from '~/shared/rbac';
 import { FeatureFlag, Permission, Role } from '@saas-starter-kit/shared';
@@ -23,14 +24,19 @@ export default defineEventHandler(async (event) => {
   const levelsByUserId = useRuntimeConfig().public.featureFlags[FeatureFlag.Level]
     ? await getLevelsForUsers(users.map((user) => user.userId))
     : new Map();
+  const pointsBalanceByUserId = useRuntimeConfig().public.featureFlags[FeatureFlag.Points]
+    ? await getMemberBalancesForUsers(users.map((user) => user.userId))
+    : new Map();
   const withRole = await Promise.all(
     users.map(async (user) => {
       const { disabled } = await getAccountStatus(user.userId);
+      const balance = pointsBalanceByUserId.get(user.userId);
       return {
         ...user,
         disabled,
         role: await getRoleForUser(user.userId),
         level: levelsByUserId.get(user.userId) ?? null,
+        points: balance === undefined ? null : { balance },
       };
     }),
   );

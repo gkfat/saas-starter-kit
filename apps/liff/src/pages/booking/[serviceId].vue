@@ -247,6 +247,6 @@ onMounted(loadSlots);
 }
 
 .booking-bottom-spacer {
-  height: 72px;
+  height: 160px;
 }
 </style>

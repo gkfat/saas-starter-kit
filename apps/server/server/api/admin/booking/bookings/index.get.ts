@@ -73,6 +73,7 @@ export default defineEventHandler(async (event): Promise<PaginatedAdminBookingsR
           }
         : {}),
       ...(booking.note ? { note: booking.note } : {}),
+      ...(booking.staffNote ? { staffNote: booking.staffNote } : {}),
       status: booking.status,
       createdAt: booking.createdAt,
     };

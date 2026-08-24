@@ -52,8 +52,8 @@
 
       <div v-for="(week, weekIndex) in weeks" :key="weekIndex" class="calendar-grid">
         <div
-          v-for="cell in week"
-          :key="cell.date ?? `blank-${weekIndex}-${Math.random()}`"
+          v-for="(cell, cellIndex) in week"
+          :key="cell.date ?? `blank-${weekIndex}-${cellIndex}`"
           class="calendar-cell"
           :class="{
             'calendar-cell--empty': !cell.date,
@@ -71,9 +71,9 @@
                 :title="holidaysByDate[cell.date]"
               />
             </div>
-            <v-chip v-if="capacitySummaryForDate(cell.date).total > 0" size="x-small" class="mt-1">
-              {{ t('bookingTimeSlots.booked') }} {{ capacitySummaryForDate(cell.date).booked }} /
-              {{ t('bookingTimeSlots.limit') }} {{ capacitySummaryForDate(cell.date).total }}
+            <v-chip v-if="cell.total > 0" size="x-small" class="mt-1">
+              {{ t('bookingTimeSlots.booked') }} {{ cell.booked }} /
+              {{ t('bookingTimeSlots.limit') }} {{ cell.total }}
             </v-chip>
           </template>
         </div>
@@ -193,7 +193,7 @@ const weekdayHeaderLabels = computed(() =>
   [1, 2, 3, 4, 5, 6, 0].map((value) => t(`bookingSlotTemplates.weekdayShort.${value}`)),
 );
 
-type CalendarCell = { date: string | null };
+type CalendarCell = { date: string | null; booked: number; total: number };
 
 const weeks = computed<CalendarCell[][]>(() => {
   const year = viewYear.value;
@@ -203,11 +203,13 @@ const weeks = computed<CalendarCell[][]>(() => {
   const leading = (firstDay.getDay() + 6) % 7;
 
   const cells: CalendarCell[] = [];
-  for (let i = 0; i < leading; i++) cells.push({ date: null });
+  for (let i = 0; i < leading; i++) cells.push({ date: null, booked: 0, total: 0 });
   for (let day = 1; day <= daysInMonth; day++) {
-    cells.push({ date: formatDateOnly(new Date(year, month, day)) });
+    const date = formatDateOnly(new Date(year, month, day));
+    const summary = capacitySummaryForDate(date);
+    cells.push({ date, booked: summary.booked, total: summary.total });
   }
-  while (cells.length % 7 !== 0) cells.push({ date: null });
+  while (cells.length % 7 !== 0) cells.push({ date: null, booked: 0, total: 0 });
 
   const result: CalendarCell[][] = [];
   for (let i = 0; i < cells.length; i += 7) result.push(cells.slice(i, i + 7));
@@ -226,17 +228,27 @@ function localDateOf(iso: string): string {
   return dayjs(iso).tz(timezoneStore.selected).format('YYYY-MM-DD');
 }
 
-function persistedSlotsForDate(date: string): DaySlotDraft[] {
-  return (slots.value ?? [])
-    .filter((slot) => localDateOf(slot.startAt) === date)
-    .map((slot) => ({
+// Grouped once per `slots`/timezone change so the month grid doesn't re-scan the full slot
+// list (which can span many months) for every calendar cell on every render.
+const persistedSlotsByDate = computed<Record<string, DaySlotDraft[]>>(() => {
+  const map: Record<string, DaySlotDraft[]> = {};
+  for (const slot of slots.value ?? []) {
+    const date = localDateOf(slot.startAt);
+    const draft: DaySlotDraft = {
       id: slot.id,
       startAt: slot.startAt,
       endAt: slot.endAt,
       capacity: slot.capacity,
       confirmedCount: slot.confirmedCount,
       pendingCount: slot.pendingCount,
-    }));
+    };
+    (map[date] ??= []).push(draft);
+  }
+  return map;
+});
+
+function persistedSlotsForDate(date: string): DaySlotDraft[] {
+  return persistedSlotsByDate.value[date] ?? [];
 }
 
 function effectiveSlotsForDate(date: string): DaySlotDraft[] {

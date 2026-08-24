@@ -4,7 +4,8 @@ export type BookingNotificationEvent =
   | { type: 'confirmed'; booking: Booking }
   | { type: 'pendingReview'; booking: Booking }
   | { type: 'rejected'; booking: Booking }
-  | { type: 'cancelled'; booking: Booking };
+  | { type: 'cancelled'; booking: Booking }
+  | { type: 'rescheduled'; booking: Booking };
 
 /**
  * design.md D4: booking depends only on this interface, not on a concrete LINE

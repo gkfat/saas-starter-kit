@@ -21,6 +21,7 @@ import {
   listSlotTemplates as listSlotTemplatesFromRepo,
   listTimeSlotsByService as listTimeSlotsByServiceFromRepo,
   queryOverduePendingBookings,
+  rescheduleBookingTransaction,
   transitionBookingTransaction,
   updateProvider as updateProviderInRepo,
   updateService as updateServiceInRepo,
@@ -28,6 +29,8 @@ import {
   updateTimeSlot as updateTimeSlotInRepo,
 } from './booking.repo';
 import {
+  AdminRescheduleBookingSchema,
+  AdminUpdateBookingStatusSchema,
   BulkCreateBookingTimeSlotsSchema,
   CreateBookingProviderSchema,
   CreateBookingSchema,
@@ -601,6 +604,121 @@ export async function reviewBooking(
   });
 
   notifyBookingEvent(updated.memberId, { type: decision, booking: updated });
+  return updated;
+}
+
+/**
+ * Admin-initiated cancellation: unlike the member-facing `cancelBooking`, this has no
+ * ownership check and no cancellation-window cutoff — staff may need to cancel a confirmed
+ * or pending booking at any time (e.g. correcting a mistake, handling a no-show after the
+ * fact).
+ */
+export async function adminCancelBooking(
+  bookingId: string,
+  input: { note?: string } = {},
+): Promise<Booking> {
+  requireBookingEnabled();
+  const { note } = AdminUpdateBookingStatusSchema.pick({ note: true }).parse(input);
+
+  const updated = await transitionBookingTransaction(bookingId, (booking, slot) => {
+    if (booking.status !== 'confirmed' && booking.status !== 'pendingReview') {
+      throw Object.assign(
+        new Error(`booking ${bookingId} cannot be cancelled from its current status`),
+        {
+          code: 'booking-invalid-status-transition',
+        },
+      );
+    }
+
+    const updatedAt = new Date().toISOString();
+    const updatedBooking: Booking = {
+      ...booking,
+      status: 'cancelled',
+      updatedAt,
+      ...(note ? { staffNote: note } : {}),
+    };
+    delete updatedBooking.reviewDeadlineAt;
+
+    const slotPatch =
+      booking.status === 'confirmed'
+        ? { confirmedCount: Math.max(0, slot.confirmedCount - 1), updatedAt }
+        : { pendingCount: Math.max(0, slot.pendingCount - 1), updatedAt };
+
+    return { updatedBooking, slotPatch };
+  });
+
+  notifyBookingEvent(updated.memberId, { type: 'cancelled', booking: updated });
+  return updated;
+}
+
+/**
+ * Admin-initiated reschedule: moves a confirmed/pending booking to a different time slot of
+ * the same service, releasing its slot count on the old slot and consuming one on the new
+ * slot (subject to the new slot's capacity). The booking's status is preserved as-is.
+ */
+export async function adminRescheduleBooking(
+  bookingId: string,
+  newTimeSlotId: string,
+  input: { note?: string } = {},
+): Promise<Booking> {
+  requireBookingEnabled();
+  const { timeSlotId, note } = AdminRescheduleBookingSchema.parse({
+    timeSlotId: newTimeSlotId,
+    ...input,
+  });
+
+  const updated = await rescheduleBookingTransaction(
+    bookingId,
+    timeSlotId,
+    (booking, oldSlot, newSlot) => {
+      if (booking.status !== 'confirmed' && booking.status !== 'pendingReview') {
+        throw Object.assign(
+          new Error(`booking ${bookingId} cannot be rescheduled from its current status`),
+          {
+            code: 'booking-invalid-status-transition',
+          },
+        );
+      }
+      if (newSlot.serviceId !== booking.serviceId) {
+        throw Object.assign(new Error(`time slot ${timeSlotId} does not belong to this service`), {
+          code: 'booking-time-slot-service-mismatch',
+        });
+      }
+      if (newSlot.id === oldSlot.id) {
+        throw Object.assign(new Error('new time slot must differ from the current one'), {
+          code: 'booking-time-slot-unchanged',
+        });
+      }
+      const used = newSlot.confirmedCount + newSlot.pendingCount;
+      if (used >= newSlot.capacity) {
+        throw Object.assign(new Error('time slot capacity is full'), {
+          code: 'booking-time-slot-full',
+        });
+      }
+
+      const updatedAt = new Date().toISOString();
+      const updatedBooking: Booking = {
+        ...booking,
+        timeSlotId: newSlot.id,
+        updatedAt,
+        ...(booking.status === 'pendingReview' ? { reviewDeadlineAt: newSlot.startAt } : {}),
+        ...(note ? { staffNote: note } : {}),
+      };
+
+      const oldSlotPatch =
+        booking.status === 'confirmed'
+          ? { confirmedCount: Math.max(0, oldSlot.confirmedCount - 1), updatedAt }
+          : { pendingCount: Math.max(0, oldSlot.pendingCount - 1), updatedAt };
+      const newSlotPatch =
+        booking.status === 'confirmed'
+          ? { confirmedCount: newSlot.confirmedCount + 1, updatedAt }
+          : { pendingCount: newSlot.pendingCount + 1, updatedAt };
+
+      return { updatedBooking, oldSlotPatch, newSlotPatch };
+    },
+  );
+
+  notifyBookingEvent(updated.memberId, { type: 'rescheduled', booking: updated });
   return updated;
 }
 

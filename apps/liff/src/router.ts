@@ -91,6 +91,13 @@ const router = createRouter({
           meta: { requiresAuth: true, featureFlag: 'booking' },
         },
         {
+          path: 'booking/my/:bookingId/cancel',
+          name: 'bookingCancelConfirm',
+          component: () => import('~/pages/booking/my/[bookingId]/cancel.vue'),
+          props: true,
+          meta: { requiresAuth: true, featureFlag: 'booking', backTo: 'myBookings' },
+        },
+        {
           path: 'booking/:serviceId',
           name: 'bookingService',
           component: () => import('~/pages/booking/[serviceId].vue'),

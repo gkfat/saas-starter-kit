@@ -97,21 +97,24 @@ type FeatureCategory = {
 const featureCategories: FeatureCategory[] = [
   {
     labelKey: 'home.explore.categories.membership',
-    modules: [FeatureModule.Auth, FeatureModule.UserManagement, FeatureModule.MemberLiff],
+    modules: [
+      FeatureModule.Auth,
+      FeatureModule.UserManagement,
+      FeatureModule.Points,
+      FeatureModule.MemberLiff,
+    ],
+  },
+  {
+    labelKey: 'home.explore.categories.engagement',
+    modules: [FeatureModule.Level, FeatureModule.Coupon, FeatureModule.Event],
+  },
+  {
+    labelKey: 'home.explore.categories.booking',
+    modules: [FeatureModule.Booking],
   },
   {
     labelKey: 'home.explore.categories.admin',
     modules: [FeatureModule.Rbac, FeatureModule.LoginLogs, FeatureModule.AuditLogs],
-  },
-  {
-    labelKey: 'home.explore.categories.engagement',
-    modules: [
-      FeatureModule.Level,
-      FeatureModule.Coupon,
-      FeatureModule.Points,
-      FeatureModule.Event,
-      FeatureModule.Booking,
-    ],
   },
   {
     labelKey: 'home.explore.categories.analytics',

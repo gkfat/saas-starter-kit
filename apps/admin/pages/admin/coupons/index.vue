@@ -2,7 +2,12 @@
   <div>
     <div class="d-flex flex-wrap ga-3 align-center justify-space-between">
       <LayoutPageHeader :title="$t('coupons.title')" />
-      <CouponsToolbar :can-write="canWrite" @create="openCreate" />
+      <CouponsToolbar
+        :can-write="canWrite"
+        :can-redeem="canRedeem"
+        @create="openCreate"
+        @redeem="openRedeem"
+      />
     </div>
 
     <CardsAppCard>
@@ -49,6 +54,7 @@
     <TemplateFormDialog v-model="formDialog" :template="editing" @saved="refresh" />
     <IssueDialog v-model="issueDialog" :template="issueTarget" @issued="refresh" />
     <InstancesDialog v-model="instancesDialog" :template="instancesTarget" />
+    <RedeemDialog v-model="redeemDialog" />
   </div>
 </template>
 
@@ -57,6 +63,7 @@ import { Permission } from '@saas-starter-kit/shared';
 import type { CouponTemplate } from '@saas-starter-kit/shared';
 import IssueDialog from '~/components/coupons/IssueDialog.vue';
 import InstancesDialog from '~/components/coupons/InstancesDialog.vue';
+import RedeemDialog from '~/components/coupons/RedeemDialog.vue';
 import TemplateFormDialog from '~/components/coupons/TemplateFormDialog.vue';
 
 const { t } = useI18n();
@@ -65,6 +72,7 @@ const { hasPermission } = usePermission();
 const canRead = computed(() => hasPermission(Permission.Coupons.Read));
 const canWrite = computed(() => hasPermission(Permission.Coupons.Write));
 const canIssue = computed(() => hasPermission(Permission.Coupons.Issue));
+const canRedeem = computed(() => hasPermission(Permission.Coupons.Redeem));
 
 const {
   data: templates,
@@ -114,5 +122,11 @@ const instancesTarget = ref<CouponTemplate | null>(null);
 function openInstances(item: CouponTemplate) {
   instancesTarget.value = item;
   instancesDialog.value = true;
+}
+
+const redeemDialog = ref(false);
+
+function openRedeem() {
+  redeemDialog.value = true;
 }
 </script>

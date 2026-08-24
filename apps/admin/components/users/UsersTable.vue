@@ -59,12 +59,23 @@
         <span v-if="item.level" class="text-no-wrap">{{ item.level.levelName }}</span>
         <span v-else class="text-medium-emphasis">—</span>
       </template>
+      <template v-if="showPointsColumn" #[`item.points`]="{ item }">
+        <span v-if="item.points" class="text-no-wrap font-weight-bold">{{
+          item.points.balance
+        }}</span>
+        <span v-else class="text-medium-emphasis">—</span>
+      </template>
       <template #[`item.actions`]="{ item }">
         <v-row no-gutters class="ga-1 flex-nowrap">
           <ButtonsIconActionBtn
             v-if="showMemberFeatures"
             icon="mdi-information-outline"
             @click="emit('detail', item)"
+          />
+          <ButtonsIconActionBtn
+            v-if="showPointsColumn && canAdjustPoints"
+            icon="mdi-cash-edit"
+            @click="emit('adjust-points', item)"
           />
           <ButtonsIconActionBtn
             v-if="canWriteUsers && item.passwordSetupPending"
@@ -100,10 +111,12 @@ const props = withDefaults(
     canDeleteUsers: boolean;
     /** Member-only affordances (level column, detail dialog) — not applicable to admin accounts */
     showMemberFeatures?: boolean;
+    /** Whether the current user may adjust member points balances */
+    canAdjustPoints?: boolean;
     /** Logged-in user's own userId, used to block self-service status changes */
     currentUserId?: string | null;
   }>(),
-  { showMemberFeatures: true, currentUserId: null },
+  { showMemberFeatures: true, canAdjustPoints: false, currentUserId: null },
 );
 
 const emit = defineEmits<{
@@ -112,12 +125,14 @@ const emit = defineEmits<{
   'toggle-status': [item: UserRow];
   'regenerate-link': [item: UserRow];
   'generate-line-invite': [item: UserRow];
+  'adjust-points': [item: UserRow];
   delete: [item: UserRow];
 }>();
 
 const { t, locale } = useI18n();
 const { isFeatureEnabled } = useFeatureFlags();
 const showLevelColumn = props.showMemberFeatures && isFeatureEnabled(FeatureFlag.Level);
+const showPointsColumn = props.showMemberFeatures && isFeatureEnabled(FeatureFlag.Points);
 
 const headers = computed(() => [
   { title: t('users.uid'), key: 'userId' },
@@ -127,6 +142,9 @@ const headers = computed(() => [
   { title: t('users.role'), key: 'role' },
   { title: t('users.status.label'), key: 'status', sortable: false },
   ...(showLevelColumn ? [{ title: t('users.level'), key: 'level', sortable: false }] : []),
+  ...(showPointsColumn
+    ? [{ title: t('pointsMembers.balance'), key: 'points', sortable: false }]
+    : []),
   { title: t('users.lastLoginAt'), key: 'lastLoginAt' },
   { title: t('users.createdAt'), key: 'createdAt' },
   { title: '', key: 'actions', sortable: false, align: 'end' as const },

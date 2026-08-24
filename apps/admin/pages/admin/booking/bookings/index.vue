@@ -43,6 +43,10 @@
           <span class="text-caption">{{ item.note ?? '—' }}</span>
         </template>
 
+        <template #[`item.staffNote`]="{ item }">
+          <span class="text-caption">{{ item.staffNote ?? '—' }}</span>
+        </template>
+
         <template #[`item.status`]="{ item }">
           <v-chip :color="statusColor(item.status)" size="small" variant="flat">
             {{ $t(`bookings.statusOption.${item.status}`) }}
@@ -54,17 +58,25 @@
         </template>
 
         <template #[`item.actions`]="{ item }">
-          <v-row
-            v-if="canReview && item.status === 'pendingReview'"
-            no-gutters
-            class="ga-1 flex-nowrap"
-          >
-            <ButtonsAppButton kind="primary" size="small" @click="openApprove(item)">
-              {{ $t('bookings.approve') }}
-            </ButtonsAppButton>
-            <ButtonsAppButton kind="secondary" size="small" @click="openReject(item)">
-              {{ $t('bookings.reject') }}
-            </ButtonsAppButton>
+          <v-row v-if="canReview" no-gutters class="ga-1 flex-nowrap">
+            <template v-if="item.status === 'pendingReview'">
+              <ButtonsAppButton kind="primary" size="small" height="32" @click="openApprove(item)">
+                {{ $t('bookings.approve') }}
+              </ButtonsAppButton>
+            </template>
+            <template v-if="item.status === 'confirmed' || item.status === 'pendingReview'">
+              <ButtonsIconActionBtn
+                icon="mdi-calendar-edit"
+                :title="$t('bookings.reschedule')"
+                @click="openReschedule(item)"
+              />
+              <ButtonsIconActionBtn
+                icon="mdi-close"
+                class="text-error"
+                :title="$t('bookings.cancel')"
+                @click="openCancel(item)"
+              />
+            </template>
           </v-row>
         </template>
       </v-data-table-server>
@@ -79,33 +91,51 @@
           <ButtonsAppButton kind="secondary" :disabled="reviewing" @click="approveDialog = false">
             {{ $t('common.cancel') }}
           </ButtonsAppButton>
-          <ButtonsAppButton kind="primary" :loading="reviewing" @click="confirmReview('confirmed')">
+          <ButtonsAppButton kind="primary" :loading="reviewing" @click="confirmReview()">
             {{ $t('common.confirm') }}
           </ButtonsAppButton>
         </v-card-actions>
       </CardsDialogCard>
     </v-dialog>
 
-    <v-dialog v-model="rejectDialog" max-width="400" persistent>
+    <v-dialog v-model="cancelDialog" max-width="400" persistent>
       <CardsDialogCard>
-        <v-card-title class="pa-4">{{ $t('bookings.rejectConfirmTitle') }}</v-card-title>
-        <v-card-text>{{ $t('bookings.rejectConfirm') }}</v-card-text>
+        <v-card-title class="pa-4">{{ $t('bookings.cancelConfirmTitle') }}</v-card-title>
+        <v-card-text>
+          <div class="mb-4">{{ $t('bookings.cancelConfirm') }}</div>
+          <div class="text-caption text-medium-emphasis mb-1">{{ $t('bookings.staffNote') }}</div>
+          <v-textarea
+            v-model="cancelNote"
+            :placeholder="$t('bookings.staffNotePlaceholder')"
+            variant="outlined"
+            density="comfortable"
+            rows="2"
+            maxlength="200"
+            hide-details
+          />
+        </v-card-text>
         <v-card-actions class="pa-4">
           <v-spacer />
-          <ButtonsAppButton kind="secondary" :disabled="reviewing" @click="rejectDialog = false">
+          <ButtonsAppButton kind="secondary" :disabled="cancelling" @click="cancelDialog = false">
             {{ $t('common.cancel') }}
           </ButtonsAppButton>
           <ButtonsAppButton
             kind="primary"
             color="error"
-            :loading="reviewing"
-            @click="confirmReview('rejected')"
+            :loading="cancelling"
+            @click="confirmCancel"
           >
             {{ $t('common.confirm') }}
           </ButtonsAppButton>
         </v-card-actions>
       </CardsDialogCard>
     </v-dialog>
+
+    <RescheduleBookingDialog
+      v-model="rescheduleDialog"
+      :booking="rescheduleTarget"
+      @rescheduled="refresh"
+    />
   </div>
 </template>
 
@@ -118,6 +148,7 @@ import type {
   PaginatedAdminBookingsResponse,
 } from '@saas-starter-kit/shared';
 import BookingsFilterBar from '~/components/booking/BookingsFilterBar.vue';
+import RescheduleBookingDialog from '~/components/booking/RescheduleBookingDialog.vue';
 import { useTimezoneStore } from '~/stores/timezone';
 import dayjs from '~/utils/dayjs';
 
@@ -181,6 +212,7 @@ const headers = computed(() => [
   { title: t('bookings.date'), key: 'timeSlotDate', sortable: false },
   { title: t('bookings.timeSlot'), key: 'timeSlotRange', sortable: false },
   { title: t('bookings.note'), key: 'note', sortable: false },
+  { title: t('bookings.staffNoteColumn'), key: 'staffNote', sortable: false },
   { title: t('bookings.createdAt'), key: 'createdAt', sortable: false },
   { title: t('bookings.status'), key: 'status', sortable: false },
   { title: '', key: 'actions', sortable: false, align: 'end' as const },
@@ -193,7 +225,6 @@ function statusColor(status: BookingStatus): string {
 }
 
 const approveDialog = ref(false);
-const rejectDialog = ref(false);
 const reviewing = ref(false);
 const reviewTarget = ref<AdminBookingRow | null>(null);
 
@@ -202,27 +233,54 @@ function openApprove(item: AdminBookingRow) {
   approveDialog.value = true;
 }
 
-function openReject(item: AdminBookingRow) {
-  reviewTarget.value = item;
-  rejectDialog.value = true;
-}
-
-async function confirmReview(status: 'confirmed' | 'rejected') {
+async function confirmReview() {
   if (!reviewTarget.value) return;
   reviewing.value = true;
   const result = await apiFetch(`/api/admin/booking/bookings/${reviewTarget.value.id}`, {
     method: 'PATCH',
-    body: { status },
+    body: { status: 'confirmed' },
   });
   if (result !== null) {
     approveDialog.value = false;
-    rejectDialog.value = false;
-    showSuccess(
-      status === 'confirmed' ? t('bookings.approveSuccess') : t('bookings.rejectSuccess'),
-    );
+    showSuccess(t('bookings.approveSuccess'));
     await refresh();
   }
   reviewing.value = false;
+}
+
+const cancelDialog = ref(false);
+const cancelling = ref(false);
+const cancelTarget = ref<AdminBookingRow | null>(null);
+const cancelNote = ref('');
+
+function openCancel(item: AdminBookingRow) {
+  cancelTarget.value = item;
+  cancelNote.value = '';
+  cancelDialog.value = true;
+}
+
+async function confirmCancel() {
+  if (!cancelTarget.value) return;
+  cancelling.value = true;
+  const note = cancelNote.value.trim();
+  const result = await apiFetch(`/api/admin/booking/bookings/${cancelTarget.value.id}`, {
+    method: 'PATCH',
+    body: { status: 'cancelled', ...(note ? { note } : {}) },
+  });
+  if (result !== null) {
+    cancelDialog.value = false;
+    showSuccess(t('bookings.cancelSuccess'));
+    await refresh();
+  }
+  cancelling.value = false;
+}
+
+const rescheduleDialog = ref(false);
+const rescheduleTarget = ref<AdminBookingRow | null>(null);
+
+function openReschedule(item: AdminBookingRow) {
+  rescheduleTarget.value = item;
+  rescheduleDialog.value = true;
 }
 </script>
 

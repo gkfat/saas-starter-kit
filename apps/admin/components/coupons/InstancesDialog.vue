@@ -12,8 +12,14 @@
           <template #no-data>
             <span class="text-medium-emphasis">{{ $t('coupons.instancesNoData') }}</span>
           </template>
-          <template #[`item.member`]="{ item }">
-            {{ memberLabel(item.memberId) }}
+          <template #[`item.memberNo`]="{ item }">
+            {{ memberField(item.memberId, 'memberNo') }}
+          </template>
+          <template #[`item.memberName`]="{ item }">
+            {{ memberField(item.memberId, 'displayName') }}
+          </template>
+          <template #[`item.memberPhone`]="{ item }">
+            {{ memberField(item.memberId, 'phone') }}
           </template>
           <template #[`item.issuedAt`]="{ item }">
             {{ formatDateTime(item.issuedAt) }}
@@ -50,7 +56,9 @@ const emit = defineEmits<{
 const { t } = useI18n();
 
 const headers = computed(() => [
-  { title: t('coupons.member'), key: 'member' },
+  { title: t('coupons.memberNo'), key: 'memberNo' },
+  { title: t('coupons.memberName'), key: 'memberName' },
+  { title: t('coupons.memberPhone'), key: 'memberPhone' },
   { title: t('coupons.issuedAt'), key: 'issuedAt' },
   { title: t('coupons.state'), key: 'state' },
 ]);
@@ -74,9 +82,10 @@ const { data: members, refresh: refreshMembers } = useAuthFetch<UserRow[]>('/api
 
 const membersById = computed(() => new Map((members.value ?? []).map((m) => [m.userId, m])));
 
-function memberLabel(memberId: string): string {
+function memberField(memberId: string, field: 'memberNo' | 'displayName' | 'phone'): string {
   const member = membersById.value.get(memberId);
-  return member ? `${member.displayName} (${member.memberNo})` : memberId;
+  if (!member) return field === 'displayName' ? t('coupons.memberDeleted') : '-';
+  return member[field] ?? '-';
 }
 
 function stateColor(state: CouponInstanceWithState['state']): string {

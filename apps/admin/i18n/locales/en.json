@@ -24,9 +24,9 @@
     "en": "English"
   },
   "nav": {
-    "groupManagement": "Management",
-    "groupCoupons": "Coupon Module",
-    "groupLevel": "Level Module",
+    "groupManagement": "Admin Management",
+    "groupMember": "Member Management",
+    "groupMarketing": "Marketing Module",
     "groupIam": "IAM",
     "groupAbout": "About",
     "dashboard": "Dashboard",
@@ -38,18 +38,14 @@
     "adminAccounts": "Admin Accounts",
     "loginLogs": "Login Logs",
     "auditLogs": "Audit Logs",
-    "levelTiers": "Level Tiers",
+    "levelTiers": "Level Settings",
     "coupons": "Coupon Management",
-    "couponsRedeem": "Redeem Coupon",
     "home": "Home",
-    "groupPoints": "Points Module",
     "pointsSettings": "Redemption Ratio",
-    "pointsMembers": "Member Points",
-    "groupEvents": "Event Module",
     "events": "Event Management",
     "groupBooking": "Booking Module",
-    "bookingServices": "Service Management",
-    "bookingSlotTemplates": "Slot Templates",
+    "bookingServices": "Service Settings",
+    "bookingSlotTemplates": "Slot Template Settings",
     "bookingBookings": "Booking Management",
     "bookingProviders": "Provider Management"
   },
@@ -258,8 +254,9 @@
       "title": "Which modules do we offer?",
       "categories": {
         "membership": "Membership",
+        "engagement": "Marketing settings",
+        "booking": "Booking",
         "admin": "Admin & governance",
-        "engagement": "Member engagement",
         "analytics": "Analytics"
       }
     }
@@ -433,7 +430,7 @@
     "notInitialized": "No level data"
   },
   "levelTiers": {
-    "title": "Level Tiers",
+    "title": "Level Settings",
     "levelNumber": "Level",
     "name": "Name",
     "metricThreshold": "Threshold",
@@ -455,6 +452,7 @@
     "title": "Coupon Management",
     "noData": "No coupon templates yet",
     "create": "New Template",
+    "redeemButton": "Redeem Coupon",
     "edit": "Edit Template",
     "templateTitle": "Title",
     "description": "Description",
@@ -491,7 +489,10 @@
     "instances": "Issuance Records",
     "instancesTitle": "Issuance Records",
     "instancesNoData": "No issuance records yet",
-    "member": "Member",
+    "memberNo": "Member No.",
+    "memberName": "Member Name",
+    "memberPhone": "Phone",
+    "memberDeleted": "Member deleted",
     "issuedAt": "Issued At",
     "state": "Redemption Status",
     "stateLabel": {
@@ -683,17 +684,19 @@
   },
   "pointsSettings": {
     "title": "Points Redemption Ratio",
+    "explainEyebrow": "How it works",
+    "explainBody": "Set the exchange ratio members use to redeem points against their purchase amount. This ratio applies to every points redemption.",
     "pointsPerUnit": "Points Required",
     "currencyValue": "Redeemable Amount (currency)",
     "ratioPreview": "{points} points = {amount} currency",
+    "unitPoints": "pts",
+    "unitCurrency": "currency",
+    "exampleHint": "Example: a member with {points} points can redeem up to {amount} in currency",
     "pointsPerUnitRequired": "Points required is required",
     "currencyValueRequired": "Redeemable amount is required",
     "updateSuccess": "Redemption ratio updated"
   },
   "pointsMembers": {
-    "title": "Member Points",
-    "noData": "No members found",
-    "searchPlaceholder": "Search member no. / name / email",
     "balance": "Balance",
     "detail": "Points Detail",
     "detailTitle": "Member Points Detail",
@@ -721,8 +724,7 @@
       "campaign_gift": "Campaign Gift",
       "birthday_gift": "Birthday Gift",
       "other": "Other"
-    },
-    "memberName": "Member Name"
+    }
   },
   "events": {
     "title": "Event Management",
@@ -761,7 +763,7 @@
     "deleteConfirm": "Are you sure you want to delete event \"{title}\"?"
   },
   "bookingServices": {
-    "title": "Service Management",
+    "title": "Service Settings",
     "noData": "No service items yet",
     "create": "New Service",
     "edit": "Edit Service",
@@ -818,8 +820,8 @@
     "startAt": "Start Time",
     "endAt": "End Time",
     "capacity": "Capacity",
-    "confirmedCount": "Confirmed",
-    "pendingCount": "Pending",
+    "confirmedCount": "Booked (Confirmed)",
+    "pendingCount": "Booked (Unconfirmed)",
     "remaining": "Remaining",
     "startAtRequired": "Start time is required",
     "endAtRequired": "End time is required",
@@ -846,7 +848,7 @@
     "limit": "Limit"
   },
   "bookingSlotTemplates": {
-    "title": "Slot Templates",
+    "title": "Slot Template Settings",
     "noData": "No slot templates yet",
     "create": "New Template",
     "edit": "Edit Template",
@@ -902,17 +904,27 @@
     "filterByService": "Filter by service",
     "filterByStatus": "Filter by status",
     "searchByMemberId": "Search by member ID",
-    "approve": "Approve",
-    "reject": "Reject",
-    "approveConfirmTitle": "Approve Booking",
-    "approveConfirm": "Are you sure you want to approve this booking?",
-    "rejectConfirmTitle": "Reject Booking",
-    "rejectConfirm": "Are you sure you want to reject this booking?",
-    "approveSuccess": "Booking approved",
-    "rejectSuccess": "Booking rejected",
+    "approve": "Confirm Booking",
+    "approveConfirmTitle": "Confirm Booking",
+    "approveConfirm": "Are you sure you want to confirm this booking?",
+    "approveSuccess": "Booking confirmed",
     "memberNo": "Member No.",
     "memberName": "Member Name",
     "note": "Customer Note",
-    "date": "Booking Date"
+    "date": "Booking Date",
+    "reschedule": "Reschedule",
+    "cancel": "Cancel Booking",
+    "staffNote": "Staff Note (optional)",
+    "staffNoteColumn": "Note",
+    "staffNotePlaceholder": "Reason for this change, shown on the booking list",
+    "cancelConfirmTitle": "Cancel Booking",
+    "cancelConfirm": "Are you sure you want to cancel this booking? This cannot be undone.",
+    "cancelSuccess": "Booking cancelled",
+    "rescheduleTitle": "Reschedule Booking",
+    "currentTimeSlot": "Current Time Slot",
+    "newTimeSlot": "New Time Slot",
+    "noAvailableTimeSlot": "No available time slots for this service",
+    "remainingCapacity": "{count} left",
+    "rescheduleSuccess": "Booking rescheduled"
   }
 }

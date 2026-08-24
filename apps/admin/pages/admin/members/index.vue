@@ -17,15 +17,24 @@
       :pending="pending"
       :can-write-users="canWriteUsers"
       :can-delete-users="canDeleteUsers"
+      :can-adjust-points="canAdjustPoints"
       @detail="openDetail"
       @edit="openEdit"
       @toggle-status="openToggleStatus"
       @regenerate-link="regenerateLink"
       @generate-line-invite="generateLineInvite"
+      @adjust-points="openPointsAdjust"
       @delete="openDelete"
     />
 
     <MemberDetailDialog v-model="detailDialog" :user="detailTarget" />
+
+    <MemberPointsDialog
+      v-model="pointsDialog"
+      :member="pointsTarget"
+      :can-adjust="canAdjustPoints"
+      @adjusted="refresh"
+    />
 
     <EditRoleDialog
       v-model="dialog"
@@ -63,7 +72,9 @@ import type {
   UserRow,
   RegenerateSetupLinkResponse,
   GenerateLineInviteResponse,
+  PointsMemberRow,
 } from '@saas-starter-kit/shared';
+import MemberPointsDialog from '~/components/points/MemberPointsDialog.vue';
 import CreateUserDialog from '~/components/users/CreateUserDialog.vue';
 import DeleteUserDialog from '~/components/users/DeleteUserDialog.vue';
 import EditRoleDialog from '~/components/users/EditRoleDialog.vue';
@@ -82,6 +93,7 @@ const { hasPermission } = usePermission();
 const canWriteUsers = computed(() => hasPermission(Permission.Members.Write));
 const canCreateUsers = computed(() => hasPermission(Permission.Members.Create));
 const canDeleteUsers = computed(() => hasPermission(Permission.Members.Delete));
+const canAdjustPoints = computed(() => hasPermission(Permission.Points.Adjust));
 
 const appliedSearch = ref('');
 const queryParams = computed(() => ({
@@ -128,6 +140,20 @@ const detailTarget = ref<UserRow | null>(null);
 function openDetail(item: UserRow) {
   detailTarget.value = item;
   detailDialog.value = true;
+}
+
+const pointsDialog = ref(false);
+const pointsTarget = ref<PointsMemberRow | null>(null);
+
+function openPointsAdjust(item: UserRow) {
+  pointsTarget.value = {
+    userId: item.userId,
+    memberNo: item.memberNo,
+    displayName: item.displayName,
+    email: item.email,
+    balance: item.points?.balance ?? 0,
+  };
+  pointsDialog.value = true;
 }
 
 const createDialog = ref(false);

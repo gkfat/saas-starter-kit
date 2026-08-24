@@ -13,4 +13,5 @@ export type UserRow = {
   lastLoginAt: string | null;
   createdAt: string;
   level?: GetLevelResult | null;
+  points?: { balance: number } | null;
 };

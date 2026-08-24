@@ -17,7 +17,6 @@ function startBooking() {
       class="booking-cta__card d-flex align-center justify-center ga-2"
       color="primary"
       variant="flat"
-      elevation="4"
       padding="4"
       @click="startBooking"
     >

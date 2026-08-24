@@ -23,6 +23,8 @@ export {
   listAdminBookings,
   listAdminBookingsPage,
   reviewBooking,
+  adminCancelBooking,
+  adminRescheduleBooking,
   processOverdueBookings,
 } from './booking.service';
 export type {

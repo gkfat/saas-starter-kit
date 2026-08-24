@@ -24,9 +24,9 @@
     "en": "English"
   },
   "nav": {
-    "groupManagement": "管理",
-    "groupCoupons": "優惠券模組",
-    "groupLevel": "等級模組",
+    "groupManagement": "後台管理",
+    "groupMember": "會員管理",
+    "groupMarketing": "行銷模組",
     "groupIam": "身份與存取管理",
     "groupAbout": "關於",
     "dashboard": "儀表板",
@@ -38,18 +38,14 @@
     "adminAccounts": "後台帳號管理",
     "loginLogs": "登入紀錄",
     "auditLogs": "稽核紀錄",
-    "levelTiers": "等級管理",
+    "levelTiers": "等級設定",
     "coupons": "優惠券管理",
-    "couponsRedeem": "優惠券核銷",
     "home": "首頁",
-    "groupPoints": "會員點數模組",
     "pointsSettings": "折抵比例設定",
-    "pointsMembers": "會員點數管理",
-    "groupEvents": "活動模組",
     "events": "活動管理",
     "groupBooking": "預約模組",
-    "bookingServices": "服務項目管理",
-    "bookingSlotTemplates": "時段樣板",
+    "bookingServices": "服務項目設定",
+    "bookingSlotTemplates": "時段樣板設定",
     "bookingBookings": "預約管理",
     "bookingProviders": "人員管理"
   },
@@ -258,8 +254,9 @@
       "title": "我們有哪些模組？",
       "categories": {
         "membership": "會員系統",
+        "engagement": "行銷設定",
+        "booking": "預約服務",
         "admin": "後台治理",
-        "engagement": "會員經營",
         "analytics": "數據分析"
       }
     }
@@ -433,7 +430,7 @@
     "notInitialized": "尚無等級資料"
   },
   "levelTiers": {
-    "title": "等級管理",
+    "title": "等級設定",
     "levelNumber": "等級",
     "name": "名稱",
     "metricThreshold": "門檻",
@@ -455,6 +452,7 @@
     "title": "優惠券管理",
     "noData": "尚未建立優惠券範本",
     "create": "新增範本",
+    "redeemButton": "核銷優惠券",
     "edit": "編輯範本",
     "templateTitle": "標題",
     "description": "說明",
@@ -491,7 +489,10 @@
     "instances": "發放紀錄",
     "instancesTitle": "發放紀錄",
     "instancesNoData": "尚無發放紀錄",
-    "member": "會員",
+    "memberNo": "會員編號",
+    "memberName": "會員名稱",
+    "memberPhone": "手機號碼",
+    "memberDeleted": "會員已刪除",
     "issuedAt": "發放時間",
     "state": "核銷狀態",
     "stateLabel": {
@@ -683,17 +684,19 @@
   },
   "pointsSettings": {
     "title": "點數折抵比例設定",
+    "explainEyebrow": "設定說明",
+    "explainBody": "設定會員使用點數折抵消費金額的兌換比例，此比例將套用於所有點數折抵計算。",
     "pointsPerUnit": "所需點數",
     "currencyValue": "可折抵金額（元）",
     "ratioPreview": "{points} 點 = {amount} 元",
+    "unitPoints": "點",
+    "unitCurrency": "元",
+    "exampleHint": "例如：擁有 {points} 點的會員，最多可折抵 {amount} 元",
     "pointsPerUnitRequired": "請輸入所需點數",
     "currencyValueRequired": "請輸入可折抵金額",
     "updateSuccess": "折抵比例已更新"
   },
   "pointsMembers": {
-    "title": "會員點數管理",
-    "noData": "尚無會員資料",
-    "searchPlaceholder": "搜尋會員編號、姓名、Email",
     "balance": "目前點數",
     "detail": "點數明細",
     "detailTitle": "會員點數明細",
@@ -721,8 +724,7 @@
       "campaign_gift": "活動贈送",
       "birthday_gift": "生日禮",
       "other": "其他"
-    },
-    "memberName": "會員名稱"
+    }
   },
   "events": {
     "title": "活動管理",
@@ -761,7 +763,7 @@
     "deleteConfirm": "確定要刪除活動「{title}」嗎？"
   },
   "bookingServices": {
-    "title": "服務項目管理",
+    "title": "服務項目設定",
     "noData": "尚未建立服務項目",
     "create": "新增服務項目",
     "edit": "編輯服務項目",
@@ -818,8 +820,8 @@
     "startAt": "開始時間",
     "endAt": "結束時間",
     "capacity": "容量上限",
-    "confirmedCount": "已確認",
-    "pendingCount": "待審核",
+    "confirmedCount": "已預約已確認",
+    "pendingCount": "已預約未確認",
     "remaining": "剩餘",
     "startAtRequired": "請選擇開始時間",
     "endAtRequired": "請選擇結束時間",
@@ -846,7 +848,7 @@
     "limit": "上限"
   },
   "bookingSlotTemplates": {
-    "title": "時段樣板",
+    "title": "時段樣板設定",
     "noData": "尚未建立時段樣板",
     "create": "新增樣板",
     "edit": "編輯樣板",
@@ -902,17 +904,27 @@
     "filterByService": "依服務項目篩選",
     "filterByStatus": "依狀態篩選",
     "searchByMemberId": "以會員 ID 搜尋",
-    "approve": "核准",
-    "reject": "拒絕",
-    "approveConfirmTitle": "核准預約",
-    "approveConfirm": "確定要核准這筆預約嗎？",
-    "rejectConfirmTitle": "拒絕預約",
-    "rejectConfirm": "確定要拒絕這筆預約嗎？",
-    "approveSuccess": "預約已核准",
-    "rejectSuccess": "預約已拒絕",
+    "approve": "確認接單",
+    "approveConfirmTitle": "確認接單",
+    "approveConfirm": "確定要確認接下這筆預約嗎？",
+    "approveSuccess": "已確認接單",
     "memberNo": "會員編號",
     "memberName": "會員名稱",
     "note": "客人備註",
-    "date": "預約日期"
+    "date": "預約日期",
+    "reschedule": "調整時段",
+    "cancel": "取消預約",
+    "staffNote": "後台備註（選填）",
+    "staffNoteColumn": "備註",
+    "staffNotePlaceholder": "可填寫調整或取消的原因，將顯示於預約列表",
+    "cancelConfirmTitle": "取消預約",
+    "cancelConfirm": "確定要取消這筆預約嗎？此操作無法復原。",
+    "cancelSuccess": "預約已取消",
+    "rescheduleTitle": "調整預約時段",
+    "currentTimeSlot": "目前時段",
+    "newTimeSlot": "新時段",
+    "noAvailableTimeSlot": "此服務項目目前沒有可用的時段",
+    "remainingCapacity": "剩餘 {count} 位",
+    "rescheduleSuccess": "預約時段已調整"
   }
 }

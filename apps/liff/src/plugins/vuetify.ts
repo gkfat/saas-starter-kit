@@ -25,4 +25,9 @@ export const vuetify = createVuetify({
   icons: {
     defaultSet: 'mdi',
   },
+  defaults: {
+    VBtn: {
+      variant: 'flat',
+    },
+  },
 });
