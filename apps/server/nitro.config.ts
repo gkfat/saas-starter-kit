@@ -1,6 +1,7 @@
 import { defineNitroConfig } from 'nitropack/config';
 import '../../scripts/load-root-env';
 
+// 無害測試註解
 export default defineNitroConfig({
   srcDir: 'server',
   compatibilityDate: '2024-04-03',
