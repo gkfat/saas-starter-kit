@@ -73,18 +73,19 @@ jobs:
       # Feature flags are baked into Nitro's runtimeConfig at build time (see
       # apps/server/nitro.config.ts and apps/server/Dockerfile) — pass them as build args
       # here, not as Cloud Run runtime env vars, or they silently fall back to defaults.
-      # Feature flag secrets are optional — fall back to the same defaults as .env.example.
+      # Feature flags are non-secret (repo Variables) and optional — fall back to the same
+      # defaults as .env.example.
       - name: Build and push image
         run: |
           IMAGE="${{ secrets.GCP_REGION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.GCP_ARTIFACT_REPO }}/saas-starter-kit-server:${{ github.sha }}"
           docker build --platform=linux/amd64 -f apps/server/Dockerfile -t "$IMAGE" . \
-            --build-arg FEATURE_AUDIT_LOG_ENABLED="${{ secrets.FEATURE_AUDIT_LOG_ENABLED || 'true' }}" \
-            --build-arg FEATURE_LOGIN_LOG_ENABLED="${{ secrets.FEATURE_LOGIN_LOG_ENABLED || 'true' }}" \
-            --build-arg FEATURE_LEVEL_ENABLED="${{ secrets.FEATURE_LEVEL_ENABLED || 'true' }}" \
-            --build-arg FEATURE_COUPON_ENABLED="${{ secrets.FEATURE_COUPON_ENABLED || 'false' }}" \
-            --build-arg FEATURE_POINTS_ENABLED="${{ secrets.FEATURE_POINTS_ENABLED || 'true' }}" \
-            --build-arg FEATURE_EVENT_ENABLED="${{ secrets.FEATURE_EVENT_ENABLED || 'true' }}" \
-            --build-arg FEATURE_BOOKING_ENABLED="${{ secrets.FEATURE_BOOKING_ENABLED || 'true' }}"
+            --build-arg FEATURE_AUDIT_LOG_ENABLED="${{ vars.FEATURE_AUDIT_LOG_ENABLED || 'true' }}" \
+            --build-arg FEATURE_LOGIN_LOG_ENABLED="${{ vars.FEATURE_LOGIN_LOG_ENABLED || 'true' }}" \
+            --build-arg FEATURE_LEVEL_ENABLED="${{ vars.FEATURE_LEVEL_ENABLED || 'true' }}" \
+            --build-arg FEATURE_COUPON_ENABLED="${{ vars.FEATURE_COUPON_ENABLED || 'false' }}" \
+            --build-arg FEATURE_POINTS_ENABLED="${{ vars.FEATURE_POINTS_ENABLED || 'true' }}" \
+            --build-arg FEATURE_EVENT_ENABLED="${{ vars.FEATURE_EVENT_ENABLED || 'true' }}" \
+            --build-arg FEATURE_BOOKING_ENABLED="${{ vars.FEATURE_BOOKING_ENABLED || 'true' }}"
           docker push "$IMAGE"
           echo "IMAGE=$IMAGE" >> "$GITHUB_ENV"
 
@@ -92,16 +93,17 @@ jobs:
       # from the repo-root .env (not present in this Docker build) — so these MUST be
       # injected at deploy time as NITRO_<KEY> env vars, or Nitro's env-override never
       # finds the (missing) config key. See apps/server/nitro.config.ts / firebase-admin.ts.
-      # Requires repo secrets: LIFF_APP_URL, ADMIN_APP_URL, CORS_ALLOWED_ORIGINS,
-      # R2_ACCOUNT_ID, R2_BUCKET_NAME, R2_PUBLIC_BASE_URL
-      # (LINE_CHANNEL_ID / VITE_LIFF_ID already required by deploy-admin below).
+      # LINE_CHANNEL_ID / VITE_LIFF_ID are shared with apps/admin (and/or apps/liff) —
+      # non-secret, repo Variables. LIFF_APP_URL / ADMIN_APP_URL / CORS_ALLOWED_ORIGINS are
+      # server-only, so they live in repo Secrets alongside R2_ACCOUNT_ID / R2_BUCKET_NAME /
+      # R2_PUBLIC_BASE_URL.
       - name: Write runtime env vars file
         run: |
           cat > /tmp/server-env-vars.yaml <<EOF
           APP_ENV: production
           NITRO_FIREBASE_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-          NITRO_LINE_CHANNEL_ID: "${{ secrets.LINE_CHANNEL_ID }}"
-          NITRO_LIFF_ID: ${{ secrets.VITE_LIFF_ID }}
+          NITRO_LINE_CHANNEL_ID: "${{ vars.LINE_CHANNEL_ID }}"
+          NITRO_LIFF_ID: ${{ vars.VITE_LIFF_ID }}
           NITRO_LIFF_APP_URL: ${{ secrets.LIFF_APP_URL }}
           NITRO_ADMIN_APP_URL: ${{ secrets.ADMIN_APP_URL }}
           NITRO_CORS_ALLOWED_ORIGINS: "${{ secrets.CORS_ALLOWED_ORIGINS }}"
@@ -143,28 +145,31 @@ jobs:
       # apps/admin uses `nuxt generate` (static output), so runtimeConfig.public is baked
       # into the build at this step — every var it reads (see apps/admin/nuxt.config.ts)
       # must be supplied here, not just at deploy time.
-      # Requires repo secrets: LINE_CHANNEL_ID, VITE_LIFF_ID, VITE_FIREBASE_API_KEY,
-      # VITE_FIREBASE_AUTH_DOMAIN, VITE_FIREBASE_PROJECT_ID, VITE_FIREBASE_STORAGE_BUCKET,
-      # VITE_FIREBASE_MESSAGING_SENDER_ID, VITE_FIREBASE_APP_ID, SERVER_URL. Feature flag
-      # secrets (including FEATURE_BOOKING_ENABLED) are optional — fall back to the same
-      # defaults as .env.example.
+      # All of these end up embedded in the shipped client bundle, so they are non-secret —
+      # repo Variables, not Secrets. Requires repo variables: LINE_CHANNEL_ID, VITE_LIFF_ID,
+      # VITE_FIREBASE_API_KEY, VITE_FIREBASE_AUTH_DOMAIN, VITE_FIREBASE_PROJECT_ID,
+      # VITE_FIREBASE_STORAGE_BUCKET, VITE_FIREBASE_MESSAGING_SENDER_ID, VITE_FIREBASE_APP_ID,
+      # SERVER_URL. VITE_GA_MEASUREMENT_ID and feature flags (including
+      # FEATURE_BOOKING_ENABLED) are optional — fall back to the same defaults as .env.example.
       - run: pnpm --dir apps/admin generate
         env:
-          ADMIN_API_BASE_URL: ${{ secrets.SERVER_URL }}
-          LINE_CHANNEL_ID: ${{ secrets.LINE_CHANNEL_ID }}
-          VITE_LIFF_ID: ${{ secrets.VITE_LIFF_ID }}
-          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
-          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
-          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
-          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
-          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-          FEATURE_AUDIT_LOG_ENABLED: ${{ secrets.FEATURE_AUDIT_LOG_ENABLED || 'true' }}
-          FEATURE_LOGIN_LOG_ENABLED: ${{ secrets.FEATURE_LOGIN_LOG_ENABLED || 'true' }}
-          FEATURE_LEVEL_ENABLED: ${{ secrets.FEATURE_LEVEL_ENABLED || 'true' }}
-          FEATURE_COUPON_ENABLED: ${{ secrets.FEATURE_COUPON_ENABLED || 'false' }}
-          FEATURE_POINTS_ENABLED: ${{ secrets.FEATURE_POINTS_ENABLED || 'true' }}
-          FEATURE_BOOKING_ENABLED: ${{ secrets.FEATURE_BOOKING_ENABLED || 'true' }}
+          ADMIN_API_BASE_URL: ${{ vars.SERVER_URL }}
+          LINE_CHANNEL_ID: ${{ vars.LINE_CHANNEL_ID }}
+          VITE_LIFF_ID: ${{ vars.VITE_LIFF_ID }}
+          VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ vars.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
+          VITE_GA_MEASUREMENT_ID: ${{ vars.VITE_GA_MEASUREMENT_ID }}
+          FEATURE_AUDIT_LOG_ENABLED: ${{ vars.FEATURE_AUDIT_LOG_ENABLED || 'true' }}
+          FEATURE_LOGIN_LOG_ENABLED: ${{ vars.FEATURE_LOGIN_LOG_ENABLED || 'true' }}
+          FEATURE_LEVEL_ENABLED: ${{ vars.FEATURE_LEVEL_ENABLED || 'true' }}
+          FEATURE_COUPON_ENABLED: ${{ vars.FEATURE_COUPON_ENABLED || 'false' }}
+          FEATURE_POINTS_ENABLED: ${{ vars.FEATURE_POINTS_ENABLED || 'true' }}
+          FEATURE_EVENT_ENABLED: ${{ vars.FEATURE_EVENT_ENABLED || 'true' }}
+          FEATURE_BOOKING_ENABLED: ${{ vars.FEATURE_BOOKING_ENABLED || 'true' }}
 
       # Requires repo secret: FIREBASE_SERVICE_ACCOUNT (see FirebaseExtended/action-hosting-deploy)
       - uses: FirebaseExtended/action-hosting-deploy@v0
@@ -188,19 +193,24 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+      # All of these end up embedded in the shipped client bundle, so they are non-secret —
+      # repo Variables, not Secrets. VITE_GA_MEASUREMENT_ID and feature flags are optional —
+      # fall back to the same defaults as .env.example.
       - run: pnpm --dir apps/liff build
         env:
-          API_BASE_URL: ${{ secrets.SERVER_URL }}
-          VITE_LIFF_ID: ${{ secrets.VITE_LIFF_ID }}
-          VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
-          VITE_FIREBASE_AUTH_DOMAIN: ${{ secrets.VITE_FIREBASE_AUTH_DOMAIN }}
-          VITE_FIREBASE_PROJECT_ID: ${{ secrets.VITE_FIREBASE_PROJECT_ID }}
-          VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
-          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
-          VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-          FEATURE_COUPON_ENABLED: ${{ secrets.FEATURE_COUPON_ENABLED || 'false' }}
-          FEATURE_POINTS_ENABLED: ${{ secrets.FEATURE_POINTS_ENABLED || 'true' }}
-          FEATURE_BOOKING_ENABLED: ${{ secrets.FEATURE_BOOKING_ENABLED || 'true' }}
+          API_BASE_URL: ${{ vars.SERVER_URL }}
+          VITE_LIFF_ID: ${{ vars.VITE_LIFF_ID }}
+          VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+          VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_STORAGE_BUCKET: ${{ vars.VITE_FIREBASE_STORAGE_BUCKET }}
+          VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+          VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
+          VITE_GA_MEASUREMENT_ID: ${{ vars.VITE_GA_MEASUREMENT_ID }}
+          FEATURE_COUPON_ENABLED: ${{ vars.FEATURE_COUPON_ENABLED || 'false' }}
+          FEATURE_POINTS_ENABLED: ${{ vars.FEATURE_POINTS_ENABLED || 'true' }}
+          FEATURE_EVENT_ENABLED: ${{ vars.FEATURE_EVENT_ENABLED || 'true' }}
+          FEATURE_BOOKING_ENABLED: ${{ vars.FEATURE_BOOKING_ENABLED || 'true' }}
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:

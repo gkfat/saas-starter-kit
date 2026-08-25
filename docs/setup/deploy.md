@@ -57,7 +57,13 @@ Secrets (`FIREBASE_PRIVATE_KEY`, etc.) SHALL be provided to Cloud Run via
 `main` only — deploys just the apps affected by the changed paths (`scripts/detect-affected-apps.ts`;
 a change under `packages/shared` is treated as affecting all three apps).
 
-Required repo secrets (Settings → Secrets and variables → Actions), none of which exist yet:
+Required repo config (Settings → Secrets and variables → Actions), none of which exist yet.
+GitHub Actions splits this page into two tabs — **Secrets** (encrypted, write-only) and
+**Variables** (plaintext, readable) — use Variables for anything that ends up in a shipped
+client bundle or a Cloud Run runtime env var anyway, since Secrets buys no extra protection
+there and only makes the value harder to inspect/rotate.
+
+### Secrets (true credentials — keep encrypted)
 
 | Secret                           | Used for                                             |
 | -------------------------------- | ---------------------------------------------------- |
@@ -67,4 +73,24 @@ Required repo secrets (Settings → Secrets and variables → Actions), none of 
 | `GCP_REGION`                     | `apps/server` → Cloud Run deploy                     |
 | `GCP_ARTIFACT_REPO`              | `apps/server` → Artifact Registry repo name          |
 | `FIREBASE_SERVICE_ACCOUNT`       | `apps/admin`, `apps/liff` → Firebase Hosting deploy  |
-| `SERVER_URL`                     | `apps/admin`, `apps/liff` build → `API_BASE_URL`     |
+| `R2_ACCOUNT_ID`                  | `apps/server` → Cloud Run runtime env                |
+| `R2_BUCKET_NAME`                 | `apps/server` → Cloud Run runtime env                |
+| `R2_PUBLIC_BASE_URL`             | `apps/server` → Cloud Run runtime env                |
+| `LIFF_APP_URL`                   | `apps/server` → Cloud Run runtime env                |
+| `ADMIN_APP_URL`                  | `apps/server` → Cloud Run runtime env                |
+| `CORS_ALLOWED_ORIGINS`           | `apps/server` → Cloud Run runtime env                |
+
+(Private keys/tokens such as `firebase-private-key`, `line-channel-secret`,
+`r2-access-key-id` live in GCP Secret Manager, not GitHub — see the `--set-secrets` flag in
+`deploy.yml`.)
+
+### Variables (non-secret — public IDs, URLs, feature flags)
+
+| Variable                                            | Used for                                                                         |
+| --------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `SERVER_URL`                                        | `apps/admin`, `apps/liff` build → `API_BASE_URL`                                 |
+| `LINE_CHANNEL_ID`                                   | `apps/server`, `apps/admin` build                                                |
+| `VITE_LIFF_ID`                                      | `apps/server`, `apps/admin`, `apps/liff` build                                   |
+| `VITE_FIREBASE_API_KEY` and other `VITE_FIREBASE_*` | `apps/admin`, `apps/liff` build — public Firebase client config                  |
+| `VITE_GA_MEASUREMENT_ID`                            | `apps/admin`, `apps/liff` build — optional, GA4 measurement ID                   |
+| `FEATURE_*_ENABLED`                                 | all apps' build — feature flags, optional (fall back to `.env.example` defaults) |
