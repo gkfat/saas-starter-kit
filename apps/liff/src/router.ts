@@ -76,7 +76,7 @@ const router = createRouter({
           name: 'eventDetail',
           component: () => import('~/pages/events/[id].vue'),
           props: true,
-          meta: { requiresAuth: true },
+          meta: { requiresAuth: true, featureFlag: 'event' },
         },
         {
           path: 'booking',
@@ -139,6 +139,9 @@ router.beforeEach((to) => {
     return '/auth/login';
   }
   if (to.meta.featureFlag === 'booking' && !import.meta.env.VITE_FEATURE_BOOKING_ENABLED) {
+    return '/home';
+  }
+  if (to.meta.featureFlag === 'event' && !import.meta.env.VITE_FEATURE_EVENT_ENABLED) {
     return '/home';
   }
 });

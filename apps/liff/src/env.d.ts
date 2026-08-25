@@ -13,6 +13,7 @@ interface ImportMetaEnv {
   readonly VITE_GA_MEASUREMENT_ID?: string;
   readonly VITE_FEATURE_COUPON_ENABLED: boolean;
   readonly VITE_FEATURE_POINTS_ENABLED: boolean;
+  readonly VITE_FEATURE_EVENT_ENABLED: boolean;
   readonly VITE_FEATURE_BOOKING_ENABLED: boolean;
 }
 

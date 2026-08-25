@@ -8,11 +8,12 @@ import MemberCard from '~/components/home/MemberCard.vue';
 
 const showBooking = ref(true);
 const bookingEnabled = Boolean(import.meta.env.VITE_FEATURE_BOOKING_ENABLED);
+const eventEnabled = Boolean(import.meta.env.VITE_FEATURE_EVENT_ENABLED);
 </script>
 
 <template>
   <v-row dense>
-    <v-col cols="12">
+    <v-col v-if="eventEnabled" cols="12">
       <EventBannerCarousel />
     </v-col>
     <v-col cols="12">
