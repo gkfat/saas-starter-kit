@@ -1,5 +1,6 @@
 import '../../scripts/load-root-env';
 
+// 無害測試註解
 export default defineNuxtConfig({
   ssr: false,
   compatibilityDate: '2026-07-31',

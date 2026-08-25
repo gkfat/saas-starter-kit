@@ -2,6 +2,7 @@ import { fileURLToPath, URL } from 'node:url';
 import { defineConfig, loadEnv } from 'vite';
 import vue from '@vitejs/plugin-vue';
 
+// 無害測試註解
 export default defineConfig(({ mode }) => {
   const envDir = fileURLToPath(new URL('../..', import.meta.url));
   const env = loadEnv(mode, envDir, '');
