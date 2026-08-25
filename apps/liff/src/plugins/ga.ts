@@ -19,6 +19,7 @@ export function initGoogleAnalytics(): void {
   function gtag(...args: unknown[]) {
     window.dataLayer.push(args);
   }
+  window.gtag = gtag;
   gtag('js', new Date());
   gtag('config', measurementId);
 }

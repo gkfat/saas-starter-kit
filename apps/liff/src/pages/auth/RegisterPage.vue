@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { isValidUsername } from '@saas-starter-kit/shared';
+import { AnalyticsEvent, isValidUsername } from '@saas-starter-kit/shared';
 import AppCard from '~/components/common/AppCard.vue';
+import { trackEvent } from '~/utils/analytics';
 import { apiFetch, type ApiError } from '~/utils/api-client';
 import { completeLineSession } from '~/utils/line-auth-flow';
 import { useLineRegistrationStore } from '~/stores/line-registration';
@@ -38,6 +39,7 @@ async function submit() {
     });
     await completeLineSession(result.customToken);
     pending.clear();
+    trackEvent(AnalyticsEvent.RegisterSubmit);
     status.value = 'done';
     router.push('/home');
   } catch (e) {

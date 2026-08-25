@@ -46,6 +46,8 @@
 - admin: 實作會員資訊頁面、我的優惠券頁面
 - 實作預約模組 feature
 - Added GA
+- Admin/Liff 各自使用獨立 GA measurement ID
+- 新增關鍵操作按鈕的 GA4 事件追蹤（Liff 預約送出/取消、快速註冊、LINE 綁定；Admin 登入/登出、預約審核、優惠券發送）
 
 ### Changed
 

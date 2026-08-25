@@ -41,6 +41,7 @@
 </template>
 
 <script setup lang="ts">
+import { AnalyticsEvent } from '@saas-starter-kit/shared';
 import LoginForm from './components/LoginForm.vue';
 import { ROUTES } from '~/config/app-routes';
 
@@ -48,6 +49,7 @@ definePageMeta({ path: ROUTES.login });
 
 const { loginWithGoogle, getLoginErrorMessage } = useAuth();
 const { showError } = useToast();
+const { trackEvent } = useAnalytics();
 const router = useRouter();
 const { t } = useI18n();
 
@@ -61,6 +63,7 @@ async function handleGoogleLogin() {
   try {
     const result = await loginWithGoogle();
     if (result.status === 'ready') {
+      trackEvent(AnalyticsEvent.AdminLoginClick);
       router.push(ROUTES.dashboard);
     } else {
       quickRegister.value = {

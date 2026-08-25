@@ -1,12 +1,15 @@
 <script setup lang="ts">
+import { AnalyticsEvent } from '@saas-starter-kit/shared';
 import { useRouter } from 'vue-router';
 import AppCard from '~/components/common/AppCard.vue';
+import { trackEvent } from '~/utils/analytics';
 
 const router = useRouter();
 
 const bookingEnabled = Boolean(import.meta.env.VITE_FEATURE_BOOKING_ENABLED);
 
 function startBooking() {
+  trackEvent(AnalyticsEvent.BookingCtaClick);
   router.push({ name: 'bookingServices' });
 }
 </script>

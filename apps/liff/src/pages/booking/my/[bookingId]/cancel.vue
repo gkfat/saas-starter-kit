@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { AnalyticsEvent } from '@saas-starter-kit/shared';
 import BookingBottomAction from '~/components/booking/BookingBottomAction.vue';
 import AppCard from '~/components/common/AppCard.vue';
 import { useToast } from '~/composables/useToast';
+import { trackEvent } from '~/utils/analytics';
 import { cancelBooking } from '~/utils/booking-api';
 
 const props = defineProps<{ bookingId: string }>();
@@ -20,6 +22,7 @@ async function confirmCancel(): Promise<void> {
   submitting.value = true;
   try {
     await cancelBooking(props.bookingId);
+    trackEvent(AnalyticsEvent.BookingCancel, { bookingId: props.bookingId });
     showSuccess('預約已取消');
     router.push({ name: 'myBookings' });
   } catch (e) {

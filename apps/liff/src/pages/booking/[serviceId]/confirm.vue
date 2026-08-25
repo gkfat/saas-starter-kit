@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import type { BookingProvider, BookingService, BookingTimeSlot } from '@saas-starter-kit/shared';
+import {
+  AnalyticsEvent,
+  type BookingProvider,
+  type BookingService,
+  type BookingTimeSlot,
+} from '@saas-starter-kit/shared';
 import BookingBottomAction from '~/components/booking/BookingBottomAction.vue';
 import BookingStepper from '~/components/booking/BookingStepper.vue';
 import AppCard from '~/components/common/AppCard.vue';
 import { useToast } from '~/composables/useToast';
+import { trackEvent } from '~/utils/analytics';
 import type { ApiError } from '~/utils/api-client';
 import {
   createBooking,
@@ -70,6 +76,7 @@ async function submit(): Promise<void> {
       ...(providerId.value ? { providerId: providerId.value } : {}),
       ...(note.value.trim() ? { note: note.value.trim() } : {}),
     });
+    trackEvent(AnalyticsEvent.BookingSubmit, { serviceId: serviceId.value });
     router.push({
       name: 'bookingResult',
       params: { serviceId: serviceId.value },

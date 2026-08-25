@@ -13,6 +13,7 @@ export default defineNuxtPlugin(() => {
   function gtag(...args: unknown[]) {
     window.dataLayer.push(args);
   }
+  window.gtag = gtag;
   gtag('js', new Date());
   gtag('config', gaMeasurementId);
 });
@@ -20,5 +21,6 @@ export default defineNuxtPlugin(() => {
 declare global {
   interface Window {
     dataLayer: unknown[];
+    gtag?: (...args: unknown[]) => void;
   }
 }

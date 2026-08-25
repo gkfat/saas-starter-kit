@@ -51,6 +51,7 @@
 </template>
 
 <script setup lang="ts">
+import { AnalyticsEvent } from '@saas-starter-kit/shared';
 import type { CouponInstance, CouponTemplate, UserRow } from '@saas-starter-kit/shared';
 
 const props = defineProps<{
@@ -66,6 +67,7 @@ const emit = defineEmits<{
 const { t } = useI18n();
 const { showSuccess } = useToast();
 const { apiFetch } = useApi();
+const { trackEvent } = useAnalytics();
 
 const headers = computed(() => [
   { title: t('users.memberNo'), key: 'memberNo' },
@@ -124,6 +126,10 @@ async function submit() {
   if (result !== null) {
     close();
     emit('issued');
+    trackEvent(AnalyticsEvent.CouponIssueClick, {
+      templateId: props.template.id,
+      count: result.length,
+    });
     showSuccess(t('coupons.issueSuccess', { count: result.length }));
   }
   issuing.value = false;
