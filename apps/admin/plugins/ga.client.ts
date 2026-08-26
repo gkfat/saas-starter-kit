@@ -1,7 +1,10 @@
 export default defineNuxtPlugin(() => {
-  if (!import.meta.env.PROD) return;
+  // if (!import.meta.env.PROD) return;
 
-  const { gaMeasurementId } = useRuntimeConfig().public;
+  const config = useRuntimeConfig().public;
+  console.log('[GA] runtime config:', config);
+
+  const { gaMeasurementId } = config;
   if (!gaMeasurementId) return;
 
   const script = document.createElement('script');
@@ -14,6 +17,10 @@ export default defineNuxtPlugin(() => {
     window.dataLayer.push(args);
   }
   window.gtag = gtag;
+  gtag('consent', 'default', {
+    ad_storage: 'granted',
+    analytics_storage: 'granted',
+  });
   gtag('js', new Date());
   gtag('config', gaMeasurementId);
 });
