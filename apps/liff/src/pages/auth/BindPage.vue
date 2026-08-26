@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { AnalyticsEvent } from '@saas-starter-kit/shared';
 import AppCard from '~/components/common/AppCard.vue';
-import { trackEvent } from '~/utils/analytics';
 import { getLineIdToken } from '~/utils/liff-client';
 import { apiFetch } from '~/utils/api-client';
 
@@ -21,7 +19,6 @@ async function submit() {
       method: 'POST',
       body: { code: code.value, idToken },
     });
-    trackEvent(AnalyticsEvent.BindSubmit);
     status.value = 'done';
   } catch (e) {
     errorMessage.value = e instanceof Error ? e.message : String(e);

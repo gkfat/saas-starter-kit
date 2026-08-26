@@ -115,7 +115,6 @@
 </template>
 
 <script setup lang="ts">
-import { AnalyticsEvent } from '@saas-starter-kit/shared';
 import { useAuthStore } from '~/stores/auth';
 import { storeToRefs } from 'pinia';
 import { useDisplay } from 'vuetify';
@@ -129,7 +128,6 @@ const { rail, toggle } = useSidebarState();
 const { hasPermission } = usePermission();
 const { isFeatureEnabled } = useFeatureFlags();
 const { logout } = useAuth();
-const { trackEvent } = useAnalytics();
 const router = useRouter();
 const route = useRoute();
 
@@ -179,7 +177,6 @@ async function handleLogout() {
   loading.value = true;
   try {
     await logout();
-    trackEvent(AnalyticsEvent.AdminLogoutClick);
     router.push(ROUTES.login);
   } finally {
     loading.value = false;

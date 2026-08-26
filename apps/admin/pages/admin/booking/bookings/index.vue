@@ -151,7 +151,7 @@
 </template>
 
 <script setup lang="ts">
-import { AnalyticsEvent, Permission } from '@saas-starter-kit/shared';
+import { Permission } from '@saas-starter-kit/shared';
 import type {
   AdminBookingRow,
   BookingService,
@@ -168,7 +168,6 @@ const { t } = useI18n();
 const { showSuccess } = useToast();
 const { apiFetch } = useApi();
 const { hasPermission } = usePermission();
-const { trackEvent } = useAnalytics();
 const timezoneStore = useTimezoneStore();
 
 const canReview = computed(() => hasPermission(Permission.Bookings.Review));
@@ -255,7 +254,6 @@ async function confirmReview() {
   });
   if (result !== null) {
     approveDialog.value = false;
-    trackEvent(AnalyticsEvent.BookingReviewSubmit, { status: 'confirmed' });
     showSuccess(t('bookings.approveSuccess'));
     await refresh();
   }
@@ -283,7 +281,6 @@ async function confirmCancel() {
   });
   if (result !== null) {
     cancelDialog.value = false;
-    trackEvent(AnalyticsEvent.BookingReviewSubmit, { status: 'cancelled' });
     showSuccess(t('bookings.cancelSuccess'));
     await refresh();
   }

@@ -92,6 +92,4 @@ there and only makes the value harder to inspect/rotate.
 | `LINE_CHANNEL_ID`                                   | `apps/server`, `apps/admin` build                                                |
 | `VITE_LIFF_ID`                                      | `apps/server`, `apps/admin`, `apps/liff` build                                   |
 | `VITE_FIREBASE_API_KEY` and other `VITE_FIREBASE_*` | `apps/admin`, `apps/liff` build — public Firebase client config                  |
-| `VITE_GA_MEASUREMENT_ID_ADMIN`                      | `apps/admin` build — optional, GA4 measurement ID                                |
-| `VITE_GA_MEASUREMENT_ID_LIFF`                       | `apps/liff` build — optional, GA4 measurement ID                                 |
 | `FEATURE_*_ENABLED`                                 | all apps' build — feature flags, optional (fall back to `.env.example` defaults) |

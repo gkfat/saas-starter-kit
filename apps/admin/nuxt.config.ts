@@ -84,7 +84,6 @@ export default defineNuxtConfig({
       firebaseAppId: process.env.VITE_FIREBASE_APP_ID,
       lineChannelId: process.env.LINE_CHANNEL_ID ?? '',
       liffId: process.env.VITE_LIFF_ID ?? '',
-      gaMeasurementId: process.env.VITE_GA_MEASUREMENT_ID_ADMIN ?? '',
       featureFlags: {
         auditLog: process.env.FEATURE_AUDIT_LOG_ENABLED !== 'false',
         loginLog: process.env.FEATURE_LOGIN_LOG_ENABLED !== 'false',
