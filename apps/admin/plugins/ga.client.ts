@@ -1,4 +1,6 @@
 export default defineNuxtPlugin(() => {
+  if (!import.meta.env.PROD) return;
+
   const { gaMeasurementId } = useRuntimeConfig().public;
   if (!gaMeasurementId) return;
 
