@@ -10,6 +10,7 @@ import {
   createTimeSlot as createTimeSlotInRepo,
   deleteSlotTemplate as deleteSlotTemplateInRepo,
   deleteTimeSlot as deleteTimeSlotInRepo,
+  getBookingById,
   getProviderById,
   getServiceById,
   getSlotTemplateById,
@@ -23,12 +24,14 @@ import {
   queryOverduePendingBookings,
   rescheduleBookingTransaction,
   transitionBookingTransaction,
+  updateBookingProviderAssignment as updateBookingProviderAssignmentInRepo,
   updateProvider as updateProviderInRepo,
   updateService as updateServiceInRepo,
   updateSlotTemplate as updateSlotTemplateInRepo,
   updateTimeSlot as updateTimeSlotInRepo,
 } from './booking.repo';
 import {
+  AdminAssignBookingProviderSchema,
   AdminRescheduleBookingSchema,
   AdminUpdateBookingStatusSchema,
   BulkCreateBookingTimeSlotsSchema,
@@ -720,6 +723,61 @@ export async function adminRescheduleBooking(
 
   notifyBookingEvent(updated.memberId, { type: 'rescheduled', booking: updated });
   return updated;
+}
+
+/**
+ * Admin-initiated reassignment: changes which provider a confirmed/pending booking is
+ * attributed to, without touching its time slot or slot counts. The new provider must be
+ * enabled and available for the booking's existing time slot — same eligibility rule
+ * `createBooking` applies when a provider is chosen up front.
+ */
+export async function assignBookingProvider(
+  bookingId: string,
+  input: { providerId: string; note?: string },
+): Promise<Booking> {
+  requireBookingEnabled();
+  const { providerId, note } = AdminAssignBookingProviderSchema.parse(input);
+
+  const booking = await getBookingById(bookingId);
+  if (!booking) {
+    throw Object.assign(new Error(`booking ${bookingId} not found`), {
+      code: 'booking-not-found',
+    });
+  }
+  if (booking.status !== 'confirmed' && booking.status !== 'pendingReview') {
+    throw Object.assign(
+      new Error(`booking ${bookingId} cannot be reassigned from its current status`),
+      { code: 'booking-invalid-status-transition' },
+    );
+  }
+
+  const provider = await getProviderById(providerId);
+  if (!provider) {
+    throw Object.assign(new Error(`provider ${providerId} not found`), {
+      code: 'booking-provider-not-found',
+    });
+  }
+
+  const slot = await getTimeSlotById(booking.timeSlotId);
+  if (!slot) {
+    throw Object.assign(new Error(`time slot ${booking.timeSlotId} not found`), {
+      code: 'booking-time-slot-not-found',
+    });
+  }
+  if (!isProviderAvailableForSlot(provider, slot)) {
+    throw Object.assign(new Error(`provider ${providerId} is not available for this booking`), {
+      code: 'booking-provider-not-available',
+    });
+  }
+
+  const updatedAt = new Date().toISOString();
+  await updateBookingProviderAssignmentInRepo(bookingId, {
+    providerId,
+    updatedAt,
+    ...(note ? { staffNote: note } : {}),
+  });
+
+  return { ...booking, providerId, updatedAt, ...(note ? { staffNote: note } : {}) };
 }
 
 /**

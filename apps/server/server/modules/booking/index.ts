@@ -25,6 +25,7 @@ export {
   reviewBooking,
   adminCancelBooking,
   adminRescheduleBooking,
+  assignBookingProvider,
   processOverdueBookings,
 } from './booking.service';
 export type {

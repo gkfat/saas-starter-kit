@@ -192,6 +192,17 @@ export async function getBookingById(id: string): Promise<Booking | null> {
   return snap.exists ? (snap.data() as Booking) : null;
 }
 
+/**
+ * Reassigns which provider a booking is attributed to. Unlike reschedule/cancel, this never
+ * touches time slot capacity counts, so it's a plain document update rather than a transaction.
+ */
+export async function updateBookingProviderAssignment(
+  id: string,
+  patch: { providerId: string; updatedAt: string; staffNote?: string },
+): Promise<void> {
+  await bookingsCollection().doc(id).update(patch);
+}
+
 // All filters are plain equality `where` clauses, so Firestore can combine any subset of
 // them without a composite index (composite indexes are only required once an inequality
 // or `orderBy` on a different field joins the mix — see queryOverduePendingBookings below).

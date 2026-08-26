@@ -71,6 +71,11 @@
                 @click="openReschedule(item)"
               />
               <ButtonsIconActionBtn
+                icon="mdi-account-switch"
+                :title="$t('bookings.assignProvider')"
+                @click="openAssignProvider(item)"
+              />
+              <ButtonsIconActionBtn
                 icon="mdi-close"
                 class="text-error"
                 :title="$t('bookings.cancel')"
@@ -136,6 +141,12 @@
       :booking="rescheduleTarget"
       @rescheduled="refresh"
     />
+
+    <AssignProviderDialog
+      v-model="assignProviderDialog"
+      :booking="assignProviderTarget"
+      @assigned="refresh"
+    />
   </div>
 </template>
 
@@ -147,6 +158,7 @@ import type {
   BookingStatus,
   PaginatedAdminBookingsResponse,
 } from '@saas-starter-kit/shared';
+import AssignProviderDialog from '~/components/booking/AssignProviderDialog.vue';
 import BookingsFilterBar from '~/components/booking/BookingsFilterBar.vue';
 import RescheduleBookingDialog from '~/components/booking/RescheduleBookingDialog.vue';
 import { useTimezoneStore } from '~/stores/timezone';
@@ -284,6 +296,14 @@ const rescheduleTarget = ref<AdminBookingRow | null>(null);
 function openReschedule(item: AdminBookingRow) {
   rescheduleTarget.value = item;
   rescheduleDialog.value = true;
+}
+
+const assignProviderDialog = ref(false);
+const assignProviderTarget = ref<AdminBookingRow | null>(null);
+
+function openAssignProvider(item: AdminBookingRow) {
+  assignProviderTarget.value = item;
+  assignProviderDialog.value = true;
 }
 </script>
 

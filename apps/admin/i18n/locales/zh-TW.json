@@ -925,6 +925,13 @@
     "newTimeSlot": "新時段",
     "noAvailableTimeSlot": "此服務項目目前沒有可用的時段",
     "remainingCapacity": "剩餘 {count} 位",
-    "rescheduleSuccess": "預約時段已調整"
+    "rescheduleSuccess": "預約時段已調整",
+    "assignProvider": "更換負責人員",
+    "assignProviderTitle": "更換負責人員",
+    "currentProvider": "目前負責人員",
+    "noProvider": "尚未指派",
+    "newProvider": "新負責人員",
+    "noAvailableProvider": "此服務項目目前沒有可指派的人員",
+    "assignProviderSuccess": "已更換負責人員"
   }
 }

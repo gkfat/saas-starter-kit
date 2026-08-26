@@ -153,3 +153,8 @@ export const AdminRescheduleBookingSchema = z.object({
   timeSlotId: z.string().min(1),
   note: z.string().trim().min(1).max(200).optional(),
 });
+
+export const AdminAssignBookingProviderSchema = z.object({
+  providerId: z.string().min(1),
+  note: z.string().trim().min(1).max(200).optional(),
+});
