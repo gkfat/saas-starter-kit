@@ -63,6 +63,17 @@ api/   → server/middleware/ (tracing → logging → auth) → modules/*/servi
 
 `server/shared/` is **not** auto-imported by Nuxt — always use explicit imports there.
 
+### dayjs subpath imports (server)
+
+`dayjs` has no `exports` map in its `package.json`, so Node's native ESM resolver (used by the built Nitro server in production, unlike dev-time transpilation) requires the full file extension on subpath imports. Always import plugins as:
+
+```ts
+import timezone from 'dayjs/plugin/timezone.js';
+import utc from 'dayjs/plugin/utc.js';
+```
+
+Omitting `.js` builds and passes locally but throws `ERR_MODULE_NOT_FOUND` at runtime only in the deployed Cloud Run container — verify with `pnpm --dir apps/server build` and grep the `.output` chunk for the bare import before trusting a change here.
+
 ### Auth flow
 
 1. Browser: Firebase Client SDK handles sign-in (`composables/useAuth.ts`)
