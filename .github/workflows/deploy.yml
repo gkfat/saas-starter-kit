@@ -166,7 +166,7 @@ jobs:
           FEATURE_AUDIT_LOG_ENABLED: ${{ vars.FEATURE_AUDIT_LOG_ENABLED || 'true' }}
           FEATURE_LOGIN_LOG_ENABLED: ${{ vars.FEATURE_LOGIN_LOG_ENABLED || 'true' }}
           FEATURE_LEVEL_ENABLED: ${{ vars.FEATURE_LEVEL_ENABLED || 'true' }}
-          FEATURE_COUPON_ENABLED: ${{ vars.FEATURE_COUPON_ENABLED || 'false' }}
+          FEATURE_COUPON_ENABLED: ${{ vars.FEATURE_COUPON_ENABLED || 'true' }}
           FEATURE_POINTS_ENABLED: ${{ vars.FEATURE_POINTS_ENABLED || 'true' }}
           FEATURE_EVENT_ENABLED: ${{ vars.FEATURE_EVENT_ENABLED || 'true' }}
           FEATURE_BOOKING_ENABLED: ${{ vars.FEATURE_BOOKING_ENABLED || 'true' }}
