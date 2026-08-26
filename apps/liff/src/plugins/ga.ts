@@ -7,7 +7,7 @@ declare global {
 export function initGoogleAnalytics(): void {
   if (!import.meta.env.PROD) return;
 
-  const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
+  const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID_LIFF;
   if (!measurementId) return;
 
   const script = document.createElement('script');
