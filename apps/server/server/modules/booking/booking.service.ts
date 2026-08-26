@@ -1,6 +1,12 @@
 import { randomUUID } from 'node:crypto';
-import { FeatureFlag } from '@saas-starter-kit/shared';
+import { DEFAULT_TIMEZONE, FeatureFlag } from '@saas-starter-kit/shared';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
 import { notifyBookingEvent } from './booking.notifier';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 import {
   bulkCreateTimeSlots as bulkCreateTimeSlotsInRepo,
   createBookingTransaction,
@@ -87,14 +93,13 @@ function isProviderAvailableForSlot(provider: BookingProvider, slot: BookingTime
   const workingHours = provider.workingHours;
   if (!workingHours) return false;
 
-  const pad = (n: number) => String(n).padStart(2, '0');
-  const start = new Date(slot.startAt);
-  const end = new Date(slot.endAt);
-  const startTime = `${pad(start.getHours())}:${pad(start.getMinutes())}`;
-  const endTime = `${pad(end.getHours())}:${pad(end.getMinutes())}`;
+  const start = dayjs(slot.startAt).tz(DEFAULT_TIMEZONE);
+  const end = dayjs(slot.endAt).tz(DEFAULT_TIMEZONE);
+  const startTime = start.format('HH:mm');
+  const endTime = end.format('HH:mm');
 
   return (
-    workingHours.weekdays.includes(start.getDay() as BookingWeekday) &&
+    workingHours.weekdays.includes(start.day() as BookingWeekday) &&
     startTime >= workingHours.dailyStartTime &&
     endTime <= workingHours.dailyEndTime
   );

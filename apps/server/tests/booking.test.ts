@@ -16,7 +16,10 @@ import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import '../../../scripts/load-root-env';
 import { prefixCollection } from '../server/shared/firestore-prefix';
-import { Role } from '@saas-starter-kit/shared';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+import { DEFAULT_TIMEZONE, Role } from '@saas-starter-kit/shared';
 import type {
   Booking,
   BookingProvider,
@@ -26,6 +29,9 @@ import type {
   BulkCreateBookingTimeSlotsResult,
   PaginatedAdminBookingsResponse,
 } from '@saas-starter-kit/shared';
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const BASE_URL = process.env.TEST_BASE_URL ?? 'http://localhost:3000';
 const RUN_ID = Date.now().toString(36).slice(-5);
@@ -191,13 +197,12 @@ async function createProvider(
   return provider;
 }
 
-/** 依 ISO 字串推算 `isProviderAvailableForSlot()` 比對用的 weekday（0=日～6=六）與 `HH:mm`。 */
+/** 依 ISO 字串推算 `isProviderAvailableForSlot()` 比對用的 weekday（0=日～6=六）與 `HH:mm`（以 DEFAULT_TIMEZONE 為準）。 */
 function weekdayAndTimeOf(iso: string): { weekday: number; time: string } {
-  const date = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, '0');
+  const date = dayjs(iso).tz(DEFAULT_TIMEZONE);
   return {
-    weekday: date.getDay(),
-    time: `${pad(date.getHours())}:${pad(date.getMinutes())}`,
+    weekday: date.day(),
+    time: date.format('HH:mm'),
   };
 }
 
