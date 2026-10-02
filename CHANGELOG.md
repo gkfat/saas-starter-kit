@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [v1.0.1] - 2026-10-01
+
+### Changed
+
+- chore: GCP secret manager 改為指定 region 以節費
+
 ## [v1.0.0] - 2026-08-26
 
 ### Added
