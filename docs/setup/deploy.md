@@ -80,8 +80,10 @@ there and only makes the value harder to inspect/rotate.
 | `ADMIN_APP_URL`                  | `apps/server` → Cloud Run runtime env                |
 | `CORS_ALLOWED_ORIGINS`           | `apps/server` → Cloud Run runtime env                |
 
-(Private keys/tokens such as `firebase-private-key`, `line-channel-secret`,
-`r2-access-key-id` live in GCP Secret Manager, not GitHub — see the `--set-secrets` flag in
+(Private keys/tokens such as `firebase-private-key-ae1`, `line-channel-secret-ae1`,
+`r2-access-key-id-ae1` live in GCP Secret Manager, not GitHub — created with
+`--replication-policy=user-managed --locations=asia-east1` to avoid per-region replica
+billing of automatic replication. See the `--set-secrets` flag in
 `deploy.yml`.)
 
 ### Variables (non-secret — public IDs, URLs, feature flags)

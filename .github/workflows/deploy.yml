@@ -112,9 +112,12 @@ jobs:
           NITRO_R2_PUBLIC_BASE_URL: "${{ secrets.R2_PUBLIC_BASE_URL }}"
           EOF
 
-      # Sensitive values live in Secret Manager (not GitHub secrets) — created via:
-      #   gcloud secrets create firebase-private-key / firebase-client-email /
-      #   line-channel-secret / level-batch-secret / r2-access-key-id / r2-secret-access-key
+      # Sensitive values live in Secret Manager (not GitHub secrets). Secrets use the `-ae1`
+      # suffix and are created with user-managed replication pinned to asia-east1 (automatic
+      # replication bills per replica region):
+      #   gcloud secrets create <name>-ae1 --replication-policy=user-managed --locations=asia-east1
+      # for: firebase-private-key / firebase-client-email / line-channel-secret /
+      #   level-batch-secret / r2-access-key-id / r2-secret-access-key
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy saas-starter-kit-server \
@@ -127,7 +130,7 @@ jobs:
             --memory 256Mi \
             --allow-unauthenticated \
             --env-vars-file=/tmp/server-env-vars.yaml \
-            --set-secrets="NITRO_FIREBASE_PRIVATE_KEY=firebase-private-key:latest,NITRO_FIREBASE_CLIENT_EMAIL=firebase-client-email:latest,NITRO_LINE_CHANNEL_SECRET=line-channel-secret:latest,NITRO_LEVEL_BATCH_SECRET=level-batch-secret:latest,NITRO_R2_ACCESS_KEY_ID=r2-access-key-id:latest,NITRO_R2_SECRET_ACCESS_KEY=r2-secret-access-key:latest"
+            --set-secrets="NITRO_FIREBASE_PRIVATE_KEY=firebase-private-key-ae1:latest,NITRO_FIREBASE_CLIENT_EMAIL=firebase-client-email-ae1:latest,NITRO_LINE_CHANNEL_SECRET=line-channel-secret-ae1:latest,NITRO_LEVEL_BATCH_SECRET=level-batch-secret-ae1:latest,NITRO_R2_ACCESS_KEY_ID=r2-access-key-id-ae1:latest,NITRO_R2_SECRET_ACCESS_KEY=r2-secret-access-key-ae1:latest"
 
   deploy-admin:
     needs: [detect-affected, lint-and-test]
